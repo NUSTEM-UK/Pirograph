@@ -1,0 +1,35 @@
+#Configuration notes
+
+
+## General Pi config
+
+Most of our Pis are set up according to [this recipe](https://github.com/NUSTEM-UK/Pi_config), as a starting point.
+
+## Pi Wifi access point
+
+As of 2018-01-22, I'm going to try following [the official documentation for this](https://www.raspberrypi.org/documentation/configuration/wireless/access-point.md).
+
+(Working from the NUSTEM base install, which is fairly stock but with things like avahi installed, alongside Microsoft VS Code)
+
+---
+
+*Time passes...*
+
+---
+
+Oh, that was a disaster. I managed to nuke the device's internet routing before I'd configured Mosquitto (which was the whole point), then the access point daemon configuration didn't work anyway. Ugh.
+
+Give it up, revert to the usual PiTop Ceed configured as Mosquitto host, and Airport access point doing its reliable thing.
+
+(I think perhaps this failed because I was using a Pi2 + wifi dongle, rather than a 3. Maybe.)
+
+## Pi Samba file sharing
+
+[This guide](https://www.raspberrypi.org/magpi/samba-file-server/) looks reasonably up-to-date.
+
+Meh, I need to find my notes from home. Also, this is a bit scrappy without changing the names of all the Pis individually.
+
+
+## Visual Studio Code Python3 config
+
+This got a *lot* easier recently: bring up the quick menu (⌘⇧P) `>Python: Select Interpreter`, and pick `/usr/local/bin/python3` (for brew-installed Python on a Mac). Boom. Done. Awesome. Running the current buffer now executes against Python3.
