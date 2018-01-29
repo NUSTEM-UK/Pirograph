@@ -4,7 +4,7 @@
 
 const char* ssid = "nustem";
 const char* password = "nustem123";
-const char* mqtt_server = "10.0.1.5";
+const char* mqtt_server = "10.0.1.3";
 
 WiFiClient espClient;
 PubSubClient client(espClient);

@@ -22,6 +22,24 @@ mqtt_channel = "pirograph"
 
 # TODO: import list of Wemos module MAC addresses, as dictionary
 
+""" TODO: when a skutter powers up, it should announce itself to pirograph/skutter
+with its MAC address. A handler here should trigger, check that MAC against the
+dictionary, add the MAC to the dict if necessary (and save the dict), then reply
+to the skutter giving it a handle/serial number.
+
+The main use of this is to allow a construction like:
+
+    my_skutter = Skutter("D15")
+
+...which would instantiate a new Skutter object attached to the device physically
+labelled 'D15'.
+
+The simpler way of doing this is to have a separate routine which preallocates the
+labels for every device we're going to power up. Which saves a bunch of logic at 
+runtime, without a huge compromise (that is, the skutter list isn't dynamic during
+execution, but we can probably live with that).
+"""
+
 class Skutter(object):
     """Initial implementation of Skutter type.
 
@@ -61,9 +79,9 @@ class Skutter(object):
             # TODO: raise error
             pass
         else:
-            my_dict = {'id':self._mac, 'transitionTime':angle}
+            my_dict = {'id':self._mac, 'transitionTime':requested_angle}
             self._message(json.dumps(my_dict))
-    
+
     def SetTransitionType(self, requested_type):
         """Commands colour animation change."""
         if requested_type in self.permittedTransitionTypes:
