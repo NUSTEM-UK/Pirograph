@@ -100,21 +100,31 @@ class Skutter:
 
     def LEDstartColour(self, targetColour):
         """Set target colour for the first pixel."""
+        # TODO: Sanity check on input value
         messageDict = {"command": "LEDstartHue", "value": targetColour}
         self._message(messageDict, self._mac)
 
     def LEDendColour(self, targetColour):
         """Set target colour for the last pixel."""
+        # TODO: Sanity check on input value
         messageDict = {"command": "LEDendHue", "value": targetColour}
         self._message(messageDict, self._mac)
 
+    def LEDcolour(self, targetColour):
+        """Convenience function to set the colour of all LEDs."""
+        # TODO: sanity check on inputs
+        # TODO: Actually set all LEDs rather than just the first
+        self.LEDstartColour(targetColour)
+
     def servo1position(self, targetSpeed):
         """Set target speed of servo 1."""
+        # TODO: Sanity check on input value
         messageDict = {"command": "servo1position", "value": targetspeed}
         self._message(messageDict, self._mac)
     
     def setBrightness(self, targetBrightness):
         """Set LED pixel brightness."""
+        # TODO: Sanity check on input value
         messageDict = {"command": "setBrightness", "value": targetBrightness}
         self._message(messageDict, self._mac)
 
