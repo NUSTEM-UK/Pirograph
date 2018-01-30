@@ -13,21 +13,22 @@ PubSubClient client(espClient);
 // Each robot has a unique name, generated from the hardware MAC address.
 // These variables will store those names.
 char skutterNameArray[60];
-String huzzahMACAddress;
+//String huzzahMACAddress;
 String skutterNameString;
 String subsTargetString;
 char subsTargetArray[60];
 
-const size_t capacity = JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(2) + 60;
-DynamicJsonBuffer jsonBuffer(capacity);
+// Massive overkill of a static buffer, but we're an ESP8266, we have bytes to burn.
+StaticJsonBuffer<4096> jsonBuffer;
 
 void setup() {
   Serial.begin(115200);
   setup_wifi();
 
   // Get this Huzzah's MAC address and use it to register with the MQTT server
-  huzzahMACAddress = WiFi.macAddress();
-  skutterNameString = "skutter_" + huzzahMACAddress;
+  //  huzzahMACAddress = WiFi.macAddress();
+  //  skutterNameString = "skutter_" + huzzahMACAddress;
+  skutterNameString = WiFi.macAddress();
   Serial.println(skutterNameString);
   skutterNameString.toCharArray(skutterNameArray, 60);
   subsTargetString = "pirograph/" + skutterNameString;
