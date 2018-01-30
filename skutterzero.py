@@ -116,11 +116,28 @@ class Skutter:
         # TODO: Actually set all LEDs rather than just the first
         self.LEDstartColour(targetColour)
 
-    def servo1position(self, targetSpeed):
+    def setServo1position(self, targetSpeed):
         """Set target speed of servo 1."""
         # TODO: Sanity check on input value
-        messageDict = {"command": "servo1position", "value": targetspeed}
+        messageDict = {"command": "servo1position", "value": targetSpeed}
         self._message(messageDict, self._mac)
+    
+    def setServo2position(self, targetSpeed):
+        """Set target speed of servo 1."""
+        # TODO: Sanity check on input value
+        messageDict = {"command": "servo2position", "value": targetSpeed}
+        self._message(messageDict, self._mac)
+
+    def servoSpeed(self, targetSpeed):
+        """Set target speed of servo 1. Convenience mapping."""
+        # TODO: Sanity check on input value
+        self.setServo1position(targetSpeed)
+    
+    def servo2speed(self, targetSpeed):
+        """Set target speed of servo 1. Convenience mapping."""
+        # TODO: Sanity check on input value
+        self.setServo2position(targetSpeed)
+    
     
     def setBrightness(self, targetBrightness):
         """Set LED pixel brightness."""

@@ -32,11 +32,13 @@ StaticJsonBuffer<4096> jsonBuffer;
 
 #define PIXEL_COUNT 1
 
-Servo myservo1;
-Servo myservo2;
+Servo servo1;
+Servo servo2;
 
 float servo1position = 90;
 float servo1target = 90;
+float servo2position = 90;
+float servo2target = 90;
 
 // Array of LEDs.
 CRGB leds[PIXEL_COUNT];
@@ -72,6 +74,11 @@ void setup() {
     ledsHSV[targetLED] = tempColour;
   }
   FastLED.show();
+
+  servo1.attach(PIN_SERVO1);
+  servo1.write(servo1position);
+  servo2.attach(PIN_SERVO2);
+  servo2.write(servo2position);
 
 }
 
@@ -148,6 +155,20 @@ void callback(char* topic, byte* payload, unsigned int length) {
     ledsHSV[0] = tempColour;
     leds[0] = tempColour;
     FastLED.show();
+  }
+
+  if (root["command"] == "servo1position") {
+    float targetPosition = root["value"];
+    servo1target = targetPosition;
+    servo1.write(targetPosition);
+    delay(20);
+  }
+
+  if (root["command"] == "servo2position") {
+    float targetPosition = root["value"];
+    servo2target = targetPosition;
+    servo2.write(targetPosition);
+    delay(20);
   }
   
 }

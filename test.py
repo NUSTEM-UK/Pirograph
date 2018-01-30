@@ -19,7 +19,15 @@ sleep(0.5)
 MY_SKUTTER.LEDcolour(120)
 MY_SKUTTER.setBrightness(255)
 
+delay = 1
+MY_SKUTTER.servoSpeed(0.0)
+sleep(delay)
+MY_SKUTTER.servoSpeed(90.0)
+sleep(delay)
+MY_SKUTTER.servo2speed(0.0)
+sleep(delay)
+MY_SKUTTER.servo2speed(180.0)
 
-for x in range(25):
-    MY_SKUTTER.setBrightness(x * 10)
-    sleep(0.2)
+# for x in range(25):
+#     MY_SKUTTER.setBrightness(x * 10)
+#     sleep(0.2)
