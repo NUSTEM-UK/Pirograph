@@ -73,17 +73,21 @@ void callback(char* topic, byte* payload, unsigned int length) {
     return;
   }
 
-  Serial.print("Name: ");
-  Serial.println(root["name"].as<char*>());
+  // TODO: Error check the parsed json for a key before we use it.
+
+  Serial.print("Command: ");
+  Serial.println(root["command"].as<String>());
+  // Serial.println(root["command"].as<char*>());
+  // Serial.println(root["value"].as<char*>());
 
   // String handling: see https://arduinojson.org/example/string/
   // Can cast to String on parse:
-  Serial.println(root["name"].as<String>());
+  // Serial.println(root["name"].as<String>());
 
   // Can even compare to a String:
-  String testString = "Bob";
-  if (root["name"] == testString) {
-    Serial.println(">>> DING DING! We have a Bob!");
+  if (root["command"] == "LEDstartHue") {
+    Serial.println(">>> DING DING! We have a LEDstartHue command!");
+    Serial.println(root["value"].as<String>());
   }
   
 }

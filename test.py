@@ -11,9 +11,7 @@ MY_SKUTTER = Skutter("D10")
 MY_MAC = MY_SKUTTER.getMac()
 print(MY_MAC)
 
-my_dict = {"one": 1, "two": 2}
-print(my_dict)
-my_dict["one"] = 3
-print(my_dict)
+# MY_SKUTTER.TestSend()
 
-MY_SKUTTER.testSend()
+MY_SKUTTER.setBrightness(50)
+MY_SKUTTER.LEDstartColour(0.0)

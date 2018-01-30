@@ -62,8 +62,6 @@ class Skutter:
         self.LEDcount = requestedLEDcount # How many LEDs in the strip?
         self.LEDbrightness = 50 # percentage
         # Package the data.
-        self._dictionarify()
-        self._jsonify()
         
 
     def _dictionarify(self):
@@ -71,40 +69,54 @@ class Skutter:
         # self.skutterDict["mac"] = self._mac
         self.skutterDict["transitionTime"] = self.transitionTime
         self.skutterDict["transitionType"] = self.transitionType
-        # self.skutterDict["cameraRotationTime"] = self.cameraRotationTime
-        # self.skutterDict["servo1position"] = self.servo1position
-        # self.skutterDict["servo2position"] = self.servo2position
-        # self.skutterDict["LEDstartHue"] = self.LEDstartHue
+        self.skutterDict["cameraRotationTime"] = self.cameraRotationTime
+        self.skutterDict["servo1position"] = self.servo1position
+        self.skutterDict["servo2position"] = self.servo2position
+        self.skutterDict["LEDstartHue"] = self.LEDstartHue
         self.skutterDict["LEDendHue"] = self.LEDendHue
-        # self.skutterDict["LEDcount"] = self.LEDcount
-        # self.skutterDict["LEDbrightness"] = self.LEDbrightness
-        self.skutterDict["name"] = "Bob"
-        self.skutterDict["age"] = 49
-
+        self.skutterDict["LEDcount"] = self.LEDcount
+        self.skutterDict["LEDbrightness"] = self.LEDbrightness
         # Leave a stub here for the next thing I think to add.
         # self.skutterDict[""] = self.
 
-    def _jsonify(self):
-        self.jsonData = json.dumps(self.skutterDict)
-
-    def _message(self, topic=""):
-        """Fire the MQTT message (internal class method)"""
-        # TODO: check the default value of topic actually works. Python docs here end
-        # up outputting the cheese shop sketch, and are more convoluted than helpful.
+    def _message(self, payload, topic=""):
+        """Fire the MQTT message (internal class method)
         
+        Receives payload as dictionary, topic optional
+        """
         # Package up the data
-        self._dictionarify()
-        self._jsonify()
         mqttc.connect(mqtt_server, mqtt_port)
-        mqttc.publish(mqtt_channel+topic, self.jsonData)
+        mqttc.publish(mqtt_channel+topic, json.dumps(payload))
         # mqttc.publish(mqtt_channel+topic, self.jsonTestData)
 
     def getMac(self):
         """Output object MAC address, as string. For testing purposes."""
         return self._mac
 
-    def testSend(self):
-        self._message("test")
+    def TestSend(self):
+        testDict = {"name": "Bob", "age": 42}
+        # self._message(testDict, "test")
+        self._message(testDict, self._mac)
+
+    def LEDstartColour(self, targetColour):
+        """Set target colour for the first pixel."""
+        messageDict = {"command": "LEDstartHue", "value": targetColour}
+        self._message(messageDict, self._mac)
+
+    def LEDendColour(self, targetColour):
+        """Set target colour for the last pixel."""
+        messageDict = {"command": "LEDendHue", "value": targetColour}
+        self._message(messageDict, self._mac)
+
+    def servo1position(self, targetSpeed):
+        """Set target speed of servo 1."""
+        messageDict = {"command": "servo1position", "value": targetspeed}
+        self._message(messageDict, self._mac)
+    
+    def setBrightness(self, targetBrightness):
+        """Set LED pixel brightness."""
+        messageDict = {"command": "setBrightness", "value": targetBrightness}
+        self._message(messageDict, self._mac)
 
     def SetTargetColour(self, position, targetColour, transitionTime, transitionType):
         """Set target colour for individual pixel."""
