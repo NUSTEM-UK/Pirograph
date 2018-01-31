@@ -8,9 +8,10 @@ Sorry, Mac and Windows users.
 """
 
 import pygame, pygame.camera
-import os
+import os, time
 from tkinter import Tk
 from tkinter.filedialog import asksaveasfilename
+from PIL import Image, ImageStat, ImageOps, ImageDraw
 
 # os.system("sydo modprobe bcm2835-v4l2") # needed for Pi camera
 Tk().withdraw()
@@ -36,6 +37,14 @@ savePath = ""
 frameNumber = 0
 saveSource = False
 
+# Config variables (can adapt at runtime)
+full_screen = 0
+video_framerate = 0
+threshold_low = 40
+threshold_high = 230
+frame_count = 1
+
+
 def main():
     while True:
         checkForEvent()
@@ -44,6 +53,7 @@ def main():
 def showScreen():
     global camFrame, preRot
     camFrame = webcam.get_image()
+    frame_count += 1
     if autoRotate:
         preRot += 0.5
         if preRot > 360:
@@ -74,6 +84,14 @@ def terminate():
     os._exit(1)
 
 
+def greyscale(self, img):
+    """See https://stackoverflow.com/questions/10261440/how-can-i-make-a-greyscale-copy-of-a-surface-in-pygame/10693616#10693616."""
+    arr = pygame.surfarray.pixels3d(img)
+    avgs = [[(r*0.298+ g*0.587 + b*0.114) for (r, g, b) in col] for col in arr]
+    arr = arr.dot([0.298, 0.587, 0.114])[:,:,None].repeat(3, axis=2)
+    return pygame.surfarray.make_surface(arr)
+
+
 def checkForEvent():
     global savePath, autoRotate, saveSource, preRot
     event = pygame.event.poll()
@@ -87,6 +105,7 @@ def checkForEvent():
             print("Autorotate: ", autoRotate)
             if autoRotate:
                 preRot = 0
+
 
 if __name__ == '__main__':
     main()
