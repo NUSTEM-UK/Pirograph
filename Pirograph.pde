@@ -8,23 +8,27 @@ PImage intermediate;
 PImage composite;
 PImage maskImage;
 
-int cam_width = 1280;
-int cam_height = 720;
+int cam_width;
+int cam_height;
 
 float angle = 0;
 float angleStep = 0.5;
 
 int Y;
 
-float threshold_low = 100;
-float threshold_high = 200;
+float threshold_low = 150;
+float threshold_high = 255;
+
+int start_time;
+int current_time;
+float fps;
 
 void setup() {
-  size(1280, 720);
+  size(1280, 720, P3D);
   background(0,0,0);
 
-  // cam_width = width;
-  // cam_width = height;
+  cam_width = width;
+  cam_height = height;
   
   String[] cameras = Capture.list();
   
@@ -38,6 +42,8 @@ void setup() {
     }
   }
   
+  int start_time = millis();
+
   intermediate = createImage(cam_width, cam_height, RGB);
   composite = createImage(cam_width, cam_height, ARGB);
   maskImage = createImage(cam_width, cam_height, RGB);
@@ -60,6 +66,7 @@ void draw() {
         
         // Find luminosity of current pixel (cast to int)
         Y = int((0.2126*red(cam.pixels[loc])) + (0.7152*green(cam.pixels[loc])) + (0.0722*blue(cam.pixels[loc])));
+        // Y = int((red(cam.pixels[loc]) + green(cam.pixels[loc]) + blue(cam.pixels[loc])) / 3.0);
 
         if (Y > threshold_high) {
           intermediate.pixels[loc] = cam.pixels[loc];
@@ -79,19 +86,28 @@ void draw() {
     intermediate.mask(maskImage);
     intermediate.updatePixels();
     
-    // software rotate of surface?
+    // software rotate of surface
     // See: https://www.processing.org/tutorials/transform2d/
     pushMatrix(); // Save the current coordinate system
     translate(width/2, height/2); // Shift coordinate origin to centre screen
     rotate(radians(angle));
     image(intermediate, -width/2, -height/2);
     popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
-
-
     angle += angleStep; // Increment rotation angle
 
-    // Store the current frame.
-    composite = get();
+    if (threshold_high > 255) {
+      threshold_high = 255;
+    }
+    if (threshold_low < 0) {
+      threshold_low = 0;
+    }
+
+    current_time = millis();
+    fps = frameCount / ((current_time-start_time)/1000);
+    println("Frame: ", frameCount, " fps: ", fps);
+
+    // Store the current frame - use for saving images
+    // composite = get();
   }
 }
 
@@ -121,6 +137,18 @@ void keyReleased() {
   } else if (key == 'R') {
     threshold_high += 10;
     println("Threshold HIGH: ", threshold_high);
+  } else if (key == 'P') {
+    intermediate = createImage(cam_width, cam_height, RGB);
+    image(intermediate, 0, 0);
+  } else if (key == 'o') {
+    angleStep += 0.25;
+    println("Step angle: ", angleStep);
+  } else if (key == 'l') {
+    angleStep -= 0.25;
+    println("Step angle: ", angleStep);
+  } else if (key == 'O') {
+    angle = 0;
+    println("ANGLE RESET");
   }
   if (threshold_high > 255) {
     threshold_high = 255;
@@ -129,40 +157,3 @@ void keyReleased() {
     threshold_low = 0;
   }
 }
-  
-/*
-  // We're handling both images' pixels
-  source.loadPixels();
-  destination.loadPixels();
-  
-  for (int x = 0; x < source.width; x++) {
-    for (int y = 0; y < source.width; y++) {
-      int loc = x + y*source.width; // PImage arrays are 1-dimensional! Freaky!
-      
-      // Test brightness against threshold
-      if (brightness(source.pixels[loc]) > threshold ) {
-        destination.pixels[loc] = source.pixels[loc]; // White if color(255), but here copy over
-      } else {
-        destination.pixels[loc] = color(0,0,0,0);   // Black
-      }
-      
-      //float r = red(img.pixels[loc]);
-      //float g = green(img.pixels[loc]);
-      //float b = blue(img.pixels[loc]);
-      
-      // Image processing here
-      
-      // Set the display pixel to the image pixel
-      // pixels[loc] = color(r,g,b);
-    }
-  }
-  destination.updatePixels();
-  image(destination, 0, 0);
-      
-  //background(0);
-  //tint(255, 127);
-  //image(img, 200, 0);
-  //tint(255, 100); // Can be (R, G, B, A)
-  //image(img2, 250, 250);
-}
-*/
