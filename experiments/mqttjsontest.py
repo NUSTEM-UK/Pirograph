@@ -3,7 +3,8 @@ import json
 from time import sleep
 
 mqttc = mqtt.Client()
-mqtt_server = "10.0.1.5"
+mqtt_server = "10.0.1.3"
+# mqtt_server = "localhost"
 
 def message(topic, payload):
     mqttc.connect(mqtt_server, 1883)

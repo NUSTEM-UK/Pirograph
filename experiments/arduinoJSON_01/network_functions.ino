@@ -32,9 +32,9 @@ void reconnect() {
     if (client.connect(skutterNameArray)) {
       Serial.println("connected");
       client.publish("pirograph/announce", subsTargetArray);
-      client.subscribe(subsTargetArray);
-      // Subscribe to the global channel
-      client.subscribe("pirograph/#");
+      client.subscribe(subsTargetArray); // Subscribe to the specific channel
+      // Subscribe to the global channel - disabled under discrimination in place
+      // client.subscribe("pirograph/#");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());

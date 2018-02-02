@@ -6,7 +6,7 @@ import pygame, pygame.camera, os
 from tkinter import Tk
 from tkinter.filedialog import asksaveasfilename
 
-os.system("sudo modprobe bcm2835-v4l2") # needed for Pi camera
+# os.system("sudo modprobe bcm2835-v4l2") # needed for Pi camera
 Tk().withdraw()
 pygame.init()
 pygame.camera.init()

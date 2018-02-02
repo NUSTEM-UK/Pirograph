@@ -14,11 +14,11 @@ from skutter_mac import MACS
 mqttc = mqtt.Client()
 
 # TODO: expose interface for configuring the MQTT broker address & port
-# mqtt_server = "10.0.1.5"
-mqtt_server = "localhost"
+mqtt_server = "10.0.1.3"
+# mqtt_server = "localhost"
 mqtt_port = 1883
 # TODO: expose interface for configuring the MQTT channel root
-mqtt_channel = "pirograph"
+mqtt_channel = "pirograph/"
 
 # TODO: import list of Wemos module MAC addresses, as dictionary
 
@@ -35,30 +35,115 @@ The main use of this is to allow a construction like:
 labelled 'D15'.
 
 The simpler way of doing this is to have a separate routine which preallocates the
-labels for every device we're going to power up. Which saves a bunch of logic at 
+labels for every device we're going to power up. Which saves a bunch of logic at
 runtime, without a huge compromise (that is, the skutter list isn't dynamic during
 execution, but we can probably live with that).
 """
 
-class Skutter(object):
+class Skutter:
     """Initial implementation of Skutter type.
 
     """
 
-    def __init__(self, skutterNumber="00"):
+    skutterDict = {}
+
+    def __init__(self, skutterNumber="00", requestedLEDcount="1"):
         """Initialise the skutter, with vaguely-sane defaults."""
         self._mac = MACS[skutterNumber] # MAC address of specific Wemos module.
         self.transitionTime = 90 # Express in degrees? Is that the simplest way here?
         self.transitionType = "interpolate" # pick a default. There may be others.
         self.permittedTransitionTypes = ("interpolate", "sine", "square")
         self.cameraRotationTime = 10.0 # Time in secs (float).
+        # Make sure all the variables exist
+        self.servo1position = 90.0
+        self.servo2position = 90.0
+        self.LEDstartHue = 0.0
+        self.LEDendHue = 0.0
+        self.LEDcount = requestedLEDcount # How many LEDs in the strip?
+        self.LEDbrightness = 50 # percentage
+        # Package the data.
+        
+
+    def _dictionarify(self):
+        """Package everything up into a neat dictionary, for JSONificaation."""
+        # self.skutterDict["mac"] = self._mac
+        self.skutterDict["transitionTime"] = self.transitionTime
+        self.skutterDict["transitionType"] = self.transitionType
+        self.skutterDict["cameraRotationTime"] = self.cameraRotationTime
+        self.skutterDict["servo1position"] = self.servo1position
+        self.skutterDict["servo2position"] = self.servo2position
+        self.skutterDict["LEDstartHue"] = self.LEDstartHue
+        self.skutterDict["LEDendHue"] = self.LEDendHue
+        self.skutterDict["LEDcount"] = self.LEDcount
+        self.skutterDict["LEDbrightness"] = self.LEDbrightness
+        # Leave a stub here for the next thing I think to add.
+        # self.skutterDict[""] = self.
 
     def _message(self, payload, topic=""):
-        """Fire the MQTT message (internal class method)"""
-        # TODO: check the default value of topic actually works. Python docs here end
-        # up outputting the cheese shop sketch, and are more convoluted than helpful.
+        """Fire the MQTT message (internal class method)
+        
+        Receives payload as dictionary, topic optional
+        """
+        # Package up the data
         mqttc.connect(mqtt_server, mqtt_port)
-        mqttc.publish(mqtt_channel+"/"+topic, payload)
+        mqttc.publish(mqtt_channel+topic, json.dumps(payload))
+        # mqttc.publish(mqtt_channel+topic, self.jsonTestData)
+
+    def getMac(self):
+        """Output object MAC address, as string. For testing purposes."""
+        return self._mac
+
+    def TestSend(self):
+        testDict = {"name": "Bob", "age": 42}
+        # self._message(testDict, "test")
+        self._message(testDict, self._mac)
+
+    def LEDstartColour(self, targetColour):
+        """Set target colour for the first pixel."""
+        # TODO: Sanity check on input value
+        messageDict = {"command": "LEDstartHue", "value": targetColour}
+        self._message(messageDict, self._mac)
+
+    def LEDendColour(self, targetColour):
+        """Set target colour for the last pixel."""
+        # TODO: Sanity check on input value
+        messageDict = {"command": "LEDendHue", "value": targetColour}
+        self._message(messageDict, self._mac)
+
+    def LEDcolour(self, targetColour):
+        """Convenience function to set the colour of all LEDs."""
+        # TODO: sanity check on inputs
+        # TODO: Actually set all LEDs rather than just the first
+        self.LEDstartColour(targetColour)
+
+    def setServo1position(self, targetSpeed):
+        """Set target speed of servo 1."""
+        # TODO: Sanity check on input value
+        messageDict = {"command": "servo1position", "value": targetSpeed}
+        self._message(messageDict, self._mac)
+    
+    def setServo2position(self, targetSpeed):
+        """Set target speed of servo 1."""
+        # TODO: Sanity check on input value
+        messageDict = {"command": "servo2position", "value": targetSpeed}
+        self._message(messageDict, self._mac)
+
+    def servoSpeed(self, targetSpeed):
+        """Set target speed of servo 1. Convenience mapping."""
+        # TODO: Sanity check on input value
+        self.setServo1position(targetSpeed)
+    
+    def servo2speed(self, targetSpeed):
+        """Set target speed of servo 1. Convenience mapping."""
+        # TODO: Sanity check on input value
+        self.setServo2position(targetSpeed)
+    
+    
+    def setBrightness(self, targetBrightness):
+        """Set LED pixel brightness."""
+        # TODO: Sanity check on input value
+        messageDict = {"command": "setBrightness", "value": targetBrightness}
+        self._message(messageDict, self._mac)
 
     def SetTargetColour(self, position, targetColour, transitionTime, transitionType):
         """Set target colour for individual pixel."""
@@ -95,3 +180,9 @@ class Skutter(object):
         # Could rotate via angle, oscillate between colour points
         # ...which itself could be square, sine, wheel, etc.
         pass
+
+
+if __name__ == '__main__':
+    my_skutter = Skutter("D10")
+    my_MAC = my_skutter.getMac()
+    print(my_MAC)

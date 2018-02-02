@@ -1,6 +1,7 @@
 """Listen for (and output) commands issued via MQTT broker.
 
 This version functions in Python3
+(in Python2, spews weird unicode guff everywhere)
 """
 import paho.mqtt.client as mqtt
 
@@ -27,6 +28,6 @@ client.on_message = on_message
 # For reasons that are completely unclear to me, connecting to 127.0.0.1
 # throws a TypeError in on_connect: needs 3 arguments, four given.
 # Adding `self` to the definition doesn't help. I don't understand.
-# client.connect('10.0.1.5', 1883)
-client.connect('127.0.0.1', 1883)
+client.connect('10.0.1.3', 1883)
+# client.connect('127.0.0.1', 1883)
 client.loop_forever()
