@@ -77,6 +77,13 @@ void draw() {
     intermediate.updatePixels();
     image(intermediate, 0, 0);
     
+    if (threshold_high > 255) {
+      threshold_high = 255;
+    }
+    if (threshold_low < 0) {
+      threshold_low = 0;
+    }
+    
     // Store the current frame.
     composite = get();
   }
@@ -108,6 +115,9 @@ void keyReleased() {
   } else if (key == 'R') {
     threshold_high += 10;
     println("Threshold HIGH: ", threshold_high);
+  } else if (key == 'P') {
+    intermediate = createImage(cam_width, cam_height, RGB);
+    image(intermediate, 0, 0);
   }
   if (threshold_high > 255) {
     threshold_high = 255;
