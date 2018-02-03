@@ -33,3 +33,15 @@ Meh, I need to find my notes from home. Also, this is a bit scrappy without chan
 ## Visual Studio Code Python3 config
 
 This got a *lot* easier recently: bring up the quick menu (⌘⇧P) `>Python: Select Interpreter`, and pick `/usr/local/bin/python3` (for brew-installed Python on a Mac). Boom. Done. Awesome. Running the current buffer now executes against Python3.
+
+
+## VLC command-line on Mac OS X:
+
+In .bash_profile:
+    alias vlc='/Applications/VLC.app/Contents/MacOS/VLC'
+
+pass `-I rc ` to suppress GUI.
+
+vlc -I rc -vvv rtsp://192.168.0.31:8554/stream --sout='#transcode{vcodec=mjpg,vb=2500,scale=auto,fps=15,acodec=none}:standard{access=http{mime="multipart/x-mixed-replace; boundary=7b3cc56e5f51db803f790dad720ed50a"},mux=mpjpeg,dst=:8089/videostream.cgi}'
+
+vlc -I rc -vvv rtsp://192.168.0.31:8554/stream --sout='#transcode{vcodec=MJPG,vb=2500,scale=1,acodec=none}:duplicate{dst=std{access=http{mime=multipart/x-mixed-replace; boundary=7b3cc56e5f51db803f790dad720ed50a},mux=mpjpeg,dst=:8080/mjpeg}}'
