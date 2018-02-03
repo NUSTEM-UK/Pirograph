@@ -44,4 +44,19 @@ pass `-I rc ` to suppress GUI.
 
 vlc -I rc -vvv rtsp://192.168.0.31:8554/stream --sout='#transcode{vcodec=mjpg,vb=2500,scale=auto,fps=15,acodec=none}:standard{access=http{mime="multipart/x-mixed-replace; boundary=7b3cc56e5f51db803f790dad720ed50a"},mux=mpjpeg,dst=:8089/videostream.cgi}'
 
-vlc -I rc -vvv rtsp://192.168.0.31:8554/stream --sout='#transcode{vcodec=MJPG,vb=2500,scale=1,acodec=none}:duplicate{dst=std{access=http{mime=multipart/x-mixed-replace; boundary=7b3cc56e5f51db803f790dad720ed50a},mux=mpjpeg,dst=:8080/mjpeg}}'
+vlc -I rc -vvv rtsp://192.168.0.31:8554/stream --sout='#transcode{vcodec=MJPG,vb=2500,scale=1,fps=15,acodec=none}:duplicate{dst=std{access=http{mime=multipart/x-mixed-replace; boundary=7b3cc56e5f51db803f790dad720ed50a},mux=mpjpeg,dst=:8080/mjpeg}}'
+
+~/Desktop/VLC.app/Contents/MacOS/VLC -I rc -vvv rtsp://192.168.0.31:8554/stream --sout='#transcode{vcodec=MJPG,vb=2500,scale=1,fps=15,acodec=none}:duplicate{dst=std{access=http{mime=multipart/x-mixed-replace; boundary=7b3cc56e5f51db803f790dad720ed50a},mux=mpjpeg,dst=:8080/mjpeg}}'
+
+
+## Streaming video
+
+Ugh. This isn't working terribly well.
+
+On Pi:
+    raspivid -o - -t 0 -w 1023 -h 1024 -fps 15 -b 8000000 --nopreview | nc 192.681.0.3 5001
+on Mac:
+    nc -l 5001 | mplayer -fps 31 -cache 4096 -
+
+...works rather well. Probably needs more cache to avoid dropped frames. Latency isn't bad. But only works for h.264 streams. Setting --codec MJPEG in raspivid options doesn't seem to work. In fact, basically nothing will read that. Ugh.
+
