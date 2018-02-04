@@ -1,0 +1,15 @@
+# TODOs
+
+## MJPEG streaming
+
+Issue here is that we need to get images into Processing, and it's not obvious what it can and can't take. Chances are, we'll have to stream MJPEG to it (which raspivid can output, with camera control... but then how does the stream get propogated over the network?). Possible avenues include:
+
+* https://chriscarey.com/blog/2017/04/30/achieving-high-frame-rate-with-a-raspberry-pi-camera-system/comment-page-1/ (Looks very promising indeed)
+* https://github.com/ccrisan/motioneyeos
+* [Picamera web streaming](picamera.readthedocs.io/en/release-1.13/recipes2.html#web-streaming), which works... but the frame rate is highly unstable.
+* www.lewisroberts.com/2015/05/15/raspberry-pi-mjpeg-at-30fps/
+* Raspivid docs: https://www.raspberrypi.org/documentation/usage/camera/raspicam/raspivid.md. Streaming Raspivid H.264 output via `ncat` works very well (with a large enough buffer in `mplayer`, receiving), but the MJPEG stream never successfully reads. I think.
+* https://github.com/speps/grumpy-pi-mjpg (bonkers Go-based streaming platform, with minimal docs)
+* UV4L, which sort-of does what we need but I think I've done something wrong with the setup on `10.0.1.3`.
+* Official V4L2 driver, though the documentation is even more lacking than for UV4L.
+

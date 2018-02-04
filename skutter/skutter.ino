@@ -17,6 +17,7 @@ const char* ssid = "nustem";
 const char* password = "nustem123";
 const char* mqtt_server = "10.0.1.3";
 
+
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -27,9 +28,6 @@ char skutterNameArray[60];
 String skutterNameString;
 String subsTargetString;
 char subsTargetArray[60];
-
-// Overkill of a static buffer, but we're an ESP8266, we have bytes to burn.
-StaticJsonBuffer<1024> jsonBuffer;
 
 // Servo and LED strip setup
 #define PIN_SERVO1 D7
@@ -62,7 +60,7 @@ CHSV ledsHSVTarget[PIXEL_COUNT];
 uint8_t in_transition = 0; // 1: forwards; 0: no transition; -1: backwards
 uint32_t time_start = millis();     // Start time of commanded transition
 uint32_t time_end = millis();       // End time of commanded transition
-uimt32_t time_current = millis();   // Recalculated in transition loop
+uint32_t time_current = millis();   // Recalculated in transition loop
 uint32_t transition_time = 5;
 String transitionType = "";
 
@@ -142,6 +140,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print("payload (string): ");
     Serial.println(payloadString);
 
+    // Declare the JSON buffer here, so we never reuse a buffer
+    // (it's destroyed when the callback is re-entered)
+    // There's a chance a command won't be parsed, if the decode and action
+    // isn't completed before the next message arrives. But the D1 is pretty quick,
+    // and queing commands just a little from the controller should prevent that from
+    // happening. So we'll leave it up to the controller.
+    StaticJsonBuffer<256> jsonBuffer;
     JsonObject& root = jsonBuffer.parseObject(payload);
     if (!root.success()) {
         Serial.println("Parsing failed!");
@@ -203,12 +208,26 @@ void callback(char* topic, byte* payload, unsigned int length) {
         servo2target = targetPosition;
         servo2.write(targetPosition);
         delay(20);
-    }
-
-    // We've handled all the possible commands, so we'll clear the JSON buffer:
-    // This might solve the situation where the Skutter craps out and stops
-    // responding to messages. Or it might prevent parsing of multiple messages arriving in rapid succesion.
-    StaticJsonBuffer<1024> jsonBuffer;
-    // Boom! It's gone.
-    
+    }    
 }
+
+
+int interpolate(int start_value, int target_value, int start_time, int end_time, int current_time) {
+  float start_value_float = (float) start_value;
+  float target_value_float = (float) target_value;
+  float calculated_value_float;
+  int calculated_value_int;
+
+  Serial.print(start_value_float);
+  Serial.print(" ");
+  Serial.println(target_value_float);
+  
+  if ( target_value_float < start_value_float ) {
+    calculated_value_float = start_value_float - ( ( (start_value_float - target_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
+  } else {
+    calculated_value_float = start_value_float + ( ( (target_value_float - start_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
+  }
+
+  calculated_value_int = (int) calculated_value_float;
+  return calculated_value_int;  
+}    
