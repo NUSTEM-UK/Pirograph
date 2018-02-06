@@ -136,7 +136,7 @@ class Skutter:
     def LEDstartHueB(self, targetHue):
         """set LED hue for first pixel, for state B."""
         # TODO: sanity check on inputs
-        self.setLEDhue("start", "A", targetHue)
+        self.setLEDhue("start", "B", targetHue)
     
     def LEDendHueA(self, targetHue):
         """set LED hue for last pixel, for state A"""
@@ -214,7 +214,7 @@ class Skutter:
             # TODO: raise error
             pass
         else:
-            messageDict = {"command": "setTransitionTime", "value": requested_angle}
+            messageDict = {"command": "setTransitionTime", "value": requested_angle*1000}
             # my_dict = {'id':self._mac, 'transitionTime':requested_angle}
             self._message(messageDict, self._mac)
 
