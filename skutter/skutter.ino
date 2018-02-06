@@ -13,10 +13,13 @@ Based on WishingWell_Skutter from the Tech-Wishing-Well project.
 #include <Servo.h>
 #include <FastLED.h> // Using FastLED not NeoPixel, to gain HSV colour support
 
-const char* ssid = "nustem";
-const char* password = "nustem123";
-const char* mqtt_server = "10.0.1.3";
+// const char* ssid = "nustem";
+// const char* password = "nustem123";
+// const char* mqtt_server = "10.0.1.3";
 
+const char* ssid = "BadgerNet-2G";
+const char* password = "Badgercwtch1";
+const char* mqtt_server = "192.168.0.31";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -41,10 +44,13 @@ char subsTargetArray[60];
 Servo servo1;
 Servo servo2;
 
+// Store servo positions (current) and A/B target states
 float servo1position = 90;
-float servo1target = 90;
+float servo1positionA = 90;
+float servo1positionB = 90;
 float servo2position = 90;
-float servo2target = 90;
+float servo2positionA = 90;
+float servo2positionB = 90;
 
 // Array of LEDs - current values
 CRGB leds[PIXEL_COUNT];
@@ -53,16 +59,17 @@ CRGB leds[PIXEL_COUNT];
 // see: https://github.com/FastLED/FastLED/wiki/Pixel-reference
 CHSV ledsHSV[PIXEL_COUNT];
 
-// LEDs - target values
-CRGB ledsTarget[PIXEL_COUNT];
-CHSV ledsHSVTarget[PIXEL_COUNT];
+// LEDs - target values for animations
+CRGB ledsHSVA[PIXEL_COUNT];
+CHSV ledsHSVB[PIXEL_COUNT];
 
 uint8_t in_transition = 0; // 1: forwards; 0: no transition; -1: backwards
 uint32_t time_start = millis();     // Start time of commanded transition
 uint32_t time_end = millis();       // End time of commanded transition
 uint32_t time_current = millis();   // Recalculated in transition loop
-uint32_t transition_time = 5;
-String transitionType = "";
+uint32_t transitionTime = 5;
+String transitionType = "ONCE";
+String transitionInterpolation = "LINEAR";
 
 void setup() {
     Serial.begin(115200);
@@ -181,6 +188,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
         FastLED.show();
     }
 
+    
+
     if (root["command"] == "setBrightness") {
         Serial.println(">>> setBrightness command received!");
         int targetBrightness = root["value"];
@@ -230,4 +239,6 @@ int interpolate(int start_value, int target_value, int start_time, int end_time,
 
   calculated_value_int = (int) calculated_value_float;
   return calculated_value_int;  
-}    
+}
+
+

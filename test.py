@@ -19,7 +19,7 @@ sleep(0.5)
 boris.LEDcolour(120)
 boris.setBrightness(255)
 
-delay = 0.00
+delay = 0.5
 
 boris.servoSpeed(90)
 boris.servo2speed(90)
