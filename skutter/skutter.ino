@@ -46,7 +46,7 @@ Servo servo1;
 Servo servo2;
 
 // Store servo positions (current) and A/B target states
-float servoPosition[1][3];
+float servoPosition[SERVO_COUNT][3];
 
 
 // Array of LEDs - current values
@@ -55,6 +55,7 @@ CRGB leds[PIXEL_COUNT];
 // conversion back to HSV.
 // see: https://github.com/FastLED/FastLED/wiki/Pixel-reference
 CHSV ledsHSV[PIXEL_COUNT][3];
+int targetBrightness; // Really nasty kludge to lock this off.
 
 // Transition setup
 // A to B is index 1 to 2; B to A is 2 to 1.
@@ -87,11 +88,15 @@ void setup() {
     client.setServer(mqtt_server, 1883);
     client.setCallback(callback);
 
+    targetBrightness = 100;
+
     FastLED.addLeds<WS2811, PIN_PIXEL, GRB>(leds, PIXEL_COUNT);
     for (int targetLED = 0; targetLED < PIXEL_COUNT; targetLED += 1) {
-        CHSV tempColour = CHSV(0, 255, 0);
+        CHSV tempColour = CHSV(0, 255, targetBrightness);
         leds[targetLED] = tempColour;
         ledsHSV[targetLED][0] = tempColour;
+        ledsHSV[targetLED][1] = tempColour; // Also set state A
+        ledsHSV[targetLED][2] = tempColour; // ...and state B
     }
     FastLED.show();
 
@@ -115,8 +120,12 @@ void setup() {
     time_start = millis();     // Start time of commanded transition
     time_end = time_start + transitionTime; // End time of commanded transition
     time_current = millis();   // Recalculated in transition loop
-    transitionType = "ONCE"; // Alternatives "LOOP", "RETURN"
-    transitionInterpolation = "LINEAR";
+    transitionType = "RETURN"; // Alternatives "LOOP", "RETURN", "ONCE"
+    transitionInterpolation = "LINEAR"; // Not used. Yet.
+
+    diagnostics();
+    Serial.println("END OF SETUP");
+    Serial.println("----");
 
     servo1.attach(PIN_SERVO1);
     servo1.write(servoPosition[0][0]);
@@ -136,31 +145,65 @@ void loop() {
     time_current = millis(); // When is now?
     // Should we have already completed the current transition?
     if (time_current < time_end) {
+        Serial.println("--- in transition");
         updateServos();
-        updateLEDs();
+        updateLEDs(); // Update the HSV arrays
+        writeLEDs();  // Write the HSV values across to the RGB array
         diagnostics();
     } else {
         // We should have completed transition by now.
+        Serial.println("<<< TRANSITION COMPLETE");
+        Serial.print("From start: ");
+        Serial.print(transitionStart);
+        Serial.print(" to target: ");
+        Serial.println(transitionTarget);
 
         // Ensure we get there
-
-        
-        // TODO: set LEDs and servos to target state.
+        // write the transitionTarget values to current
+        copyData(transitionTarget, 0);
+        servo1.write(servoPosition[0][0]);
+        servo2.write(servoPosition[1][0]);
 
         // Now reassign start and target states.
         if (transitionType == "ONCE") {
-
+            // Set [transitionStart] data to that at [transitionTarget]
+            copyData(transitionStart, transitionTarget);
+            transitionStart = 2;
+            transitionTarget = 2;
+            // We can just leave it here, until we're needed again.
         } else if (transitionType == "LOOP") {
             // We're reverting to state A and heading for B again.
-
+            copyData(transitionStart, 0);
+            transitionStart = 1;
+            transitionTarget = 2;
+            time_end = time_current + transitionTime;
         } else if (transitionType == "RETURN") {
             // if we were going A to B, now set B to A
             // else set A to B
-
+            if (transitionTarget = 2) {
+                // Make the current state the target state
+                copyData(2, 0);
+                // Now reset the transition target
+                transitionTarget = 1;
+                transitionStart = 2;
+                Serial.print("Heading to state A: ");
+                Serial.println(transitionTarget);
+            } else if (transitionTarget = 1) {
+                // Make the current state the target state
+                copyData(1, 0);
+                // Now reset the transition target
+                transitionTarget = 2;
+                transitionStart = 1;
+                Serial.print("Heading to state B: ");
+                Serial.println(transitionTarget);
+            }
+            // Update the end time
+            time_end = time_current + transitionTime;
         }
 
     }
 
+    // Make sure we show the results of all our fancy LED wrangling.
     FastLED.show();
     delay(1000); // Slow things down so we can see what's going on.
 }
@@ -219,7 +262,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
         if (position == "start") {
             pixel_number = 0;
         } else {
-            pixel_number = PIXEL_COUNT;
+            pixel_number = (PIXEL_COUNT - 1); // I think that's right. Probably.
         }
         // Are we writing to state A or B?
         int stateIndex;
@@ -229,16 +272,24 @@ void callback(char* topic, byte* payload, unsigned int length) {
             stateIndex = 2;
         }
         // Update the appropriate array entry:
+        // Serial.print("Setting ");
+        // Serial.print(pixel_number);
+        // Serial.print(" LED in state: ");
+        // Serial.print(stateIndex);
+        // Serial.print(" to hue: ");
+        // Serial.println(targetHue);
         ledsHSV[pixel_number][stateIndex].hue = targetHue;
+        // Serial.println(ledsHSV[pixel_number][stateIndex].hue);
         // Now update the pixel hue interpolation for this state:
-        interpolateLEDs(stateIndex);
+        updateLEDgradient(stateIndex);
         // Set the transition timer running
+        time_current = millis();
         time_end = time_current + transitionTime;
     }
 
     if (root["command"] == "setBrightness") {
         Serial.println(">>> setBrightness command received!");
-        int targetBrightness = root["value"];
+        targetBrightness = root["value"];
         // Loops through all states, update all brightnesses
         for (int state = 0; state < 3; state++) {
             for (int i = 0; i < PIXEL_COUNT; i++) {
@@ -260,13 +311,26 @@ void callback(char* topic, byte* payload, unsigned int length) {
         Serial.println(targetPosition);
         // Now act on it.
         int stateIndex;
+        // TODO: find out why `if (state == "A")` doesn't work here
+        // Something weird to do with String handling
         if (state == "A") {
-            int stateIndex = 1;
+            stateIndex = 1;
         } else {
-            int stateIndex = 2;
+            stateIndex = 2;
         }
+        Serial.print("Servo: ");
+        Serial.print(servoNum);
+        Serial.print(" State: ");
+        Serial.print(stateIndex);
+        Serial.print(" to position: ");
+        Serial.println(targetPosition);
         servoPosition[servoNum-1][stateIndex] = targetPosition;
+        Serial.print("Target servo set to : ");
+        Serial.println(servoPosition[servoNum-1][stateIndex]);
+        diagnostics();
+        Serial.println("<<< END PROCESSING setServoPosition");
         // Set the transition timer running again
+        time_current = millis();
         time_end = time_current + transitionTime;
     }
 
@@ -284,39 +348,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
         Serial.print("Transition time: ");
         Serial.println(transitionTime);
     }
-
-    // Defunct code:
-
-    // if (root["command"] == "servo1position") {
-    //     float targetPosition = root["value"];
-    //     servo1target = targetPosition;
-    //     servo1.write(targetPosition);
-    //     delay(20);
-    // }
-
-    // if (root["command"] == "servo2position") {
-    //     float targetPosition = root["value"];
-    //     servo2target = targetPosition;
-    //     servo2.write(targetPosition);
-    //     delay(20);
-    // }    
-
-    // if (root["command"] == "LEDstartHue") {
-    //     Serial.println(">>> DING DING! We have a LEDstartHue command!");
-    //     Serial.println(root["value"].as<String>());
-    //     int targetHue = root["value"];
-    //     CHSV tempColour = CHSV(targetHue, ledsHSV[0].sat, ledsHSV[0].val);
-    //     // Serial.print("Hue: ");
-    //     // Serial.println(tempColour.h);
-    //     // Serial.print("Sat: ");
-    //     // Serial.println(tempColour.s);
-    //     // Serial.print("Val: ");
-    //     // Serial.println(tempColour.v);
-    //     // Serial.println(ledsHSV[0].sat);
-    //     ledsHSV[0] = tempColour;
-    //     leds[0] = tempColour;
-    //     FastLED.show();
-    // }
 
 }
 
@@ -341,7 +372,6 @@ int interpolate(int start_value, int target_value, int start_time, int end_time,
     return calculated_value_int;
 }
 
-
 void writeLEDs() {
     // Map ledsHSV to leds (RGB), and update the pixel string.
     for (int i = 0; i < PIXEL_COUNT ; i++) {
@@ -354,7 +384,7 @@ void writeLEDs() {
     // FastLED.show(); // ...but do that in the loop.
 }
 
-void interpolateLEDs(int state) {
+void updateLEDgradient(int state) {
     // interpolate HSV values between start and end points in string
     // Get the end points
     CHSV startColour = CHSV(ledsHSV[0][state].hue, ledsHSV[0][state].sat, ledsHSV[0][state].val);
@@ -378,14 +408,21 @@ void updateLEDs() {
         tempColour.hue = interpolate(ledsHSV[i][transitionStart].hue,
                                      ledsHSV[i][transitionTarget].hue,
                                      time_start, time_end, time_current);
-        tempColour.sat = interpolate(ledsHSV[i][transitionStart].sat,
-                                     ledsHSV[i][transitionTarget].sat,
-                                     time_start, time_end, time_current);
-        tempColour.val = interpolate(ledsHSV[i][transitionStart].val,
-                                     ledsHSV[i][transitionTarget].val,
-                                     time_start, time_end, time_current);
-        ledsHSV[i][0] = tempColour;    
+        tempColour.sat = 255;
+        tempColour.val = targetBrightness;
+        // tempColour.sat = interpolate(ledsHSV[i][transitionStart].sat,
+        //                              ledsHSV[i][transitionTarget].sat,
+        //                              time_start, time_end, time_current);
+        // tempColour.val = interpolate(ledsHSV[i][transitionStart].val,
+        //                              ledsHSV[i][transitionTarget].val,
+        //                              time_start, time_end, time_current);
+        ledsHSV[i][0] = tempColour;
         leds[i] = tempColour;
+        Serial.print(ledsHSV[i][transitionStart].hue);
+        Serial.print(" ");
+        Serial.print(ledsHSV[i][transitionTarget].hue);
+        Serial.print(" ");
+        Serial.println(tempColour.hue);
     }
     // Again, we'll need to call FastLED.show() to update the string. Do that in the loop.
 }
@@ -403,12 +440,21 @@ void updateServos() {
 }
 
 void diagnostics() {
-    Serial.print("LEDs: ");
-    for (int i = 0; i < 3 ; i++) {
-        Serial.print(ledsHSV[0][i].hue);
-        Serial.print(" ");
+    for (int i = 0; i < PIXEL_COUNT; i++) {
+        Serial.print("LED: ");
+        Serial.print(i);
+        Serial.print(" :: ");
+        for (int j = 0; j < 3 ; j++) {
+            Serial.print("(");
+            Serial.print(ledsHSV[i][j].hue);
+            Serial.print(",");
+            Serial.print(ledsHSV[i][j].sat);
+            Serial.print(",");
+            Serial.print(ledsHSV[i][j].val);
+            Serial.print(") ");
+        }
+        Serial.println();
     }
-    Serial.println();
     Serial.println("Servos: ");
     for (int i = 0; i < 2; i++) {
         Serial.print("  ");
@@ -419,5 +465,18 @@ void diagnostics() {
             Serial.print(" ");
         }
         Serial.println();
+    }
+}
+
+void copyData(int source, int destination) {
+    // Copy data from source index to target index
+
+    // First the LEDs
+    for (int i = 0; i < PIXEL_COUNT; i++) {
+            ledsHSV[i][destination] = ledsHSV[i][source];
+    }
+    // Now the Servos
+    for (int i = 0; i < SERVO_COUNT; i++) {
+        servoPosition[i][destination] = servoPosition[i][source];
     }
 }
