@@ -2,48 +2,35 @@
 
 ## Getting set up
 
-Import the library into your Python sketch:
+Import the library into your Python sketch, and make yourself a new Skutter to talk to. Mine's named `boris`:
 
     from skutterzero import *
-
-...and make yourself a new Skutter to talk to. Mine's named `boris`:
-
     boris = Skutter("D07")
 
-The identifier (`D07`) is the designation printed on the Skutter module.
-
-You can now send your Skutter commands, for example:
+The identifier (`D07`) is the designation printed on the Skutter module. You can now send your Skutter commands, for example, these commands will set full brightness, and a colour (hue) of `0`, which displays as red.
 
     boris.LEDbrightness(255)
     boris.LEDcolour(0)
-
-will set full brightness, and a colour (hue) of `0`, which displays as red.
-
 ## Servo commands
-
-Your skutter understands a range of commands:
 
     skuttername.servo1speed(speed)
     skuttername.servo2speed(speed)
 
-where `speed` is between `0` and `180`. For continuous rotation (360°) servos, `90` will be a dead stop, with values either side ranging from slow to full speed in either direction.
+Where `speed` is between `0` and `180`. For continuous rotation (360°) servos, `90` will be a dead stop, with values either side ranging from slow to full speed in either direction.
 
-For conventional (angular) servos, the value you command is the deflection angle, again between `0` and `180` degrees. If it makes more sense to you, you can also use:
+For conventional (angular) servos, the value is the deflection angle, again between `0` and `180` degrees. If it makes more sense to you, you can also use:
 
     skuttername.servo1position(speed)
     skuttername.servo2position(speed)
 
 ## LED commands
 
+These behave identically, and will set all connected LEDs to the hue you command, from `0` (red) through to `255` (also red):
+
     skuttername.LEDcolour(hue)
     skuttername.LEDhue(hue)
 
-These will set all connected LEDs to the hue you command, from `0` (red) through to `255` (also red).
-
-    skuttername.setBrightness(brightness)
-
-will set the overall LED brightness, from `0` to `255`. Note that we're using the Hue/Saturation/Brightness colour model throughout, here, and Saturation is always set to maximum.
-
+You've seen `setBrightness` above. The values range from `0` to `255`. Note that we're using the Hue/Saturation/Brightness colour model throughout, here, and Saturation is always set to maximum.
 ### LED gradients
 
 **UNTESTED!!**
@@ -53,42 +40,39 @@ If your skutter has more than one LED attached, you can command either end of th
     skuttername.LEDstartHue(hue)
     skuttername.LEDendHue(hue)
 
-...will set the hue of the start and end of the strip. There aren't (yet) corresponding `LEDstartBrightness` or `LEDendBrightness` commands.
-
-Note that all gradients (and transitions) currently go the 'long' way around. So colour 20 to 230 should logically go 'over the top' of the colour wheel via 255/0, but it doesn't. This isn't ideal! 
+There aren't (yet) corresponding `LEDstartBrightness` or `LEDendBrightness` commands. Note that all gradients (and transitions) currently go the 'long' way around. So colour 20 to 230 should logically go 'over the top' of the colour wheel via 255/0, but it doesn't. This isn't ideal! 
 
 ## Animating things
 
-You can command changes to happen over time, and let the skutter handle the details. The skutter will need to know where it starts (state `A`), where it finishes (state `B`), and details like how long it should take to get from `A` to `B` (`transitionTime`) and what it should do when it gets there (`transitionType`).
-
-> *(I'm not sure this is working yet!)*
+You can command changes to happen over time, and let the skutter handle the details. The skutter will need to know where it starts (state `A`), where it finishes (state `B`), and details like how long it should take to get from `A` to `B` (`transitionTime`) and what to do when it gets there (`transitionType`).
 
     skuttername.transitionTime(seconds)
+    # !!Possibly not working right now!!
 
 
-For now, you have to set duration manually. It may be possible for the skutter to know the camera rotation angle, and hence for us to set `transitionTime` by 'number of degrees through which the camera turns.' How might you use that?
+For now, you have to set duration manually. It may be possible for the skutter to know the camera rotation angle, and hence for us to set `transitionTime` by 'number of degrees through which the camera turns.' How might you use that? Also note that at present, the transitionTime is the same for *everything*: both servos, the lights, all of it.
 
-Also note that the transitionTime is the same for *everything*: both servos, the lights, all of it. That's fixable, but I haven't got to it yet.
+You can choose what happens when the animation reaches the end point (*this is slightly untested*):
 
-    skuttername.transitionType("ONCE")
+    skuttername.transitionType("ONCE")   # transition from A to B, then stay at B.
+    skuttername.transitionType("LOOP")   # transition from A to B, then repeat.
+    skuttername.transitionType("RETURN") # transition from A to B, back to A, then repeat.
 
-Possible values here (only tested very briefly, but they seem to more-or-less work):
-
-    "ONCE"    # transition from A to B, then stay at B.
-    "LOOP"    # transition from A to B, then repeat.
-    "RETURN"  # transition from A to B, back to A, then repeat.
-
-Setting `A` and `B` states can be achieved through these commands:
+Setting `A` and `B` states can be achieved through:
 
     skuttername.servo1speedA(speed)
     skuttername.servo1speedB(speed)
+
     skuttername.servo2speedA(speed)
     skuttername.servo2speedB(speed)
 
-The servo animation commands are also available as `.servo1positionA`, `.servo1positionB`, and so on. Use whichever makes most sense for your particular skutter.
+    skuttername.LEDstartHueA(hue)
+    skuttername.LEDstartHueB(hue)
 
+<!-- 
+The servo animation commands are also available as `.servo1positionA`, `.servo1positionB`, and so on. Use whichever makes most sense for your particular skutter.
     skuttername.LEDstartHueA(hue)
     skuttername.LEDstartHueB(hue)
     skuttername.LEDendHueA(hue)
     skuttername.LEDendHueB(hue)
-
+ -->
