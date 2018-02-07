@@ -163,20 +163,22 @@ void loop() {
         // Now reassign start and target states.
         if (transitionType == "ONCE") {
             // Set [transitionStart] data to that at [transitionTarget]
+            Serial.println("*** ONCE ONLY");
             copyData(transitionStart, transitionTarget);
             transitionStart = 2;
             transitionTarget = 2;
             // We can just leave it here, until we're needed again.
         } else if (transitionType == "LOOP") {
             // We're reverting to state A and heading for B again.
+            Serial.println("*** LOOPING");
             copyData(transitionStart, 0);
             transitionStart = 1;
             transitionTarget = 2;
-            time_end = time_current + transitionTime;
         } else if (transitionType == "RETURN") {
             // if we were going A to B, now set B to A
             // else set A to B
-            if (transitionTarget = 2) {
+            Serial.println("*** RETURNING");
+            if (transitionTarget == 2) {
                 // Make the current state the target state
                 copyData(2, 0);
                 // Now reset the transition target
@@ -184,7 +186,7 @@ void loop() {
                 transitionStart = 2;
                 Serial.print("Heading to state A: ");
                 Serial.println(transitionTarget);
-            } else if (transitionTarget = 1) {
+            } else if (transitionTarget == 1) {
                 // Make the current state the target state
                 copyData(1, 0);
                 // Now reset the transition target
@@ -193,15 +195,16 @@ void loop() {
                 Serial.print("Heading to state B: ");
                 Serial.println(transitionTarget);
             }
-            // Update the end time
-            time_end = time_current + transitionTime;
         }
+        // Update the transition times
+        time_start = time_current;
+        time_end = time_current + transitionTime;
 
     }
 
     // Make sure we show the results of all our fancy LED wrangling.
     FastLED.show();
-    delay(1000); // Slow things down so we can see what's going on.
+    // delay(1000); // Slow things down so we can see what's going on.
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -349,8 +352,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 
 int interpolate(int start_value, int target_value, int start_time, int end_time, int current_time) {
-    float start_value_float = (float) start_value;
-    float target_value_float = (float) target_value;
+    float v_start = (float) start_value;
+    float v_target = (float) target_value;
+    float t_start = (float) start_time;
+    float t_end = (float) end_time;
+    float t_current = (float) current_time;
     float calculated_value_float;
     int calculated_value_int;
 
@@ -358,7 +364,7 @@ int interpolate(int start_value, int target_value, int start_time, int end_time,
     // Serial.print(" ");
     // Serial.println(target_value_float);
 
-    calculated_value_float = start_value_float + ( ((target_value_float - start_value_float) / (float)end_time - (float)start_time) * ((float)current_time - (float)start_time) );
+    calculated_value_float = v_start + (( (v_target - v_start) / (t_end - t_start) ) * (t_current - t_start) );
 
     // if ( target_value_float < start_value_float ) {
     //     calculated_value_float = start_value_float - ( ( (start_value_float - target_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
@@ -427,8 +433,8 @@ void updateLEDs() {
 
 void updateServos() {
     for (int i = 0; i < SERVO_COUNT; i++) {
-        servoPosition[i][0] = interpolate(servoPosition[i][transitionStart],
-                                  servoPosition[i][transitionTarget],
+        servoPosition[i][0] = (float)interpolate((int)servoPosition[i][transitionStart],
+                                  (int)servoPosition[i][transitionTarget],
                                   time_start,
                                   time_end,
                                   time_current);
