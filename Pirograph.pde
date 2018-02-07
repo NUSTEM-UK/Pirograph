@@ -24,7 +24,7 @@ int current_time;
 float fps;
 
 void setup() {
-  size(1280, 720, P3D);
+  size(1920, 1080, P3D);
   background(0,0,0);
 
   cam_width = width;
@@ -38,6 +38,8 @@ void setup() {
   } else {
     println("Available cameras:");
     for (int i = 0; i < cameras.length; i++) {
+      print(i);
+      print(" : ");
       println(cameras[i]);
     }
   }
@@ -47,7 +49,13 @@ void setup() {
   intermediate = createImage(cam_width, cam_height, RGB);
   composite = createImage(cam_width, cam_height, ARGB);
   maskImage = createImage(cam_width, cam_height, RGB);
-  cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
+  
+  // Select camera. Remember to change cam_width & cam_height (and size constructor) above
+  // if changing these!
+  //cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
+  cam = new Capture(this, cameras[15]); // C615 webcam, 1080p30
+  //cam = new Capture(this, cameras[16]); // C615, 1080p15
+  //cam = new Capture(this, cameras[18]); // C615, 960x540 30fps.
   cam.start();
 }
 
