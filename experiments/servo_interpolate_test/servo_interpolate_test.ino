@@ -111,11 +111,13 @@ int interpolate(int start_value, int target_value, int start_time, int end_time,
     // Serial.print(" ");
     // Serial.println(target_value_float);
 
-    if ( target_value_float < start_value_float ) {
-        calculated_value_float = start_value_float - ( ( (start_value_float - target_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
-    } else {
-        calculated_value_float = start_value_float + ( ( (target_value_float - start_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
-    }
+    calculated_value_float = start_value_float + ( ((target_value_float - start_value_float) / (float)end_time - (float)start_time) * ((float)current_time - (float)start_time) );
+
+    // if ( target_value_float < start_value_float ) {
+    //     calculated_value_float = start_value_float - ( ( (start_value_float - target_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
+    // } else {
+    //     calculated_value_float = start_value_float + ( ( (target_value_float - start_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
+    // }
 
     calculated_value_int = (int) calculated_value_float;
     return calculated_value_int;
