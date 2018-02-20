@@ -1,123 +1,217 @@
-"""Pirograph image processing.
+#!/usr/bin/env python
 
-Pygame implementation, based heavily on earlier Technology Wishing Well
-code and Mike Cook's Kaleido Cam from the Mag Pi, December 2017.
+"""Pirogrpah Image processing
 
-Note that this code will only work on V4L2 systems: ie. Linux and Raspberry Pi.
-Sorry, Mac and Windows users.
+Implemented loading an image from disk, to avoid camera faffing while we try
+to benchmark and performance-tune the image processing.
 
-...so for testing reasons, this instrumented version just loads an image from disk.
+On the Mac, 12.9% of execution time is in screen.blit,
+            48.4% in pygame.display.flip()
+
+If we init the Pygame display with FULLSCREEN | DOUBLEBUF | OPENGL | HWSURFACE,
+that drops to 28.7% and overall perforamcne is about 50% better. Blimey.
+
 """
 
+import io, time, sys
 import pygame
-# import pygame.camera
-import os, time
-from tkinter import Tk
-from tkinter.filedialog import asksaveasfilename
+
 from PIL import Image, ImageStat, ImageOps, ImageDraw
+import numpy as np
+import os.path
 
-# os.system("sydo modprobe bcm2835-v4l2") # needed for Pi camera
-Tk().withdraw()
-pygame.init()
-# pygame.camera.init()
-os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
-pygame.display.set_caption("Pirograph")
-pygame.event.set_allowed(None)
-pygame.event.set_allowed([pygame.KEYDOWN, pygame.QUIT])
+# Set working frame size. Stick with multiples of 32:
+# eg. 736, 800, 864, 896, 960, 1024, 1056.
+# A good compromise for a 1080-line HD display is 854 px square.
+size = width, height = 1056, 1056
 
-imagesize = 800 # basic image size.
-screen = pygame.display.set_mode([imagesize, imagesize], 0, 32)
-
-# find, open and start camera
-# cam_list = pygame.camera.list_cameras()
-# print(cam_list)
-# webcam = pygame.camera.Camera(cam_list[0], (1920, 1080))
-# webcam.start()
-
-preRot = 0.0
-autoRotate = False
-savePath = ""
-frameNumber = 0
-saveSource = False
-
-# Config variables (can adapt at runtime)
-full_screen = 0
-video_framerate = 0
+# Set up some configuration variables
+video_framerate = 8
+# Default image processing settings
 threshold_low = 40
 threshold_high = 230
+
 frame_count = 1
 
+# Initialise PyGame surface
+pygame.init()
+pygame.OPENGL = True
+# Toggle next two for faster mode, but without console display (unless shelled in)
+screen = pygame.display.set_mode(size, 0, 32) 
+# screen = pygame.display.set_mode(size, pygame.OPENGL | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF, 32)
+screen.fill((0, 0, 0))
+pygame.display.flip()
 
-def main():
-    x = 0
-    while x in range(10):
-        checkForEvent()
-        showScreen()
-        print(x)
-        x += 1
-        # print("")
+# Initialise PIL image to black background
+composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
+composite = composite.convert('RGBA')
+raw_str = composite.tobytes("raw", 'RGBA')
+pygame.surface = pygame.image.fromstring(raw_str, size, 'RGBA')
 
-def showScreen():
-    global camFrame, preRot, frame_count
-    # camFrame = webcam.get_image()
-    camFrame = pygame.image.load('test_image.jpeg')
+# Set up overlay mask image
+# Oversize so it anti-aliases on scaledown
+overmask_size = (width * 3, height * 3)
+overmask_centre = [ overmask_size[0] / 2 , overmask_size[1] / 2 ]
+overmask_radius = overmask_size[0] / 2
+
+def drawOvermask():
+    global overmask
+    global overmask_size
+    global overmask_radius
+    global overmask_centre
+    overmask = Image.new('L', overmask_size, 0)
+    draw = ImageDraw.Draw(overmask)
+    draw.ellipse (  (
+        (overmask_centre[0] - overmask_radius),
+        (overmask_centre[1] - overmask_radius),
+        (overmask_centre[0] + overmask_radius),
+        (overmask_centre[1] + overmask_radius) ), fill = 255)
+    overmask = overmask.resize(size, Image.ANTIALIAS)
+
+
+def get_brightness(image):
+    """Return overall brightness value for image"""
+    stat = ImageStat.Stat(image)
+    return stat.rms[0]
+
+
+def handlePygameEvents():
+    global threshold_low
+    global threshold_high
+    global composite
+    global frame_count
+    global overmask_size
+    global overmask_centre
+    global overmask_radius
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: sys.exit()
+        elif event.type is pygame.KEYDOWN:
+            key_press = event.key
+            # key_press = pygame.key.name(event.key)
+            # print key_press # For diagnostic purposes, but messes up output
+            if key_press == pygame.K_e:
+                if (threshold_low + 1) < 256:
+                    threshold_low += 1
+                print("threshold_low set to %i" % threshold_low)
+            elif key_press == pygame.K_d:
+                if (threshold_low - 1) >= 0:
+                    threshold_low -= 1
+                print("threshold_low set to %i" % threshold_low)
+            elif key_press == pygame.K_r:
+                if (threshold_high + 1) < 256:
+                    threshold_high += 1
+                print("threshold_high set to %i" % threshold_high)
+            elif key_press == pygame.K_f:
+                if (threshold_high -1) >= 0:
+                    threshold_high -= 1
+                print("threshold_high set to %i" % threshold_high)
+            
+            # Check for left shift and allow rapid threshold changes
+            if pygame.key.get_mods() & pygame.KMOD_LSHIFT:
+                if key_press == pygame.K_q:
+                    sys.exit()
+                if key_press == pygame.K_e:
+                    if (threshold_low + 10) < 256:
+                        threshold_low += 10
+                    print("threshold_low set to %i" % threshold_low)
+                elif key_press == pygame.K_d:
+                    if (threshold_low - 10) >= 0:
+                        threshold_low -= 10
+                    print("threshold_low set to %i" % threshold_low)
+                elif key_press == pygame.K_r:
+                    if (threshold_high + 10) < 256:
+                        threshold_high += 10
+                    print("threshold_high set to %i" % threshold_high)
+                elif key_press == pygame.K_f:
+                    if (threshold_high -10) >= 0:
+                        threshold_high -= 10
+                    print("threshold_high set to %i" % threshold_high)
+                # Check for SHIFT+P and if found, set working image to pure black again
+                elif key_press == pygame.K_p:
+                    print("*** STARTING OVER ***")
+                    composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
+                    composite = composite.convert('RGBA')
+
+# Set up mask image
+drawOvermask()
+
+# Note that array size arguments are the other way around to the camera resolution. Just to catch you out.
+# rawCapture = PiRGBArray(camera, size=(height, width))
+thisFrame = Image.open('test_image.jpeg')
+#rawCapture = PiYUVArray(camera, size=(height, width))
+
+time_begin = time.time()
+time_start = time.time()
+frame_count = 1
+
+# Work through the stream of images from the camera
+
+@profile
+def process_frame():
+    # frame_new = Image.frombytes('RGB', size, frame.array)
+    # frame_yuv = Image.frombytes('yuv', size, frame.array)
+    #frame_rgb_array = frame.array
+    #frame_rgb_image = Image.fromarray(frame_rgb_array)
+    frame_rgb_image = Image.new('RGBA', size)
+    frame_rgb_image.paste(thisFrame)
+
+    # BEGIN Image processing code 
+    
+    # Create YUV conversion for luminosity mask processing
+    #frame_yuv = frame_rgb_image.convert("YCbCr")
+    #frame_yuv_array = np.array(frame_yuv)
+    #frame_yuv_array = np.array(frame_rgb_image.convert("YCbCr"))
+    #frame_y = frame_yuv_array[0:width, 0:height, 0]
+    frame_y = np.array(frame_rgb_image.convert("YCbCr"))[0:width, 0:height, 0]
+
+    # ***** MASK PROCESSING *****
+    # Clip low values to black (transparent)
+    # First index the low values...
+    low_clip_indices = frame_y < threshold_low
+    # ...then set values at those indices to zero
+    frame_y[low_clip_indices] = 0
+
+    # Clip high values to white (solid)
+    # First index the high values...
+    high_clip_indices = frame_y > threshold_high
+    # ...then set values at those indices to 255
+    frame_y[high_clip_indices] = 255
+    
+    # Make mask image from Numpy array frame_y
+    mask = Image.fromarray(frame_y, "L")
+    
+    # ***** COMPOSITE NEW FRAME *****
+    # Convert captured frame to RGBA
+    frame_rgb_image = frame_rgb_image.convert("RGBA")
+    
+    # Combine captured frame with rolling composite, via computed mask
+    # TODO: Check this is really doing what we think it is
+    composite.paste(frame_rgb_image, (0,0), mask)
+    
+    # Apply overlay mask
+    composite.paste(overmask, (0,0), ImageOps.invert(overmask))
+    
+    # ***** DISPLAY NEW FRAME *****    
+    raw_str = composite.tobytes("raw", 'RGBA')
+    pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
+    
+    # Finally, update the window
+    screen.blit(pygame_surface, (0,0))
+    pygame.display.flip()
+
+
+x = 0
+while x in range(50):
+    # Do image processing things
+    process_frame()
+
+    # Handle PyGame events (ie. keypress controls)
+    handlePygameEvents()
+
+    time_taken = time.time() - time_start
+    time_since_begin = time.time() - time_begin
+    print("Frame %d in %.3f secs, at %.2f fps, Low: %d High: %d" % (frame_count, time_taken, (frame_count/time_since_begin), threshold_low, threshold_high))
+    
+    time_start = time.time()
     frame_count += 1
-    if autoRotate:
-        preRot += 0.5
-        if preRot > 360:
-            preRot -= 360
-        rotFrame = pygame.transform.scale(camFrame, (imagesize, imagesize)) # ensure square
-        rotFrame.set_alpha(greyscale(rotFrame))
-        rotFrame = rot_center(rotFrame, preRot) # Rotate
-        sqFrame = pygame.Surface((imagesize, imagesize))
-        sqFrame.blit(rotFrame, (0, 0))
-    else:
-        thisFrame = pygame.transform.scale(camFrame, (imagesize, imagesize))
-        thisFrame.set_alpha(greyscale(thisFrame))
-        sqFrame = pygame.Surface((imagesize, imagesize))
-        sqFrame.blit(thisFrame, (0, 0))
-    screen.blit(sqFrame, (0, 0))
-    pygame.display.update()
-
-
-def rot_center(image, angle):
-    # rotate an image while keeping its center and size
-    orig_rect = image.get_rect()
-    rot_image = pygame.transform.rotate(image, angle)
-    rot_rect = orig_rect.copy()
-    rot_rect.center = rot_image.get_rect().center
-    rot_image = rot_image.subsurface(rot_rect).copy()
-    return rot_image
-
-
-def terminate():
-    # webcam.stop()
-    pygame.quit()
-    os._exit(1)
-
-
-def greyscale(self, img):
-    """See https://stackoverflow.com/questions/10261440/how-can-i-make-a-greyscale-copy-of-a-surface-in-pygame/10693616#10693616."""
-    arr = pygame.surfarray.pixels3d(img)
-    avgs = [[(r*0.298+ g*0.587 + b*0.114) for (r, g, b) in col] for col in arr]
-    arr = arr.dot([0.298, 0.587, 0.114])[:,:,None].repeat(3, axis=2)
-    return pygame.surfarray.make_surface(arr)
-
-
-def checkForEvent():
-    global savePath, autoRotate, saveSource, preRot
-    event = pygame.event.poll()
-    if event.type == pygame.QUIT:
-        terminate()
-    if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_ESCAPE:
-            terminate()
-        if event.key == pygame.K_r:
-            autoRotate = not autoRotate
-            print("Autorotate: ", autoRotate)
-            if autoRotate:
-                preRot = 0
-
-
-if __name__ == '__main__':
-    main()
+    x += 1
