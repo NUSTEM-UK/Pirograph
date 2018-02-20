@@ -4,6 +4,13 @@
 
 Implemented loading an image from disk, to avoid camera faffing while we try
 to benchmark and performance-tune the image processing.
+
+On the Mac, 12.9% of execution time is in screen.blit,
+            48.4% in pygame.display.flip()
+
+If we init the Pygame display with FULLSCREEN | DOUBLEBUF | OPENGL | HWSURFACE,
+that drops to 28.7% and overall perforamcne is about 50% better. Blimey.
+
 """
 
 import io, time, sys
@@ -16,7 +23,7 @@ import os.path
 # Set working frame size. Stick with multiples of 32:
 # eg. 736, 800, 864, 896, 960, 1024, 1056.
 # A good compromise for a 1080-line HD display is 854 px square.
-size = width, height = 736, 736
+size = width, height = 1056, 1056
 
 # Set up some configuration variables
 video_framerate = 8
@@ -28,7 +35,10 @@ frame_count = 1
 
 # Initialise PyGame surface
 pygame.init()
-screen = pygame.display.set_mode(size)
+pygame.OPENGL = True
+# Toggle next two for faster mode, but without console display (unless shelled in)
+screen = pygame.display.set_mode(size, 0, 32) 
+# screen = pygame.display.set_mode(size, pygame.OPENGL | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF, 32)
 screen.fill((0, 0, 0))
 pygame.display.flip()
 
@@ -136,8 +146,8 @@ frame_count = 1
 
 # Work through the stream of images from the camera
 
-x = 0
-while x in range(10):    
+@profile
+def process_frame():
     # frame_new = Image.frombytes('RGB', size, frame.array)
     # frame_yuv = Image.frombytes('yuv', size, frame.array)
     #frame_rgb_array = frame.array
@@ -189,6 +199,12 @@ while x in range(10):
     screen.blit(pygame_surface, (0,0))
     pygame.display.flip()
 
+
+x = 0
+while x in range(50):
+    # Do image processing things
+    process_frame()
+
     # Handle PyGame events (ie. keypress controls)
     handlePygameEvents()
 
@@ -198,3 +214,4 @@ while x in range(10):
     
     time_start = time.time()
     frame_count += 1
+    x += 1
