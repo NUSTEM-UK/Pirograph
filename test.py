@@ -19,7 +19,7 @@ sleep(0.5)
 boris.LEDcolour(120)
 boris.setBrightness(255)
 
-delay = 1
+delay = 0.5
 
 boris.servoSpeed(90)
 boris.servo2speed(90)
@@ -46,8 +46,11 @@ sleep(delay)
 boris.servo2speed(0.0)
 sleep(delay)
 boris.servo2speed(180.0)
+sleep(delay)
 
-# for x in range(25):
-#     boris.setBrightness(x * 10)
-#     sleep(0.2)
+for x in range(25):
+    boris.setBrightness(x * 10)
+    sleep(delay)
 
+boris.servoSpeed(90.0)
+boris.servo2speed(90.0)

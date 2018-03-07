@@ -1,16 +1,15 @@
 // Basic thresholding to an RGBA destination
 // This is doing the thresholding on RGB source pixels. Ugh.
 
-import processing.video.*;
+import gohai.glvideo.*;
 
-Capture cam;
+GLCapture cam;
 PImage intermediate;
 PImage composite;
 PImage maskImage;
 
 int cam_width;
 int cam_height;
-
 
 float angle = 0;
 float angleStep = 0.5;
@@ -25,39 +24,29 @@ int current_time;
 float fps;
 
 void setup() {
-  size(1920, 1080, P3D);
+  size(1280, 720, P3D);
   background(0,0,0);
 
   cam_width = width;
   cam_height = height;
   
-  String[] cameras = Capture.list();
+  String[] cameras = GLCapture.list();
   
-  if (cameras.length == 0) {
-    println("There are no available cameras.");
-    exit();
-  } else {
-    println("Available cameras:");
-    for (int i = 0; i < cameras.length; i++) {
-      print(i);
-      print(" : ");
-      println(cameras[i]);
-    }
-  }
+  println("Available cameras:");
+  //if (0 < cameras.length) {
+  //    String[] configs = GLCapture.configs(cameras[0]);
+  //    println("Configs:");
+  //    printArray(configs);
+  //}
   
   int start_time = millis();
 
   intermediate = createImage(cam_width, cam_height, RGB);
   composite = createImage(cam_width, cam_height, ARGB);
   maskImage = createImage(cam_width, cam_height, RGB);
-  
-  // Select camera. Remember to change cam_width & cam_height (and size constructor) above
-  // if changing these!
-  //cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
-  cam = new Capture(this, cameras[15]); // C615 webcam, 1080p30
-  //cam = new Capture(this, cameras[16]); // C615, 1080p15
-  //cam = new Capture(this, cameras[18]); // C615, 960x540 30fps.
-
+  cam = new GLCapture(this);
+  //cam = new GLCapture(this, cameras[0], cam_width, cam_height, 30);
+  // cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
   cam.start();
 }
 
@@ -167,4 +156,3 @@ void keyReleased() {
     threshold_low = 0;
   }
 }
-
