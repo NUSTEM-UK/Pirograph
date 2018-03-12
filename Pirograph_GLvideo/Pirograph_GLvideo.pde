@@ -27,17 +27,17 @@ void setup() {
   size(1280, 720, P3D);
   background(0,0,0);
 
-  cam_width = width;
-  cam_height = height;
+  cam_width = 320;
+  cam_height = 200;
   
   String[] cameras = GLCapture.list();
   
   println("Available cameras:");
-  //if (0 < cameras.length) {
-  //    String[] configs = GLCapture.configs(cameras[0]);
-  //    println("Configs:");
-  //    printArray(configs);
-  //}
+  if (0 < cameras.length) {
+      String[] configs = GLCapture.configs(cameras[0]);
+      println("Configs:");
+      printArray(configs);
+  }
   
   int start_time = millis();
 
@@ -64,7 +64,7 @@ void draw() {
         int loc = x + y*cam_width;
         
         // Find luminosity of current pixel (cast to int)
-        Y = int((0.2126*red(cam.pixels[loc])) + (0.7152*green(cam.pixels[loc])) + (0.0722*blue(cam.pixels[loc])));
+ 
         // Y = int((red(cam.pixels[loc]) + green(cam.pixels[loc]) + blue(cam.pixels[loc])) / 3.0);
 
         if (Y > threshold_high) {
