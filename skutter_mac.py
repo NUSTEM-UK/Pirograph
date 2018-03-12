@@ -1,6 +1,8 @@
 """Dictionary of Wemos hardware MAC addresses.
 
 Allows targeting of individual skutter robot.
+TODO: Remove this, and rewrite with a system which assigns names more dynamically, 
+based on announced MAC addresses.
 """
 
 MACS = {"00": "18:FE:34:FD:91:AD",
