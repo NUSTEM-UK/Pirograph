@@ -25,7 +25,7 @@ int current_time;
 float fps;
 
 void setup() {
-  size(1280, 720, P2D);
+  size(1280, 720, P3D);
   background(0,0,0);
 
   cam_width = 1280;

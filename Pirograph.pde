@@ -11,6 +11,7 @@ PImage maskImage;
 int cam_width;
 int cam_height;
 
+
 float angle = 0;
 float angleStep = 0.5;
 
@@ -56,6 +57,7 @@ void setup() {
   cam = new Capture(this, cameras[15]); // C615 webcam, 1080p30
   //cam = new Capture(this, cameras[16]); // C615, 1080p15
   //cam = new Capture(this, cameras[18]); // C615, 960x540 30fps.
+
   cam.start();
 }
 
@@ -165,3 +167,4 @@ void keyReleased() {
     threshold_low = 0;
   }
 }
+

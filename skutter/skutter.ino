@@ -38,6 +38,7 @@ char subsTargetArray[60];
 #define PIXEL_COUNT 1
 #define SERVO_COUNT 2
 
+
 Servo servo1;
 Servo servo2;
 
@@ -205,6 +206,7 @@ void loop() {
     // Make sure we show the results of all our fancy LED wrangling.
     FastLED.show();
     // delay(1000); // Slow things down so we can see what's going on.
+
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -213,6 +215,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     // Serial.println(topic);
     // Serial.print("payload: ");
     // Serial.println(*payload);
+
 
     String payloadString;
     for (int i = 0; i < length ; i++) {
@@ -228,6 +231,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     // and queing commands just a little from the controller should prevent that from
     // happening. So we'll leave it up to the controller.
     StaticJsonBuffer<256> jsonBuffer;
+
     JsonObject& root = jsonBuffer.parseObject(payload);
     if (!root.success()) {
         Serial.println("Parsing failed!");
@@ -240,7 +244,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.println(root["command"].as<String>());
     // Serial.println(root["command"].as<char*>());
     // Serial.println(root["value"].as<char*>());
-
+    
     // String handling: see https://arduinojson.org/example/string/
     // Can cast to String on parse:
     // Serial.println(root["name"].as<String>());
