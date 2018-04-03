@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Skutter Control</title>
+    <title>Skutter Control : Derek</title>
 
     <!-- Bootstrap core CSS -->
     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
@@ -30,7 +30,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Home</a>
+          <a class="navbar-brand" href="/">Home</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <!--
@@ -51,9 +51,20 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
       <div class="container">
-        <h1>Skutter Control</h1>
-        <p>Control any skutter, anytime, anywhere.</p>
-        <p>This is a large content block / call-out, part of a standard Bootstrap layout.</p>
+        <h1>Skutter Control : Derek</h1>
+        <p></p>
+        <!-- Add sonme flashed content, if any is being sent. -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <!-- <strong>Title</strong> --> {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
       </div>
     </div>
 
@@ -70,8 +81,21 @@
           <p>Fingers crossed, this gives us enough flexibility to make things work easily.</p>
        </div>
         <div class="col-md-4">
-          <h2>Available Skutters</h2>
-            <a class="btn btn-success btn-block" href="derek" role="button">Derek</a> 
+          <h2>Servo Speed</h2>
+             <form class="form-horizontal" action="/send" method="POST">
+                <!-- So the form handler can parse which skutter the data is for, we return a hidden value here -->
+                <input type="hidden" name="skutterName" value="derek" />
+                <div class="form-group">
+                    <div class="col-sm-9">
+                        <input type="text" name="servo1speed" id="servo1speed" placeholder="Speed (0-180)" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-9">
+                        <input type="submit" value="Send" class="btn btn-primary btn-block" />
+                    </div>
+                </div>
+            </form> <!-- /form -->
         </div>
       </div>
 
