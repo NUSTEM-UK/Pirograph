@@ -9,6 +9,8 @@ from flask import render_template
 from flask import url_for
 from flask import request
 from flask import flash
+# skutterzero - and its config file `skutter_mac.py` are copied over from the main
+# directory here. Which means there's a fragmentation risk. Ugh.
 from skutterzero import Skutter
 
 app = Flask(__name__)
@@ -42,17 +44,25 @@ def daphne():
 # One MQTT form handler to rule them all.
 @app.route("/send", methods=["POST"])
 def send():
+    """Handle form submission and fire off MQTT messages.
+    Currently, works only with a single form field. There's probably a neat way of:
+    - stepping through form fields
+    - firing off those methods to the appropriate skutter
+    - not blowing up when it all goes wrong
+    """
     skutterName = request.form.get("skutterName")
     servo1speed = request.form.get("servo1speed")
     flash_message = "Skutter: "+ skutterName + " Servo1Speed: " + servo1speed
     # Work out which Skutter we're talking to from the form data, and command that one.
     str_to_class(skutterName).servo1speed(servo1speed)
+    # Give some mildly reassuring feedback to the user, that their data bas been acted upon.
     flash(flash_message)
     # Return us to the Skutter page from which we came.
     return redirect(url_for(skutterName))
 
 if __name__ == '__main__':
     # Instantiate the Skutter objects here, so they're available app-wide.
+    # This should probably be in the main body of the code, not tucked away down here.
     derek = Skutter("D07")
     daphne = Skutter("D08")
     app.run(port=5000, debug=True)
