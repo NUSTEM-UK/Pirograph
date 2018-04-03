@@ -2,6 +2,8 @@
 
 Install Python packages listed in [requirements.txt](requirements.txt), via `pip3 install ...`, then run the development server with `python3 skutter_control.py`. Interface will load on `127.0.0.1:5000` (NB. localhost-only).
 
+Incidentally, `mosquitto_sub -v -t pirograph/+` will output MQTT broker action on the `pirograph/#` topics. We've previously written our own Python for that, which keeps breaking between Python2 & 3. Whoops.
+
 ## Next steps
 
 In no particular order:
