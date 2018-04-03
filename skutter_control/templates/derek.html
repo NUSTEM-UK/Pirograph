@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block title %}
+    Skutter Control : Derek
+{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block jumbo %}
+    <h1>Skutter Control - Derek</h1>
+{% endblock %}
+{% block row1 %}
+    <div class="col-md-4">
+        <h2>Column One</h2>
+        <p>Bootstrap uses a conventional 12-column grid, with content columns able to span multiple columns. 
+          That's defined in the div classes in the page template.</p>
+      </div>
+      <div class="col-md-4">
+        <h2>Column Two</h2>
+        <p>Fingers crossed, this gives us enough flexibility to make things work easily.</p>
+     </div>
+      <div class="col-md-4">
+        <h2>Servo Speed</h2>
+           <form class="form-horizontal" action="/send" method="POST">
+              <!-- So the form handler can parse which skutter the data is for, we return a hidden value here -->
+              <input type="hidden" name="skutterName" value="derek" />
+              <div class="form-group">
+                  <div class="col-sm-9">
+                      <input type="text" name="servo1speed" id="servo1speed" placeholder="Speed (0-180)" class="form-control" />
+                      <input type="color" name="colourA"> 
+                      <input type="range" name="rangeA">
+                  </div>
+              </div>
+              <div class="form-group">
+                  <div class="col-sm-9">
+                      <input type="submit" value="Send" class="btn btn-primary btn-block" />
+                  </div>
+              </div>
+          </form> <!-- /form -->
+      </div>
+{% endblock %}
