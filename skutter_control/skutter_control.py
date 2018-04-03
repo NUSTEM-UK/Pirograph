@@ -17,7 +17,9 @@ app.secret_key = '2B4C0s8ObsIuL6pxvbfJaTm+MJcfvLKSw9IzTNlr1T5pYJZ1kSzQz'
 def str_to_class(s):
     """Used for converting a form-passed string into the name of a Skutter object.
     We check if the named Skutter exists, which should help avoid arbitrary code
-    execution from a web form (<ulp>)."""
+    execution from a web form (<ulp>).
+    TODO: This isn't actually tested. It does what's wanted when passed sane data, but
+          behaviour with bad data is unknown. Hopefully the app blows up."""
     if s in globals() and isinstance(globals()[s], Skutter):
         return globals()[s]
     return None
