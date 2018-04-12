@@ -60,6 +60,7 @@ time_begin = time.time()
 time_start = time.time()
 frame_count = 1
 
+@profile
 def process_frame(frame):
     current = current_process()
     time_startframe = time.time()
@@ -69,6 +70,10 @@ def process_frame(frame):
     # BEGIN Image processing code 
     
     # Create YUV conversion for luminosity mask processing
+    frame_yuv = frame_rgb_image.convert("YCbCr")
+    frame_yuv_array = np.array(frame_yuv)
+    frame_yuv_array = np.array(frame_rgb_image.convert("YCbCr"))
+    frame_y = frame_yuv_array[0:width, 0:height, 0]
     frame_y = np.array(frame_rgb_image.convert("YCbCr"))[0:width, 0:height, 0]
 
     # ***** MASK PROCESSING *****
@@ -112,7 +117,9 @@ frames = [thisFrame1, thisFrame1, thisFrame1, thisFrame1, thisFrame1,
 if __name__ == '__main__':
     print("Starting...")
     time_start = time.time()
-    pool = Pool(processes=4)
-    outputs = pool.map(process_frame, frames)
+    # pool = Pool(processes=1)
+    # outputs = pool.map(process_frame, frames)
+    for frame in frames:
+        output = process_frame(frame)
     # pool.close()
     print("complete in: %s" %(time.time() - time_start))
