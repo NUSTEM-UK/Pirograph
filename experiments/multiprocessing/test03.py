@@ -10,7 +10,7 @@ from PIL import Image, ImageStat, ImageOps, ImageDraw
 import numpy as np
 import os.path
 
-from multiprocessing import Pool
+from multiprocessing import Pool, current_process
 
 # Set working frame size. Stick with multiples of 32:
 # eg. 736, 800, 864, 896, 960, 1024, 1056.
@@ -24,9 +24,9 @@ threshold_high = 230
 frame_count = 1
 
 # Initialise PIL image to black background
-composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
-composite = composite.convert('RGBA')
-raw_str = composite.tobytes("raw", 'RGBA')
+#composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
+#composite = composite.convert('RGBA')
+#raw_str = composite.tobytes("raw", 'RGBA')
 
 # Set up overlay mask image
 # Oversize so it anti-aliases on scaledown
@@ -61,6 +61,7 @@ time_start = time.time()
 frame_count = 1
 
 def process_frame(frame):
+    current = current_process()
     time_startframe = time.time()
     frame_rgb_image = Image.new('RGBA', frame.size)
     frame_rgb_image.paste(frame)
@@ -91,22 +92,27 @@ def process_frame(frame):
     frame_rgb_image = frame_rgb_image.convert("RGBA")
 
     
-    print("Thread complete in: %s" %(time.time()-time_startframe))
+    print("Thread %s complete in: %s" %(current.name, time.time()-time_startframe))
     return mask
 
 x = 0
 compImage = Image.new('RGBA', size)
 
 thisFrame1 = Image.open('test_image.jpeg')
-# thisFrame2 = Image.open('test_image.jpeg')
-# thisFrame3 = Image.open('test_image.jpeg')
-# thisFrame4 = Image.open('test_image.jpeg')
-# thisFrame5 = Image.open('test_image.jpeg')
-frames = [thisFrame1, thisFrame1, thisFrame1]
+thisFrame2 = Image.open('test_image.jpeg')
+thisFrame3 = Image.open('test_image.jpeg')
+thisFrame4 = Image.open('test_image.jpeg')
+thisFrame5 = Image.open('test_image.jpeg')
+frames = [thisFrame1, thisFrame1, thisFrame1, thisFrame1, thisFrame1,
+          thisFrame2, thisFrame2, thisFrame2, thisFrame2, thisFrame2,
+          thisFrame4, thisFrame3, thisFrame3, thisFrame3, thisFrame3,
+          thisFrame3, thisFrame4, thisFrame4, thisFrame4, thisFrame4,
+          thisFrame5, thisFrame5, thisFrame5, thisFrame5, thisFrame5]
 
 if __name__ == '__main__':
     print("Starting...")
-    pool = Pool(processes=2)
+    time_start = time.time()
+    pool = Pool(processes=4)
     outputs = pool.map(process_frame, frames)
     # pool.close()
     print("complete in: %s" %(time.time() - time_start))
