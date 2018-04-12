@@ -68,12 +68,9 @@ def process_frame(frame):
     frame_rgb_image.paste(frame)
 
     # BEGIN Image processing code 
-    
+
+    # *** BEGIN YUV conversion and mask route    
     # Create YUV conversion for luminosity mask processing
-    frame_yuv = frame_rgb_image.convert("YCbCr")
-    frame_yuv_array = np.array(frame_yuv)
-    frame_yuv_array = np.array(frame_rgb_image.convert("YCbCr"))
-    frame_y = frame_yuv_array[0:width, 0:height, 0]
     frame_y = np.array(frame_rgb_image.convert("YCbCr"))[0:width, 0:height, 0]
 
     # ***** MASK PROCESSING *****
@@ -88,9 +85,21 @@ def process_frame(frame):
     high_clip_indices = frame_y > threshold_high
     # ...then set values at those indices to 255
     frame_y[high_clip_indices] = 255
-    
+
     # Make mask image from Numpy array frame_y
     mask = Image.fromarray(frame_y, "L")
+    
+    # *** END YUV conversion and mask route
+
+    # *** BEGIN greyscale conversion and mask route
+    frame_grey = np.array(frame_rgb_image.convert("L"))[0:width, 0:height]
+    low_clip_indices = frame_grey < threshold_low
+    high_clip_indices = frame_grey > threshold_high
+    frame_grey[low_clip_indices] = 0
+    frame_grey[high_clip_indices] = 255
+    mask = Image.fromarray(frame_y, "L")
+    # *** END greyscale conversion and mask route
+
     
     # ***** COMPOSITE NEW FRAME *****
     # Convert captured frame to RGBA
