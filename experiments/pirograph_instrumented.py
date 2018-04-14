@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Pirogrpah Image processing
+"""Pirograph Image processing
 
 Implemented loading an image from disk, to avoid camera faffing while we try
 to benchmark and performance-tune the image processing.

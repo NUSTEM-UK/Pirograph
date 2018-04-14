@@ -1,0 +1,38 @@
+# Python multiprocessing performance
+
+## test03.py
+
+Mac Pro:
+	each thread, python2, ~0.03 sec.
+	overall:1 worker: 	0.96 sec
+			2 workers:	0.77 sec
+			3 workers:	0.77 sec
+			4 workers:	0.71 sec
+			5 workers:	0.70 sec
+			6 workers:	0.69 sec
+			7 workers:	0.86 sec
+	each thread, python3, ~0.035 sec
+	overall:1 worker:	0.92
+			2 workers:	0.77
+			3 workers:	0.72
+			4 workers:	0.70
+			5 workers:	0.69
+			6 workers:	0.69
+			7 workers:	0.82
+	python3, straight-through with no multiprocessing: 0.82 sec.
+
+Raspberry Pi 3:
+	each thread, python2, ~0.11 sec
+	overall:1 worker:	3.45 sec
+			2 workers:	2.13 sec
+			3 workers: 	1.99 sec
+			4 workers:	1.95 sec
+	(each thread slows with greater load)
+	each thread, python3, ~0.11 sec
+	overall:1 worker:	3.4 sec
+			2 workers:	2.16 sec
+			3 workers:	2.05 sec
+			4 workers:	2.00 sec
+	(again, each thread slows with load)
+	python3, straight-through: 3 secs.
+

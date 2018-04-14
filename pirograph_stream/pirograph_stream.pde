@@ -25,11 +25,11 @@ int current_time;
 float fps;
 
 void setup() {
-  size(1280, 720, P3D);
+  size(1024, 768, P3D);
   background(0,0,0);
 
-  cam_width = 1280;
-  cam_height = 720  ;
+  cam_width = 1024;
+  cam_height = 768  ;
     
   int start_time = millis();
 
@@ -37,8 +37,9 @@ void setup() {
   composite = createImage(cam_width, cam_height, ARGB);
   maskImage = createImage(cam_width, cam_height, RGB);
   // cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
-  // cam = new IPCapture(this, "http://192.168.0.31:8000/stream.mjpg", "", "");
-  cam = new IPCapture(this, "http://10.0.1.2:8081/", "", "");
+   //cam = new IPCapture(this, "http://192.168.0.33:8000/stream.mjpg", "", "");
+  cam = new IPCapture(this, "http://192.168.0.33:8081", "", "");
+  //cam = new IPCapture(this, "http://10.0.1.2:8081/", "", "");
   cam.start();
 }
 
