@@ -14,3 +14,8 @@ Things that need sorting:
     ✔ Include in repo @done(18-04-15 14:56)
     ☐ Need linking, eg: https://stackoverflow.com/questions/8966740/how-to-host-google-web-fonts-on-my-own-server
 ✔ Bootstrap theme to https://github.com/lacockj/bs4-steam-theme/, to steampunkify everything @done(18-04-15 14:46)
+☐ Random assignment of Skutter control
+    ☐ One user per Skutter
+    ☐ Cookie storage for session data?
+    ☐ Timeout
+    ☐ ...or cheat, and have one tablet per Skutter?
