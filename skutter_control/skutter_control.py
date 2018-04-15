@@ -12,9 +12,14 @@ from flask import flash
 # skutterzero - and its config file `skutter_mac.py` are copied over from the main
 # directory here. Which means there's a fragmentation risk. Ugh.
 from skutterzero import Skutter
+from itertools import islice # Used to skip the first form field in POST handler
 
 app = Flask(__name__)
 app.secret_key = '2B4C0s8ObsIuL6pxvbfJaTm+MJcfvLKSw9IzTNlr1T5pYJZ1kSzQz'
+
+# Instantiate Skutters:
+derek = Skutter("D07")
+daphne = Skutter("D08")
 
 def str_to_class(s):
     """Used for converting a form-passed string into the name of a Skutter object.
@@ -34,11 +39,13 @@ def home():
 
 # It's ridiculous to handle each skutter separately here. This needs fixing.
 @app.route("/derek")
-def derek():
-    return render_template("derek.html")
+def renderDerek():
+    print(derek.servo1positionA)
+    return render_template("derek.html", servo1positionA=derek.servo1positionA)
+    # The above throws a bound method exception, because servo1positionA is both an instance variable and a method. Oops.
 
 @app.route("/daphne")
-def daphne():
+def renderDaphne():
     return render_template("daphne.html")
 
 # One MQTT form handler to rule them all.
@@ -51,9 +58,13 @@ def send():
     - not blowing up when it all goes wrong
     """
     skutterName = request.form.get("skutterName")
+    flash_message = "Skutter: " + skutterName
+    for v in islice(request.form, 1, None): # Skip the first entry, that's the name of the skutter
+        flash_message += " | %s : %s " %(v, request.form[v])
+    # TODO: Handle the individual elements of the form submission, rather than hard-coding here.
     servo1speed = request.form.get("servo1speed")
     knobData1 = request.form.get("knob-data-1")
-    flash_message = "Skutter: "+ skutterName + " | Servo1Speed: " + servo1speed + " | Knob data: " + knobData1
+    # flash_message = "Skutter: "+ skutterName + " | Servo1Speed: " + servo1speed + " | Knob data: " + knobData1
     # Work out which Skutter we're talking to from the form data, and command that one.
     str_to_class(skutterName).servo1speed(servo1speed)
     # Give some mildly reassuring feedback to the user, that their data bas been acted upon.
@@ -62,9 +73,6 @@ def send():
     return redirect(url_for(skutterName))
 
 if __name__ == '__main__':
-    # Instantiate the Skutter objects here, so they're available app-wide.
     # This should probably be in the main body of the code, not tucked away down here.
-    derek = Skutter("D07")
-    daphne = Skutter("D08")
     app.run(port=5000, debug=True)
 
