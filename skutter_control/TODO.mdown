@@ -1,0 +1,10 @@
+# Things that need sorting
+
+- Port to [WTForms](https://pythonhosted.org/Flask-Bootstrap/forms.html)
+- Set up form handler to [iterate over form fields](https://stackoverflow.com/questions/7777850/iterating-over-submitted-form-fields-in-flask.
+- Implement instance variable data storage in SkutterZero; modify with setter messages.
+- Pass instance variables to individual Skutter page templates.
+- Colour control for Skutter pages.
+- Page layout for A/B states, etc.
+- Disable submit button unless controls changed.
+- Bootstrap theme to https://github.com/lacockj/bs4-steam-theme/, to steampunkify everything

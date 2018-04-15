@@ -5,39 +5,47 @@
 {% block head %}
     {{ super() }}
 {% endblock head %}
-{% block jumbo %}
-    <h1>Skutter Control - Daphne</h1>
-{% endblock jumbo %}
+{% block skutterName %}
+    Skutter Control - Daphne
+{% endblock skutterName %}
 {% block row1 %}
-    <div class="col-md-4">
-        <h2>Column One</h2>
-        <p>Bootstrap uses a conventional 12-column grid, with content columns able to span multiple columns. 
-          That's defined in the div classes in the page template.</p>
-    </div>
-    <div class="col-md-4">
-        <h2>Column Two</h2>
-        <p>Fingers crossed, this gives us enough flexibility to make things work easily.</p>
-    </div>
-    <div class="col-md-4">
-        <h2>Servo Speed</h2>
-        <form class="form-horizontal" action="/send" method="POST">
-            <!-- So the form handler can parse which skutter the data is for, we return a hidden value here -->
-            <input type="hidden" name="skutterName" value="daphne" />
-            <div class="form-group">
-                <div class="col-sm-9">
-                    <input type="text" name="servo1speed" id="servo1speed" placeholder="Speed (0-180)" class="form-control" />
-                </div>
-            </div>
-            <div class="form-group">
-                <input name="knob-data-1" class="knob" data-width="200" data-min="-100" data-displayPrevious=true value="88" />
-            </div>
-            <div class="form-group">
-                <div class="col-sm-9">
-                    <input type="submit" value="Send" class="btn btn-primary btn-block" />
-                </div>
-            </div>
-        </form> <!-- /form -->
-    </div>
+    <div class="card-group">
+        <div class="card">
+            <div class="card-body">
+                <h2 class-"card-title">Column One</h2>
+                <p class="card-text">Bootstrap uses a conventional 12-column grid, with content columns able to span multiple columns. 
+                That's defined in the div classes in the page template.</p>
+            </div> <!-- card-body-->
+        </div> <!-- card -->
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Column Two</h2>
+                <p class="card-text">Fingers crossed, this gives us enough flexibility to make things work easily.</p>
+            </div> <!-- card-body -->
+        </div> <!-- card -->
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Servo Speed</h2>
+                <form class="form-horizontal" action="/send" method="POST">
+                    <!-- So the form handler can parse which skutter the data is for, we return a hidden value here -->
+                    <input type="hidden" name="skutterName" value="daphne" />
+                    <div class="form-group">
+                        <div class="col-sm-9">
+                            <input type="text" name="servo1speed" id="servo1speed" placeholder="Speed (0-180)" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input name="knob-data-1" class="knob" data-width="200" data-min="-100" data-displayPrevious=true value="88" />
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-9">
+                            <input type="submit" value="Send" class="large" />
+                        </div>
+                    </div>
+                </form> <!-- /form -->
+            </div> <!-- card-body -->
+        </div> <!-- card -->
+    </div> <!-- card-columns -->
 {% endblock row1 %}
 {% block foot %}
     <script>

@@ -53,7 +53,7 @@ def send():
     skutterName = request.form.get("skutterName")
     servo1speed = request.form.get("servo1speed")
     knobData1 = request.form.get("knob-data-1")
-    flash_message = "Skutter: "+ skutterName + " Servo1Speed: " + servo1speed + "Knob data: " + knobData1
+    flash_message = "Skutter: "+ skutterName + " | Servo1Speed: " + servo1speed + " | Knob data: " + knobData1
     # Work out which Skutter we're talking to from the form data, and command that one.
     str_to_class(skutterName).servo1speed(servo1speed)
     # Give some mildly reassuring feedback to the user, that their data bas been acted upon.
