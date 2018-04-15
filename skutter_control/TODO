@@ -6,4 +6,7 @@ Things that need sorting:
 ☐ Colour control for Skutter pages.
 ☐ Page layout for A/B states, etc.
 ☐ Disable submit button unless controls changed.
+☐ Fonts are loading from Google fonts - need downloading locally
+    ✔ Include in repo @done(18-04-15 14:56)
+    ☐ Need linking, eg: https://stackoverflow.com/questions/8966740/how-to-host-google-web-fonts-on-my-own-server
 ✔ Bootstrap theme to https://github.com/lacockj/bs4-steam-theme/, to steampunkify everything @done(18-04-15 14:46)
