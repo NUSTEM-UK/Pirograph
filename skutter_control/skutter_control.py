@@ -52,7 +52,7 @@ def renderDaphne():
 @app.route("/hettie")
 def renderHettie():
     return render_template("hettie.html")
-    # return render_template("hettie.html", servo1positionA=hettieservo1positionA,
+    # return render_template("hettie.html", servo1positionA=hettie.servo1positionA,
     #                                       servo1positionB=hettie.servo1positionB,
     #                                       servo2positionA=hettie.servo2positionA,
     #                                       servo2positionB=hettie.servo2positionB,
