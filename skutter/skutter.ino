@@ -347,7 +347,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 
     if (root["command"] == 'setTransitionTime') {
-        int transitionTime = root["value"];
+        transitionTime = root["value"];
         Serial.print("Transition time: ");
         Serial.println(transitionTime);
     }
@@ -396,9 +396,9 @@ void updateLEDgradient(int state) {
     // interpolate HSV values between start and end points in string
     // Get the end points
     CHSV startColour = CHSV(ledsHSV[0][state].hue, ledsHSV[0][state].sat, ledsHSV[0][state].val);
-    CHSV endColour = CHSV(ledsHSV[PIXEL_COUNT][state].hue, ledsHSV[PIXEL_COUNT][state].sat, ledsHSV[PIXEL_COUNT][state].val);
+    CHSV endColour = CHSV(ledsHSV[PIXEL_COUNT - 1][state].hue, ledsHSV[PIXEL_COUNT - 1][state].sat, ledsHSV[PIXEL_COUNT - 1][state].val);
     // Now looping between the 2nd and n-1th LEDs
-    for (int i = 1; i < (PIXEL_COUNT - 1); i++) {    
+    for (int i = 1; i < PIXEL_COUNT; i++) {    
         CHSV tempColour;
         tempColour.hue = interpolate(startColour.hue, endColour.hue, 0, PIXEL_COUNT, i);
         tempColour.sat = interpolate(startColour.sat, endColour.sat, 0, PIXEL_COUNT, i);
