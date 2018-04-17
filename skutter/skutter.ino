@@ -35,7 +35,7 @@ char subsTargetArray[60];
 #define PIN_LED_RED D3
 #define PIN_PIXEL D1
 
-#define PIXEL_COUNT 1
+#define PIXEL_COUNT 9
 #define SERVO_COUNT 2
 
 
@@ -85,7 +85,7 @@ void setup() {
     client.setServer(mqtt_server, 1883);
     client.setCallback(callback);
 
-    targetBrightness = 100;
+    targetBrightness = 200;
 
     FastLED.addLeds<WS2811, PIN_PIXEL, GRB>(leds, PIXEL_COUNT);
     for (int targetLED = 0; targetLED < PIXEL_COUNT; targetLED += 1) {
@@ -146,7 +146,7 @@ void loop() {
         updateServos();
         updateLEDs(); // Update the HSV arrays
         writeLEDs();  // Write the HSV values across to the RGB array
-        diagnostics();
+        //diagnostics();
     } else {
         // We should have completed transition by now.
         Serial.println("<<< TRANSITION COMPLETE");
