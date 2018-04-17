@@ -20,6 +20,7 @@ app.secret_key = '2B4C0s8ObsIuL6pxvbfJaTm+MJcfvLKSw9IzTNlr1T5pYJZ1kSzQz'
 # Instantiate Skutters:
 derek = Skutter("D07")
 daphne = Skutter("D08")
+hettie = Skutter("D04")
 
 def str_to_class(s):
     """Used for converting a form-passed string into the name of a Skutter object.
@@ -48,29 +49,44 @@ def renderDerek():
 def renderDaphne():
     return render_template("daphne.html")
 
+@app.route("/hettie")
+def renderHettie():
+    return render_template("hettie.html")
+    # return render_template("hettie.html", servo1positionA=hettieservo1positionA,
+    #                                       servo1positionB=hettie.servo1positionB,
+    #                                       servo2positionA=hettie.servo2positionA,
+    #                                       servo2positionB=hettie.servo2positionB,
+    #                                       LEDstartHueA=hettie.LEDstartHueA,
+    #                                       LEDstartHueA=hettie.LEDstartHueB,
+    #                                       LEDendHueA=hettie.LEDendHueA,
+    #                                       LEDendHueB=hettie.LEDendHueB,
+    #                                       transitionTime=hettie.transitionTime)
+
+
 # One MQTT form handler to rule them all.
 @app.route("/send", methods=["POST"])
 def send():
-    """Handle form submission and fire off MQTT messages.
-    Currently, works only with a single form field. There's probably a neat way of:
-    - stepping through form fields
-    - firing off those methods to the appropriate skutter
-    - not blowing up when it all goes wrong
-    """
+    """Handle form submission and fire off MQTT messages."""
     skutterName = request.form.get("skutterName")
     flash_message = "Skutter: " + skutterName
     for v in islice(request.form, 1, None): # Skip the first entry, that's the name of the skutter
         flash_message += " | %s : %s " %(v, request.form[v])
+        # Now call method v on object skutterName, passing in the form value request.form[v]
+        # This relies on SkutterZero to handle string/hex data passed in. Ouch.
+        getattr(str_to_class(skutterName), v)(request.form[v])
+
+
     # TODO: Handle the individual elements of the form submission, rather than hard-coding here.
-    servo1speed = request.form.get("servo1speed")
-    knobData1 = request.form.get("knob-data-1")
+    # servo1speed = request.form.get("servo1speed")
+    # knobData1 = request.form.get("knob-data-1")
     # flash_message = "Skutter: "+ skutterName + " | Servo1Speed: " + servo1speed + " | Knob data: " + knobData1
     # Work out which Skutter we're talking to from the form data, and command that one.
-    str_to_class(skutterName).servo1speed(servo1speed)
+    
+    # str_to_class(skutterName).servo1speed(servo1speed)
     # Give some mildly reassuring feedback to the user, that their data bas been acted upon.
     flash(flash_message)
     # Return us to the Skutter page from which we came.
-    return redirect(url_for(skutterName))
+    return redirect(skutterName)
 
 if __name__ == '__main__':
     # This should probably be in the main body of the code, not tucked away down here.

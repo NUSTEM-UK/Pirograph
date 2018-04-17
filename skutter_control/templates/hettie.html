@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+{% block title %}
+    Skutter Control : Hettie
+{% endblock title %}
+{% block head %}
+    {{ super() }}
+{% endblock head %}
+{% block jumbo %}
+     <h1>Skutter Control &ndash; Hettie</h1>
+{% endblock jumbo %}
+{% block controls %}
+    <div class="row">
+        <div class="col-sm">
+            <!-- <h3>Column 1</h3> -->
+        </div>
+        <div class="col-sm">
+            <h3>Rotation Speed</h3>
+        </div>
+        <div class="col-sm">
+            <h3>Arm Angle</h3>
+        </div>
+        <div class="col-sm">
+            <h3>Start Colour</h3>
+        </div>
+        <div class="col-sm">
+            <h3>End Colour</h3>
+        </div>
+    </div> <!-- row -->
+    <form action="/send" method="POST">
+        <input type="hidden" name="skutterName" value="hettie" />
+        <div class="row">
+            <div class="col-sm">
+                <h3>State A</h3>
+            </div>
+            <div class="col-sm">
+                <input name="servo1speedA" class="knob" data-min="-90" data-max="90" data-displayPrevious=true value="0" />
+            </div>
+            <div class="col-sm">
+                <input name="servo2positionA" class="knob" data-min="0" data-max="180" data-displayPrevious=true value="90" />
+            </div>
+            <div class="col-sm">
+                <input type="color" name="LEDstartHueA" /> 
+            </div>
+            <div class="col-sm">
+                <input type="color" name="LEDendHueA" /> 
+            </div>
+        </div> <!-- row -->
+        <div class="row">
+            <div class="col-sm">
+                <h3>State B</h3>
+            </div>
+            <div class="col-sm">
+                <input name="servo1speedB" class="knob" data-min="-90" data-max="90" data-displayPrevious=true value="0" />
+            </div>
+            <div class="col-sm">
+                <input name="servo2positionB" class="knob" data-min="0" data-max="180" data-displayPrevious=true value="90" />
+            </div>
+            <div class="col-sm">
+                <input type="color" name="LEDstartHueB" /> 
+            </div>
+            <div class="col-sm">
+                <input type="color" name="LEDendHueB" /> 
+            </div>
+        </div> <!-- row -->
+        <div class="row">
+            <div class="col-sm">
+                <h3>Transition time</h3>
+            </div>
+            <div class="col-sm">
+                <input name="transitionTime" class="knob" data-min="1" data-max="30" data-displayPrevious=true value="90" />
+            </div>
+            <div class="col-sm">
+                <input type="submit" value="Send" class="large" />
+            </div>
+            <div class="col-sm">
+            </div>
+            <div class="col-sm"></div>
+            </div>
+        </div> <!-- row -->
+    </form>
+    
+{% endblock controls %}
+
+{% block foot %}
+    <script>
+        $(function($) {
+
+            $(".knob").knob({
+                change : function (value) {
+                    //console.log("change : " + value);
+                },
+                release : function (value) {
+                    //console.log(this.$.attr('value'));
+                    console.log("release : " + value);
+                },
+                cancel : function () {
+                    console.log("cancel : ", this);
+                },
+                
+            });
+
+        });
+    </script>
+{% endblock foot %}
