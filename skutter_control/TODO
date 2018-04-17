@@ -8,12 +8,16 @@ Things that need sorting:
 ✔ Pass instance variables to individual Skutter page templates. @done(18-04-15 15:34)
     ☐ ...proof-of-concept, but incomplete (and see above) @started(18-04-15 15:35)
 ☐ Colour control for Skutter pages.
-☐ Page layout for A/B states, etc.
+✔ Page layout for A/B states, etc. @done(18-04-17 15:27)
 ☐ Disable submit button unless controls changed.
 ☐ Fonts are loading from Google fonts - need downloading locally @started(18-04-15 15:35)
     ✔ Include in repo @done(18-04-15 14:56)
     ☐ Need linking, eg: https://stackoverflow.com/questions/8966740/how-to-host-google-web-fonts-on-my-own-server
 ✔ Bootstrap theme to https://github.com/lacockj/bs4-steam-theme/, to steampunkify everything @done(18-04-15 14:46)
-☐ Possibly useful Bootstrap theme: https://hackerthemes.com/bootstrap-themes/neon-glow/
-    ☐ Otherwise, the best stuff seems to be at Bootswatch: https://bootswatch.com (I like Slate, Spacelab)
-
+☐ Bootsrap theme alternatives: https://bootswatch.com (Spacelab, Slate)
+☐ Random assignment of Skutter control
+    ☐ One user per Skutter
+    ☐ Cookie storage for session data?
+    ☐ Timeout
+    ☐ ...or cheat, and have one tablet per Skutter?
+☐ Tidy up HTML master layout

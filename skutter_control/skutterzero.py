@@ -10,12 +10,13 @@ is mostly an abstraction of the message-passing and networking code.
 import json
 import paho.mqtt.client as mqtt
 from skutter_mac import MACS
+from colorsys import rgb_to_hsv # Needed for Hex to HSV conversions
 
 mqttc = mqtt.Client()
 
 # TODO: expose interface for configuring the MQTT broker address & port
-# mqtt_server = "10.0.1.3"
-mqtt_server = "localhost"
+mqtt_server = "10.0.1.3"
+# mqtt_server = "localhost"
 # mqtt_server = "192.168.0.31"
 mqtt_port = 1883
 # TODO: expose interface for configuring the MQTT channel root
@@ -40,6 +41,15 @@ labels for every device we're going to power up. Which saves a bunch of logic at
 runtime, without a huge compromise (that is, the skutter list isn't dynamic during
 execution, but we can probably live with that).
 """
+
+def hex_to_rgb(value):
+    """Helper function to handle hex colour codes, and return rgb.
+       
+       Used with colorsys routines to extract hue angle from web hex data.
+    """
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 class Skutter:
     """Initial implementation of Skutter type.
@@ -95,7 +105,15 @@ class Skutter:
     def setLEDhue(self, position, state, value):
         """Command LED colour change."""
         # TODO: sanity check on inputs
-        messageDict = {"command": "setLEDhue", "position": position, "state": state, "value": value}
+        if value.startswith("#"):
+            # We have a hex code - convert to HSV (via RGB) and send Hue
+            r, g, b = hex_to_rgb(value)
+            h, s, v = rgb_to_hsv(r, g, b)
+            # Now send the hue value, scaled to integer 0-255 (which the Skutter expects)
+            messageDict = {"command": "setLEDhue", "position": position, "state": state, "value": int(h*255)}
+        else:
+            # Assume it's hue value and cast to int
+            messageDict = {"command": "setLEDhue", "position": position, "state": state, "value": int(value)}
         self._message(messageDict, self._mac)
 
     def LEDstartHue(self, targetHue):
@@ -151,7 +169,7 @@ class Skutter:
     def setServoPosition(self, servoNum, state, angle):
         """base message sender for servo interactions."""
         # TODO: sanity check on inputs
-        messageDict = {"command": "setServoPosition", "servoNum": servoNum, "state": state, "angle": angle}
+        messageDict = {"command": "setServoPosition", "servoNum": servoNum, "state": state, "angle": int(angle)}
         self._message(messageDict, self._mac)
 
     def servo1position(self, targetSpeed):
@@ -206,15 +224,15 @@ class Skutter:
 
     def LEDbrightness(self, targetBrightness):
         """Convenience method alias for setBrightness."""
-        self.setBrightness(targetBrightness)
+        self.setBrightness(int(targetBrightness))
 
-    def transitionTime(self, requested_angle):
+    def transitionTime(self, requested_time):
         # TODO: add sanity check
-        if requested_angle < 0: # TODO: check if transitionTime is integer
+        if int(requested_time) < 0: # TODO: check if transitionTime is integer
             # TODO: raise error
             pass
         else:
-            messageDict = {"command": "setTransitionTime", "value": requested_angle*1000}
+            messageDict = {"command": "setTransitionTime", "value": int(requested_time)*1000}
             # my_dict = {'id':self._mac, 'transitionTime':requested_angle}
             self._message(messageDict, self._mac)
 
