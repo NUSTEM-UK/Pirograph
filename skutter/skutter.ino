@@ -146,7 +146,7 @@ void loop() {
         updateServos();
         updateLEDs(); // Update the HSV arrays
         writeLEDs();  // Write the HSV values across to the RGB array
-        diagnostics();
+        //diagnostics(); // commented out diagnostics(), because no one needs this amount of data
     } else {
         // We should have completed transition by now.
         Serial.println("<<< TRANSITION COMPLETE");
@@ -197,7 +197,7 @@ void loop() {
                 Serial.println(transitionTarget);
             }
         }
-        // Update the transition times
+        // Update the transition times - note that transitions times only get updated once we reach the end of a loop
         time_start = time_current;
         time_end = time_current + transitionTime;
 
@@ -215,7 +215,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
     // Serial.println(topic);
     // Serial.print("payload: ");
     // Serial.println(*payload);
-
 
     String payloadString;
     for (int i = 0; i < length ; i++) {
@@ -350,35 +349,38 @@ void callback(char* topic, byte* payload, unsigned int length) {
         transitionTime = root["value"];
         Serial.print("Transition time: ");
         Serial.println(transitionTime);
+        // Set the transition timer running again - added this to see what goes on
+        time_current = millis();
+        time_end = time_current + transitionTime;
     }
 
 }
 
+// let's see if we can change to the map funciton instead
+// int interpolate(int start_value, int target_value, int start_time, int end_time, int current_time) {
+//     float v_start = (float) start_value;
+//     float v_target = (float) target_value;
+//     float t_start = (float) start_time;
+//     float t_end = (float) end_time;
+//     float t_current = (float) current_time;
+//     float calculated_value_float;
+//     int calculated_value_int;
 
-int interpolate(int start_value, int target_value, int start_time, int end_time, int current_time) {
-    float v_start = (float) start_value;
-    float v_target = (float) target_value;
-    float t_start = (float) start_time;
-    float t_end = (float) end_time;
-    float t_current = (float) current_time;
-    float calculated_value_float;
-    int calculated_value_int;
+//     // Serial.print(start_value_float);
+//     // Serial.print(" ");
+//     // Serial.println(target_value_float);
 
-    // Serial.print(start_value_float);
-    // Serial.print(" ");
-    // Serial.println(target_value_float);
+//     calculated_value_float = v_start + (( (v_target - v_start) / (t_end - t_start) ) * (t_current - t_start) );
 
-    calculated_value_float = v_start + (( (v_target - v_start) / (t_end - t_start) ) * (t_current - t_start) );
+//     // if ( target_value_float < start_value_float ) {
+//     //     calculated_value_float = start_value_float - ( ( (start_value_float - target_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
+//     // } else {
+//     //     calculated_value_float = start_value_float + ( ( (target_value_float - start_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
+//     // }
 
-    // if ( target_value_float < start_value_float ) {
-    //     calculated_value_float = start_value_float - ( ( (start_value_float - target_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
-    // } else {
-    //     calculated_value_float = start_value_float + ( ( (target_value_float - start_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
-    // }
-
-    calculated_value_int = (int) calculated_value_float;
-    return calculated_value_int;
-}
+//     calculated_value_int = (int) calculated_value_float;
+//     return calculated_value_int;
+// }
 
 void writeLEDs() {
     // Map ledsHSV to leds (RGB), and update the pixel string.
@@ -398,11 +400,21 @@ void updateLEDgradient(int state) {
     CHSV startColour = CHSV(ledsHSV[0][state].hue, ledsHSV[0][state].sat, ledsHSV[0][state].val);
     CHSV endColour = CHSV(ledsHSV[PIXEL_COUNT - 1][state].hue, ledsHSV[PIXEL_COUNT - 1][state].sat, ledsHSV[PIXEL_COUNT - 1][state].val);
     // Now looping between the 2nd and n-1th LEDs
+    // for (int i = 1; i < PIXEL_COUNT; i++) {    
+    //     CHSV tempColour;
+    //     tempColour.hue = interpolate(startColour.hue, endColour.hue, 0, PIXEL_COUNT, i);
+    //     tempColour.sat = interpolate(startColour.sat, endColour.sat, 0, PIXEL_COUNT, i);
+    //     tempColour.val = interpolate(startColour.val, endColour.val, 0, PIXEL_COUNT, i);
+
+    //     ledsHSV[i][state] = tempColour;
+    // }
+
+    // let's try this with the 'map' function - Syntax map(value, fromLow, fromHigh, toLow, toHigh)
     for (int i = 1; i < PIXEL_COUNT; i++) {    
         CHSV tempColour;
-        tempColour.hue = interpolate(startColour.hue, endColour.hue, 0, PIXEL_COUNT, i);
-        tempColour.sat = interpolate(startColour.sat, endColour.sat, 0, PIXEL_COUNT, i);
-        tempColour.val = interpolate(startColour.val, endColour.val, 0, PIXEL_COUNT, i);
+        tempColour.hue = (int) map(i, 0, PIXEL_COUNT, startColour.hue, endColour.hue);
+        tempColour.sat = (int) map(i, 0, PIXEL_COUNT, startColour.sat, endColour.sat);
+        tempColour.val = (int) map(i, 0, PIXEL_COUNT, startColour.val, endColour.val);
 
         ledsHSV[i][state] = tempColour;
     }
@@ -413,9 +425,13 @@ void updateLEDs() {
 
     for (int i = 0; i < PIXEL_COUNT; i++) {
         CHSV tempColour;
-        tempColour.hue = interpolate(ledsHSV[i][transitionStart].hue,
-                                     ledsHSV[i][transitionTarget].hue,
-                                     time_start, time_end, time_current);
+        // inserted the mp function here
+        tempColour.hue = (int) map(time_current, time_start, time_end, ledsHSV[i][transitionStart].hue,
+                                     ledsHSV[i][transitionTarget].hue
+                                     );
+        // tempColour.hue = interpolate(ledsHSV[i][transitionStart].hue,
+        //                              ledsHSV[i][transitionTarget].hue,
+        //                              time_start, time_end, time_current);
         tempColour.sat = 255;
         tempColour.val = targetBrightness;
         // tempColour.sat = interpolate(ledsHSV[i][transitionStart].sat,
@@ -437,11 +453,16 @@ void updateLEDs() {
 
 void updateServos() {
     for (int i = 0; i < SERVO_COUNT; i++) {
-        servoPosition[i][0] = (float)interpolate((int)servoPosition[i][transitionStart],
-                                  (int)servoPosition[i][transitionTarget],
-                                  time_start,
-                                  time_end,
-                                  time_current);
+        //try the mapping function here too
+        servoPosition[i][0] = (float)map(time_current, time_start,
+                                  time_end,(int)servoPosition[i][transitionStart],
+                                  (int)servoPosition[i][transitionTarget]);
+
+        // servoPosition[i][0] = (float)interpolate((int)servoPosition[i][transitionStart],
+        //                           (int)servoPosition[i][transitionTarget],
+        //                           time_start,
+        //                           time_end,
+        //                           time_current);
     }
     servo1.write(servoPosition[0][0]);
     servo2.write(servoPosition[1][0]);
