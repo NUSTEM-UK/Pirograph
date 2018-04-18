@@ -140,12 +140,18 @@ void loop() {
     client.loop();
 
     time_current = millis(); // When is now?
+
     // Should we have already completed the current transition?
     if (time_current < time_end) {
-        Serial.println("--- in transition");
+        //Serial.println("--- in transition");
         updateServos();
         updateLEDs(); // Update the HSV arrays
         writeLEDs();  // Write the HSV values across to the RGB array
+
+        // a counting fucntion to test whether the transition time is getting updated
+        // if ((time_end-time_current)%1000 == 0) {
+        // Serial.println((int)((time_end-time_current)/1000));
+        // }
         //diagnostics(); // commented out diagnostics(), because no one needs this amount of data
     } else {
         // We should have completed transition by now.
@@ -185,21 +191,31 @@ void loop() {
                 // Now reset the transition target
                 transitionTarget = 1;
                 transitionStart = 2;
-                Serial.print("Heading to state A: ");
-                Serial.println(transitionTarget);
+                // Serial.print("Heading to state A: ");
+                // Serial.println(transitionTarget);
             } else if (transitionTarget == 1) {
                 // Make the current state the target state
                 copyData(1, 0);
                 // Now reset the transition target
                 transitionTarget = 2;
                 transitionStart = 1;
-                Serial.print("Heading to state B: ");
-                Serial.println(transitionTarget);
+                // Serial.print("Heading to state B: ");
+                // Serial.println(transitionTarget);
             }
         }
         // Update the transition times - note that transitions times only get updated once we reach the end of a loop
+        Serial.println("Start time updated");
         time_start = time_current;
+        // Serial.println(time_start);
+        // Serial.print("End time updated: ");
+        Serial.print("Transition Duration");
+        Serial.print(transitionTime);
         time_end = time_current + transitionTime;
+        // // Serial.println(time_end);
+        // Serial.print("New duration: ");
+        // Serial.println(time_end-time_start);
+
+       
 
     }
 
@@ -345,7 +361,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
         transitionType = tempType;
     }
 
-    if (root["command"] == 'setTransitionTime') {
+    if (root["command"] == "setTransitionTime") { //Comparisons here must use " " and not ''
+        Serial.print("PING");
         transitionTime = root["value"];
         Serial.print("Transition time: ");
         Serial.println(transitionTime);
@@ -442,11 +459,11 @@ void updateLEDs() {
         //                              time_start, time_end, time_current);
         ledsHSV[i][0] = tempColour;
         leds[i] = tempColour;
-        Serial.print(ledsHSV[i][transitionStart].hue);
-        Serial.print(" ");
-        Serial.print(ledsHSV[i][transitionTarget].hue);
-        Serial.print(" ");
-        Serial.println(tempColour.hue);
+        // Serial.print(ledsHSV[i][transitionStart].hue);
+        // Serial.print(" ");
+        // Serial.print(ledsHSV[i][transitionTarget].hue);
+        // Serial.print(" ");
+        // Serial.println(tempColour.hue);
     }
     // Again, we'll need to call FastLED.show() to update the string. Do that in the loop.
 }
