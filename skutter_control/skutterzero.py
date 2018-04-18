@@ -268,6 +268,7 @@ class Skutter:
     def servo1speedA(self, targetSpeed):
         self._servo1speedA = targetSpeed
         self.servo1positionA(targetSpeed)
+
     @property
     def servo1speedB(self):
         return self._servo1speedB
