@@ -61,27 +61,20 @@ class Skutter:
     def __init__(self, skutterNumber="00", requestedLEDcount="1"):
         """Initialise the skutter, with vaguely-sane defaults."""
         self._mac = MACS[skutterNumber] # MAC address of specific Wemos module.
-        self.permittedTransitionTypes = ("ONCE", "LOOP", "RETURN")
-        self.cameraRotationTime = 10.0 # Time in secs (float).
+        self._permittedTransitionTypes = ("ONCE", "LOOP", "RETURN")
+        self._cameraRotationTime = 10.0 # Time in secs (float).
         # Make sure all the variables exist
-        self.LEDcount = requestedLEDcount # How many LEDs in the strip?
-        # Package the data.
-        
+        self._LEDcount = requestedLEDcount # How many LEDs in the strip?
+        self._servo1postionA = 90.0
+        self._servo1positionB = 90.0
+        self._servo2positionA = 90.0
+        self._servo2positionB = 90.0
+        self._LEDstartHueA = 0
+        self._LEDstartHueB = 0
+        self._LEDendHueA = 0
+        self._LEDendHueB = 0
+        self._transitionTime = 5.0
 
-    def _dictionarify(self):
-        """Package everything up into a neat dictionary, for JSONificaation."""
-        # self.skutterDict["mac"] = self._mac
-        self.skutterDict["transitionTime"] = self.transitionTime
-        self.skutterDict["transitionType"] = self.transitionType
-        self.skutterDict["cameraRotationTime"] = self.cameraRotationTime
-        self.skutterDict["servo1position"] = self.servo1position
-        self.skutterDict["servo2position"] = self.servo2position
-        self.skutterDict["LEDstartHue"] = self.LEDstartHue
-        self.skutterDict["LEDendHue"] = self.LEDendHue
-        self.skutterDict["LEDcount"] = self.LEDcount
-        self.skutterDict["LEDbrightness"] = self.LEDbrightness
-        # Leave a stub here for the next thing I think to add.
-        # self.skutterDict[""] = self.
 
     def _message(self, payload, topic=""):
         """Fire the MQTT message (internal class method)
@@ -93,7 +86,8 @@ class Skutter:
         mqttc.publish(mqtt_channel+topic, json.dumps(payload))
         # mqttc.publish(mqtt_channel+topic, self.jsonTestData)
 
-    def getMac(self):
+    @property
+    def mac(self):
         """Output object MAC address, as string. For testing purposes."""
         return self._mac
 
