@@ -71,6 +71,7 @@ def send():
     flash_message = "Skutter: " + mySkutter
     for v in islice(request.form, 1, None): # Skip the first entry, that's the name of the skutter
         flash_message += " | %s : %s " %(v, request.form[v])
+        print(v, request.form[v])
         # Now call method v on object skutterName, passing in the form value request.form[v]
         # This relies on SkutterZero to handle string/hex data passed in. Ouch.
         getattr(str_to_class(mySkutter), v)(request.form[v])

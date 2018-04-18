@@ -33,16 +33,28 @@
                 <h3>State A</h3>
             </div>
             <div class="col-sm">
-                <input name="servo1speedA" class="knob" data-min="-90" data-max="90" data-displayPrevious=true value="0" />
+                <input name="servo1speedA" class="knob" data-min="-90" 
+                                                        data-max="90" 
+                                                        data-displayPrevious=true 
+                                                        data-width="150" 
+                                                        data-angleOffset=-90
+                                                        data-angleArc=180
+                                                        value="0" />
             </div>
             <div class="col-sm">
-                <input name="servo2positionA" class="knob" data-min="0" data-max="180" data-displayPrevious=true value="90" />
+                <input name="servo2positionA" class="knob" data-min="0" 
+                                                           data-max="180" 
+                                                           data-displayPrevious=true 
+                                                           data-width="150" 
+                                                           data-angleOffset=-90
+                                                           data-angleArc=180
+                                                           value="90" />
             </div>
             <div class="col-sm">
-                <input type="color" name="LEDstartHueA" /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueA" /> 
             </div>
             <div class="col-sm">
-                <input type="color" name="LEDendHueA" /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueA" /> 
             </div>
         </div> <!-- row -->
         <div class="row">
@@ -50,16 +62,28 @@
                 <h3>State B</h3>
             </div>
             <div class="col-sm">
-                <input name="servo1speedB" class="knob" data-min="-90" data-max="90" data-displayPrevious=true value="0" />
+                <input name="servo1speedB" class="knob" data-min="-90" 
+                                                        data-max="90" 
+                                                        data-displayPrevious=true 
+                                                        data-width="150" 
+                                                        data-angleOffset=-90
+                                                        data-angleArc=180
+                                                        value="0" />
             </div>
             <div class="col-sm">
-                <input name="servo2positionB" class="knob" data-min="0" data-max="180" data-displayPrevious=true value="90" />
+                <input name="servo2positionB" class="knob" data-min="0" 
+                                                           data-max="180" 
+                                                           data-displayPrevious=true 
+                                                           data-width="150" 
+                                                           data-angleOffset=-90
+                                                           data-angleArc=180
+                                                           value="90" />
             </div>
             <div class="col-sm">
-                <input type="color" name="LEDstartHueB" /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueB" /> 
             </div>
             <div class="col-sm">
-                <input type="color" name="LEDendHueB" /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueB" /> 
             </div>
         </div> <!-- row -->
         <div class="row">
@@ -67,7 +91,11 @@
                 <h3>Transition time</h3>
             </div>
             <div class="col-sm">
-                <input name="transitionTime" class="knob" data-min="1" data-max="30" data-displayPrevious=true value="90" />
+                <input name="transitionTime" class="knob" data-min="1" 
+                                                          data-max="30" 
+                                                          data-displayPrevious=true 
+                                                          data-width=150
+                                                          value="90" />
             </div>
             <div class="col-sm">
                 <input type="submit" value="Send" class="large" />
