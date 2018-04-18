@@ -51,16 +51,16 @@ def renderDaphne():
 
 @app.route("/hettie")
 def renderHettie():
-    return render_template("hettie.html")
-    # return render_template("hettie.html", servo1positionA=hettie.servo1positionA,
-    #                                       servo1positionB=hettie.servo1positionB,
-    #                                       servo2positionA=hettie.servo2positionA,
-    #                                       servo2positionB=hettie.servo2positionB,
-    #                                       LEDstartHueA=hettie.LEDstartHueA,
-    #                                       LEDstartHueA=hettie.LEDstartHueB,
-    #                                       LEDendHueA=hettie.LEDendHueA,
-    #                                       LEDendHueB=hettie.LEDendHueB,
-    #                                       transitionTime=hettie.transitionTime)
+    # return render_template("hettie.html")
+    return render_template("hettie.html", servo1speedA=hettie.servo1speedA,
+                                          servo1speedB=hettie.servo1speedB,
+                                          servo2positionA=hettie.servo2positionA,
+                                          servo2positionB=hettie.servo2positionB,
+                                          LEDstartHueA=hettie.LEDstartHueA,
+                                          LEDstartHueB=hettie.LEDstartHueB,
+                                          LEDendHueA=hettie.LEDendHueA,
+                                          LEDendHueB=hettie.LEDendHueB,
+                                          transitionTime=hettie.transitionTime)
 
 
 # One MQTT form handler to rule them all.
@@ -74,7 +74,8 @@ def send():
         print(v, request.form[v])
         # Now call method v on object skutterName, passing in the form value request.form[v]
         # This relies on SkutterZero to handle string/hex data passed in. Ouch.
-        getattr(str_to_class(mySkutter), v)(request.form[v])
+        # Using setattr here to ensure we access the setter method named v
+        setattr(str_to_class(mySkutter), v, request.form[v])
 
 
     # TODO: Handle the individual elements of the form submission, rather than hard-coding here.
