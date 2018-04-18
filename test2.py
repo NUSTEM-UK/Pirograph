@@ -1,6 +1,6 @@
 from skutterzero import Skutter
 
-derek = Skutter("D07")
+h = Skutter("D04")
 
 # derek.setBrightness(255)
 # derek.transitionTime(10)
@@ -14,6 +14,9 @@ derek = Skutter("D07")
 # derek.servo2speedA(180)
 # derek.servo2speedB(90)
 
-print(derek.LEDcount)
+# print(derek.LEDcount)
 
-derek.servo1positionA
+# derek.servo1positionA
+
+h.LEDHueA(0)
+h.LEDHueB(50)

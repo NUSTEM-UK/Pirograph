@@ -104,6 +104,34 @@ class Skutter:
         self.setLEDhue("start", "A", targetHue)
         self.setLEDhue("start", "B", targetHue)
 
+# Joe's Additions addition of a set both start and enf of Ab and then B for neos
+    def LEDHueA(self, targetHue):
+        """set LED hue for first pixel, for states A and B."""
+        # TODO: sanity check on inputs
+        self.setLEDhue("start", "A", targetHue)
+        self.setLEDhue("end", "A", targetHue)
+        self.setBrightness(200)
+
+    def LEDHueB(self, targetHue):
+        """set LED hue for first pixel, for states A and B."""
+        # TODO: sanity check on inputs
+        self.setLEDhue("start", "B", targetHue)
+        self.setLEDhue("end", "B", targetHue)
+        self.setBrightness(0)
+# change servo for A and B together
+    def testservo(self, servoNum, Aspeed, Bspeed):
+        """set start, end and transitions for servo 1"""
+        self.setServoPosition(servoNum,"A",Aspeed)
+        self.setServoPosition(servoNum,"B",Bspeed)
+
+# stop everything that moves
+    def chill(self):
+        self.setServoPosition("1","A",90)
+        self.setServoPosition("1","B",90)
+        self.setServoPosition("2","A",90)
+        self.setServoPosition("2","B",90)
+
+
     def LEDendHue(self, targetHue):
         """set LED hue for last pixel, for states A and B."""
         # TODO: sanity check on inputs
