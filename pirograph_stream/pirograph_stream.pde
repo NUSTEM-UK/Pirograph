@@ -38,8 +38,8 @@ void setup() {
   maskImage = createImage(cam_width, cam_height, RGB);
   // cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
    //cam = new IPCapture(this, "http://192.168.0.33:8000/stream.mjpg", "", "");
-  cam = new IPCapture(this, "http://192.168.0.33:8081", "", "");
-  //cam = new IPCapture(this, "http://10.0.1.2:8081/", "", "");
+  //cam = new IPCapture(this, "http://192.168.0.33:8081", "", "");
+  cam = new IPCapture(this, "http://10.0.1.10:8081/", "", "");
   cam.start();
 }
 
@@ -81,11 +81,11 @@ void draw() {
     // software rotate of surface
     // See: https://www.processing.org/tutorials/transform2d/
     pushMatrix(); // Save the current coordinate system
-    //translate(width/2, height/2); // Shift coordinate origin to centre screen
-    //rotate(radians(angle));
+    translate(width/2, height/2); // Shift coordinate origin to centre screen
+    rotate(radians(angle));
     image(intermediate, -width/2, -height/2);
     popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
-    //angle += angleStep; // Increment rotation angle
+    angle += angleStep; // Increment rotation angle
 
     if (threshold_high > 255) {
       threshold_high = 255;
