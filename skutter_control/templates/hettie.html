@@ -39,7 +39,7 @@
                                                         data-width="150" 
                                                         data-angleOffset=-90
                                                         data-angleArc=180
-                                                        value="0" />
+                                                        value={{servo1speedA}} />
             </div>
             <div class="col-sm">
                 <input name="servo2positionA" class="knob" data-min="0" 
@@ -48,13 +48,13 @@
                                                            data-width="150" 
                                                            data-angleOffset=-90
                                                            data-angleArc=180
-                                                           value="90" />
+                                                           value={{servo2positionA}} />
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueA" /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueA" value={{LEDstartHueA}} /> 
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueA" /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueA" value={{LEDendHueA}} /> 
             </div>
         </div> <!-- row -->
         <div class="row">
@@ -68,7 +68,7 @@
                                                         data-width="150" 
                                                         data-angleOffset=-90
                                                         data-angleArc=180
-                                                        value="0" />
+                                                        value={{servo1speedB}} />
             </div>
             <div class="col-sm">
                 <input name="servo2positionB" class="knob" data-min="0" 
@@ -77,13 +77,13 @@
                                                            data-width="150" 
                                                            data-angleOffset=-90
                                                            data-angleArc=180
-                                                           value="90" />
+                                                           value={{servo2positionB}} />
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueB" /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueB" value={{LEDstartHueB}} /> 
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueB" /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueB" value={{LEDendHueB}} /> 
             </div>
         </div> <!-- row -->
         <div class="row">
@@ -95,7 +95,7 @@
                                                           data-max="30" 
                                                           data-displayPrevious=true 
                                                           data-width=150
-                                                          value="90" />
+                                                          value={{transitionTime}} />
             </div>
             <div class="col-sm">
                 <input type="submit" value="Send" class="large" />
