@@ -301,8 +301,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
         // Now update the pixel hue interpolation for this state:
         updateLEDgradient(stateIndex);
         // Set the transition timer running
-        time_current = millis();
-        time_end = time_current + transitionTime;
+        // time_current = millis();
+        // time_end = time_current + transitionTime;
     }
 
     if (root["command"] == "setBrightness") {
@@ -348,8 +348,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
         diagnostics();
         Serial.println("<<< END PROCESSING setServoPosition");
         // Set the transition timer running again
-        time_current = millis();
-        time_end = time_current + transitionTime;
+        // time_current = millis();
+        // time_end = time_current + transitionTime;
     }
 
     if (root["command"] == "setTransitionType") {

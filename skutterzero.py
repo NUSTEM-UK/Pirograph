@@ -110,12 +110,14 @@ class Skutter:
         # TODO: sanity check on inputs
         self.setLEDhue("start", "A", targetHue)
         self.setLEDhue("end", "A", targetHue)
+        self.setBrightness(200)
 
     def LEDHueB(self, targetHue):
         """set LED hue for first pixel, for states A and B."""
         # TODO: sanity check on inputs
         self.setLEDhue("start", "B", targetHue)
         self.setLEDhue("end", "B", targetHue)
+        self.setBrightness(0)
 # change servo for A and B together
     def testservo(self, servoNum, Aspeed, Bspeed):
         """set start, end and transitions for servo 1"""
