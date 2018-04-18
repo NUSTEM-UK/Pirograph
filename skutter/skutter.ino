@@ -35,7 +35,7 @@ char subsTargetArray[60];
 #define PIN_LED_RED D3
 #define PIN_PIXEL D1
 
-#define PIXEL_COUNT 1
+#define PIXEL_COUNT 9
 #define SERVO_COUNT 2
 
 
