@@ -181,14 +181,14 @@ void loop() {
         copyData(transitionTarget, 0);
 
         // Now reassign start and target states.
-        if (transitionType == "ONCE") {
+        if (transitionType == "ONCE") {             //blurgh, can't fathom stepper integration here
             // Set [transitionStart] data to that at [transitionTarget]
             Serial.println("*** ONCE ONLY");
             copyData(transitionStart, transitionTarget);
             transitionStart = 2;
             transitionTarget = 2;
             // We can just leave it here, until we're needed again.
-        } else if (transitionType == "LOOP") {
+        } else if (transitionType == "LOOP") {      //blurgh, can't fathom stepper integration here
             // We're reverting to state A and heading for B again.
             Serial.println("*** LOOPING");
             copyData(transitionStart, 0);

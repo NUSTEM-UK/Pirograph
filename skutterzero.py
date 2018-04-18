@@ -92,6 +92,17 @@ class Skutter:
         # self._message(testDict, "test")
         self._message(testDict, self._mac)
 
+### added these two to support the steppers - I think I've done it write
+    def setStepperSpeed(self, speed, state):
+        """Command Stepper1 speed change"""
+        messageDict = {"command": "setStepper1speed", "speed": speed, "state": state}
+        self._message(messageDict, self._mac)
+
+    def setStepperAngle(self, angle, state):
+        """Command Stepper1 speed change"""
+        messageDict = {"command": "setStepper2angle", "angle": angle, "state": state}
+        self._message(messageDict, self._mac)
+
     def setLEDhue(self, position, state, value):
         """Command LED colour change."""
         # TODO: sanity check on inputs
