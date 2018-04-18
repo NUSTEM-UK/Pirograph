@@ -67,13 +67,13 @@ def renderHettie():
 @app.route("/send", methods=["POST"])
 def send():
     """Handle form submission and fire off MQTT messages."""
-    skutterName = request.form.get("skutterName")
-    flash_message = "Skutter: " + skutterName
+    mySkutter = request.form.get("skutterName")
+    flash_message = "Skutter: " + mySkutter
     for v in islice(request.form, 1, None): # Skip the first entry, that's the name of the skutter
         flash_message += " | %s : %s " %(v, request.form[v])
         # Now call method v on object skutterName, passing in the form value request.form[v]
         # This relies on SkutterZero to handle string/hex data passed in. Ouch.
-        getattr(str_to_class(skutterName), v)(request.form[v])
+        getattr(str_to_class(mySkutter), v)(request.form[v])
 
 
     # TODO: Handle the individual elements of the form submission, rather than hard-coding here.
@@ -86,7 +86,7 @@ def send():
     # Give some mildly reassuring feedback to the user, that their data bas been acted upon.
     flash(flash_message)
     # Return us to the Skutter page from which we came.
-    return redirect(skutterName)
+    return redirect(mySkutter)
 
 if __name__ == '__main__':
     # This should probably be in the main body of the code, not tucked away down here.

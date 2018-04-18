@@ -112,3 +112,5 @@ venv.bak/
 # mypy
 .mypy_cache/
 experiments/multiprocessing/test03.py.lprof
+__pycache__/skutter_mac.cpython-36.pyc
+__pycache__/skutterzero.cpython-36.pyc
