@@ -121,3 +121,6 @@ Then:
     sudo a2ensite /etc/apache2/sites-available/skutter_control-default
     sudo systemctl reload apache2
 
+To force reload of app, `touch skutter_control.wsgi`.
+
+
