@@ -13,6 +13,8 @@ AccelStepper stepper1(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
 int currentTime;
 int targetDur;
 int endTime;
+int startTime;
+int nowSpeed;
 
 // the stepper array
 // the arrary looks like [speedA, speedB, transition]
@@ -34,44 +36,58 @@ void setup() {
     // set an initial duration and end time
     // the allowable minimun duration for the stepper one is 1sec, 
     // for stepper2 is 5 sec (0-360 deg)
-    targetDur = 5000;
+    targetDur = 10000;
     currentTime = millis();
     endTime = currentTime + targetDur;
+    startTime = currentTime;
 
     //populate the stepperInfo array
     //speed maximum limited to 1000, otherwise the thang don't spin
     stepperInfo[0] = 1000; //speedA
-    stepperInfo[1] = 500; //speedB
+    stepperInfo[1] = 1000; //speedB
     stepperInfo[2] = 1; //transtion from A->B
 
     stepperInfo2[0] = 0; //angleA
     stepperInfo2[1] = 50; //angleB
     stepperInfo2[2] = 1; //transtion from A->B
 
-    // set an initial target based upon the polarity of the speed [0]
-    if (stepperInfo[0] >= 0){
-        stepper1.move(1000000);
-    } else {
-        stepper1.move(-100000);
-    }
     // set the speed and acceleration rate for sped[0]
-    stepper1.setMaxSpeed(stepperInfo[0]);
-    stepper1.setAcceleration(500);
+    stepper1.setMaxSpeed(1000);
+
 }
 
 void loop() {
     currentTime = millis();
-    if (currentTime > endTime) {
+    if (currentTime <= endTime) {
+        updateStepper();
+        //Serial.println(stepper1.speed());
+    } else {
         Serial.println("Time's up.");
+        startTime = currentTime;
         endTime = currentTime + targetDur;
-        //updateStepper1();
-        //updateStepper2();
-        smoothSpeed();
+
+        if (stepperInfo[2] == 1){
+        Serial.println("B --> A");
+        stepperInfo[2] = 0;    
+        } else {
+        Serial.println("A --> B");
+        stepperInfo[2] = 1;    
+        }
     }
     // send message to the stepper to do something
-    stepper1.run();
+    stepper1.runSpeed();
 }
 
+void updateStepper(){
+    if (stepperInfo[2]==1){
+    nowSpeed = map(currentTime, startTime, endTime, stepperInfo[0], stepperInfo[1] );
+    } else {
+    nowSpeed = map(currentTime, startTime, endTime, stepperInfo[1], stepperInfo[0] );    
+    }
+    stepper1.setSpeed(nowSpeed);
+}
+
+// not working, pauases on decelleration
 void smoothSpeed(){
     // check which transition we are doing
         if (stepperInfo[2] == 1){   // A->B
@@ -119,7 +135,6 @@ void updateStepper2(){
     }
 }
 
-// now defunct as it always brought the stepper to a stop during transionton of speed
 // function to shift stepper 1 - continuous rotation
 void updateStepper1(){
         // check which transition we are doing

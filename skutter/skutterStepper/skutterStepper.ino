@@ -10,8 +10,29 @@ Based on WishingWell_Skutter from the Tech-Wishing-Well project.
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
+//#include <Servo.h> //Dont need in Skutter Stepper
 #include <FastLED.h> // Using FastLED not NeoPixel, to gain HSV colour support
+
+// here comes the hot-steppers
 #include <AccelStepper.h>
+#define HALFSTEP 8
+
+// Motor pin definitions - Stepper Speed 
+#define motorPin1  D5     // IN1 on the ULN2003 driver 1
+#define motorPin2  D6     // IN2 on the ULN2003 driver 1
+#define motorPin3  D7     // IN3 on the ULN2003 driver 1
+#define motorPin4  D8     // IN4 on the ULN2003 driver 1
+
+AccelStepper speedStepper(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
+
+// Motor pin definitions - Stepper Speed 
+#define motorPin5  D1     // IN1 on the ULN2003 driver 1
+#define motorPin6  D2     // IN2 on the ULN2003 driver 1
+#define motorPin7  D3     // IN3 on the ULN2003 driver 1
+#define motorPin8  D4     // IN4 on the ULN2003 driver 1
+
+AccelStepper angleStepper(HALFSTEP, motorPin5, motorPin7, motorPin6, motorPin8);
+
 
 const char* ssid = "nustem";
 const char* password = "nustem123";
@@ -28,36 +49,31 @@ String skutterNameString;
 String subsTargetString;
 char subsTargetArray[60];
 
-// LED strip setup
-// #define PIN_LED_BLUE D4
+// Servo and LED strip setup
+// #define PIN_SERVO1 D7
+// #define PIN_SERVO2 D6
+// #define PIN_LED_BLUE D4 //I can't use these because I don't have enough pins
 // #define PIN_LED_RED D3
-#define PIN_PIXEL D1
+
+//its the only one I've got left!
+#define PIN_PIXEL D0
+
 #define PIXEL_COUNT 9
-
-// Motor pin definitions Stepper 1
-#define motorPin1  D5     // IN1 on the ULN2003 driver 1
-#define motorPin2  D6     // IN2 on the ULN2003 driver 1
-#define motorPin3  D7     // IN3 on the ULN2003 driver 1
-#define motorPin4  D8     // IN4 on the ULN2003 driver 1
-
-// Motor pin definitions Stepper 2
-#define motorPin5  D4     // IN1 on the ULN2003 driver 1
-#define motorPin6  D3     // IN2 on the ULN2003 driver 1
-#define motorPin7  D2     // IN3 on the ULN2003 driver 1
-#define motorPin8  D1     // IN4 on the ULN2003 driver 1
-#define HALFSTEP 8
-
-AccelStepper stepper1(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
-AccelStepper stepper2(HALFSTEP, motorPin5, motorPin6, motorPin7, motorPin8);
+//#define SERVO_COUNT 2
 
 
-// The stepper array
-// the stepperInfo --> [speedA, speedB, transition]
-// the stepperInfo2 --> [angleA, angleB, transition]
-// transition = 1 means we're travelling from A --> B
-// transition = 0 means we're travelling from B --> A
-int stepperInfo[3];
-int stepperInfo2[3]; 
+// Servo servo1;
+// Servo servo2;
+
+// Store servo positions (current) and A/B target states
+//float servoPosition[SERVO_COUNT][3];
+
+// the arrays to hold the 1st and 2nd stepper speeds and angles
+int stepperSpeed[3];
+int stepperAngle[3];
+// the current speed of the speedy stepper
+int nowSpeed;
+
 
 // Array of LEDs - current values
 CRGB leds[PIXEL_COUNT];
@@ -114,7 +130,13 @@ void setup() {
     // pinMode(PIN_LED_BLUE, OUTPUT);
     // pinMode(PIN_LED_RED, OUTPUT);
 
-// Set defaults
+    //Start speed and angles servo positions
+    for (int i = 0; i < 3; i++){
+        stepperSpeed[i] = 0;
+        stepperAngle[i] = 0;
+    }
+
+    // Set defaults
     transitionTarget = 2; // to which index are we heading?
     transitionStart = 1;  // from which index did we start?
     transitionTime = 5000;
@@ -124,24 +146,19 @@ void setup() {
     transitionType = "RETURN"; // Alternatives "LOOP", "RETURN", "ONCE"
     transitionInterpolation = "LINEAR"; // Not used. Yet.
 
+    // set the speed and acceleration rate for sped[0]
+    speedStepper.setMaxSpeed(1000);
+    //angleStepper.setMaxSpeed(1000);  
+
     //diagnostics();
     Serial.println("END OF SETUP");
     Serial.println("----");
 
-    // populate the initial stepper arrays States A and B == 0
-    // stepper 1 - speed
-    stepperInfo[0] = 0; //speedA
-    stepperInfo[1] = 0; //speedB
-    stepperInfo[2] = 1; //transtion from A->B
-    
-    // stepper 2 - angle
-    stepperInfo2[0] = 0; //angleA
-    stepperInfo2[1] = 0; //angleB
-    stepperInfo2[2] = 1; //transtion from A->B
+    // servo1.attach(PIN_SERVO1);
+    // servo1.write(servoPosition[0][0]);
+    // servo2.attach(PIN_SERVO2);
+    // servo2.write(servoPosition[1][0]);
 
-    //keep the steppers still until instructions received
-    stepper1.moveTo(0);
-    stepper2.moveTo(0);
 }
 
 void loop() {
@@ -156,17 +173,10 @@ void loop() {
 
     // Should we have already completed the current transition?
     if (time_current < time_end) {
-        //Serial.println("--- in transition");
+        //updateServos();
         updateLEDs(); // Update the HSV arrays
         writeLEDs();  // Write the HSV values across to the RGB array
-        
-        // shift the steppers if needs be
-        stepper1.run();
-        stepper2.run();
-        // a counting fucntion to test whether the transition time is getting updated
-        // if ((time_end-time_current)%1000 == 0) {
-        // Serial.println((int)((time_end-time_current)/1000));
-        // }
+        updateSpeedStepper();
         //diagnostics(); // commented out diagnostics(), because no one needs this amount of data
     } else {
         // We should have completed transition by now.
@@ -179,16 +189,18 @@ void loop() {
         // Ensure we get there
         // write the transitionTarget values to current
         copyData(transitionTarget, 0);
+        // servo1.write(servoPosition[0][0]);
+        // servo2.write(servoPosition[1][0]);
 
         // Now reassign start and target states.
-        if (transitionType == "ONCE") {             //blurgh, can't fathom stepper integration here
+        if (transitionType == "ONCE") {
             // Set [transitionStart] data to that at [transitionTarget]
             Serial.println("*** ONCE ONLY");
             copyData(transitionStart, transitionTarget);
             transitionStart = 2;
             transitionTarget = 2;
             // We can just leave it here, until we're needed again.
-        } else if (transitionType == "LOOP") {      //blurgh, can't fathom stepper integration here
+        } else if (transitionType == "LOOP") {
             // We're reverting to state A and heading for B again.
             Serial.println("*** LOOPING");
             copyData(transitionStart, 0);
@@ -198,8 +210,7 @@ void loop() {
             // if we were going A to B, now set B to A
             // else set A to B
             Serial.println("*** RETURNING");
-            updateStepper1();
-            updateStepper2();
+            updateAngleStepper();
             if (transitionTarget == 2) {
                 // Make the current state the target state
                 copyData(2, 0);
@@ -233,7 +244,9 @@ void loop() {
        
 
     }
-
+    //Run the speedy stepper
+    angleStepper.run();
+    speedStepper.runSpeed();
     // Make sure we show the results of all our fancy LED wrangling.
     FastLED.show();
     // delay(1000); // Slow things down so we can see what's going on.
@@ -242,6 +255,10 @@ void loop() {
 
 void callback(char* topic, byte* payload, unsigned int length) {
     Serial.println(">>> MQTT message received");
+    // Serial.print("topic: ");
+    // Serial.println(topic);
+    // Serial.print("payload: ");
+    // Serial.println(*payload);
 
     String payloadString;
     for (int i = 0; i < length ; i++) {
@@ -326,37 +343,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
             }
         }
     }
-    if (root["command"] == "setStepper1speed") {
-        String state = root["state"];
-        int targetSpeed = root["speed"];
-        Serial.println("Set Stepper 1");
-        Serial.print("State: ");
-        Serial.println(state);
-        Serial.print("To speed: ");
-        Serial.println(targetSpeed);
 
-        if (state == "A") {
-            stepperInfo[0] = targetSpeed;
-        } else {
-            stepperInfo[1] = targetSpeed;  
-        }      
-    }
-
-    if (root["command"] == "setStepper2angle") {
-        String state = root["state"];
-        int targetAngle = root["speed"];
-        Serial.println("Set Stepper 1");
-        Serial.print("State: ");
-        Serial.println(state);
-        Serial.print("To angle: ");
-        Serial.println(targetAngle);
-        if (state == "A") {
-            stepperInfo2[0] = targetAngle;
-        } else {
-            stepperInfo2[1] = targetAngle;  
-        }      
-    }
-    
     if (root["command"] == "setTransitionType") {
         String tempType = root["value"];
         // Output parsed structure to serial, for debugging
@@ -364,6 +351,29 @@ void callback(char* topic, byte* payload, unsigned int length) {
         Serial.println(tempType);
         // Now act on it.
         transitionType = tempType;
+    }
+
+    if (root["command"] == "setStepperAngle") {
+        int angle = root["angle"];
+        String state = root["state"];
+        // Output parsed structure to serial, for debugging
+        // Now act on it.
+        if (state == "A") {
+            stepperAngle[0] = angle;
+        } else {
+            stepperAngle[1] = angle;
+        }
+    }
+
+    if (root["command"] == "setStepperSpeed") {
+        int speed = root["speed"];
+        String state = root["state"];
+        // Now act on it.
+        if (state == "A") {
+            stepperSpeed[0] = speed;
+                } else {
+            stepperSpeed[1] = speed;
+        }
     }
 
     if (root["command"] == "setTransitionTime") { //Comparisons here must use " " and not ''
@@ -447,7 +457,6 @@ void updateLEDs() {
     // Again, we'll need to call FastLED.show() to update the string. Do that in the loop.
 }
 
-
 void diagnostics() {
     for (int i = 0; i < PIXEL_COUNT; i++) {
         Serial.print("LED: ");
@@ -468,75 +477,45 @@ void diagnostics() {
 
 void copyData(int source, int destination) {
     // Copy data from source index to target index
-
     // First the LEDs
     for (int i = 0; i < PIXEL_COUNT; i++) {
             ledsHSV[i][destination] = ledsHSV[i][source];
     }
+
 }
 
-void updateStepper1(){
-        // check which transition we are doing
-        if (stepperInfo[2] == 1){   // A->B
-            // set current position as 0
-            stepper1.setCurrentPosition(0.0);
-            Serial.println("B --> A");
-            stepperInfo[2] = 0;
-            int newSpeed = abs(stepperInfo[0]); //absolute value of speedB
-            float totSteps = (transitionTime/1000 * newSpeed) - newSpeed;
-            Serial.print("Number of steps: ");
-            Serial.println(totSteps);
-            stepper1.setMaxSpeed(newSpeed);
-            stepper1.setAcceleration(newSpeed);
-            if (stepperInfo[0]<=0){
-                stepper1.moveTo(0-totSteps);
-            } else {
-            stepper1.moveTo(totSteps);
-            }
-        } else {                    // B -> A
-            // set current position as 0
-            stepper1.setCurrentPosition(0.0);
-
-            Serial.print(stepperInfo[4]);
-            Serial.println("A --> B");
-            stepperInfo[2] = 1;     // 
-            int newSpeed = abs(stepperInfo[1]); //absolute value of speedB
-            float totSteps = (transitionTime/1000 * newSpeed) - newSpeed;
-            Serial.print("Number of steps: ");
-            Serial.println(0-totSteps);
-            stepper1.setMaxSpeed(newSpeed);
-            stepper1.setAcceleration(newSpeed);
-            if (stepperInfo[1]<=0){
-                stepper1.moveTo(0-totSteps);
-            } else {
-            stepper1.moveTo(totSteps);
-            }
-        }    
+void updateSpeedStepper(){
+    if (stepperSpeed[2]==1){
+    nowSpeed = map(time_current, time_start, time_end, stepperSpeed[0], stepperSpeed[1] );
+    } else {
+    nowSpeed = map(time_current, time_start, time_end, stepperSpeed[1], stepperSpeed[0] );    
+    }
+    speedStepper.setSpeed(nowSpeed);
 }
 
-void updateStepper2(){
-    int totStepsA = map(stepperInfo2[0],0,360,0,4000);
-    int totStepsB = map(stepperInfo2[1],0,360,0,4000);
+void updateAngleStepper(){
+    int totStepsA = map(stepperAngle[0],0,360,0,4000);
+    int totStepsB = map(stepperAngle[1],0,360,0,4000);
     int deltaSteps = abs(totStepsA - totStepsB);
     int newSpeed = deltaSteps / ((transitionTime/1000)-1);
 
-    if (stepperInfo2[2] == 1){   // A->B
+    if (stepperAngle[2] == 1){   // A->B
         Serial.println("B --> A");
-        stepperInfo2[2] = 0;
+        stepperAngle[2] = 0;
         //map the angle to a number of steps (1 rev ~ 4000)
         Serial.print("Necessary speed: ");
         Serial.println(newSpeed);
-        stepper1.setMaxSpeed(newSpeed);
-        stepper1.setAcceleration(newSpeed);
-        stepper1.moveTo(totStepsA);
+        angleStepper.setMaxSpeed(newSpeed);
+        angleStepper.setAcceleration(newSpeed);
+        angleStepper.moveTo(totStepsA);
     } else {
         Serial.println("A --> B");
-        stepperInfo2[2] = 1;
+        stepperAngle[2] = 1;
         //map the angle to a number of steps (1 rev ~ 4000)
         Serial.print("Necessary speed: ");
         Serial.println(newSpeed);
-        stepper1.setMaxSpeed(newSpeed);
-        stepper1.setAcceleration(newSpeed);
-        stepper1.moveTo(totStepsB);
+        angleStepper.setMaxSpeed(newSpeed);
+        angleStepper.setAcceleration(newSpeed);
+        angleStepper.moveTo(totStepsB);
     }
 }
