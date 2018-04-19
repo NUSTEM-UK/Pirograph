@@ -80,11 +80,44 @@ OK, so that didn't really work out - I never managed to get the server stable, t
 
 This was useful: http://www.ashokraja.me/post/Serving-a-Python-Flask-Web-Application-via-Apache-Webserver-in-Raspberry-Pi.aspx
 
-ALso needed
+Key step to permissions issues:
+
+    sudo usermod -a -G "www-data" pi
+
+...then can reverse-proxy into user directory, which makes deployment updates much easier.
+
+Also needed
 
     sudo apt install apache2
     sudo apt install libapache2-mod-wsgi-py3
     sudo a2enmod wsgi
 
-See Pi 00 for config.
+See Pi 00 for config, but in brief:
+
+  sudo a2dissite 000-default.conf
+  sudo systemctl reload apache2
+
+`/etc/apache2/sites-available/skutter_control-default.conf`
+
+    WSGIDaemonProcess skutter_control-default user=pi group=www-data threads=5
+    WSGIScriptAlias / /home/pi/Pirograph/skutter_control/skutter_control.wsgi
+    <Directory "/home/pi/Pirograph/skutter_control">
+        WSGIProccessGroup skutter_control-default
+        WSGIScriptReloading On
+        WSGIApplicationGroup %{GLOBAL}
+        Require all granted
+    </Directory>
+    ErrorLog /home/pi/Pirograph/skutter_control/logs/error.log
+
+Then in `Pirograph/skutter_control`:
+
+    mkdir logs
+    nano skutter_control.wsgi
+        import sys
+        sys.path.insert(0, '/home/pi/Pirograph/skutter_control')\
+        from skutter_control import app as application
+
+Then:
+    sudo a2ensite /etc/apache2/sites-available/skutter_control-default
+    sudo systemctl reload apache2
 
