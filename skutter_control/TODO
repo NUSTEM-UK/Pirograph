@@ -27,3 +27,4 @@ Things that need sorting:
 ☐ Integrate stepper controls
 ☐ Admin page: stop & reset skutter without restarting the app (implies defining defaults / zero positions)
 ☐ Do we pass full HSV data?
+☐ Check we're sending all the form data: LEDendHueB seems to be missing from Hettier in production.
