@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block title %}
+    Skutter Control : Admin / Panic
+{% endblock title %}
+{% block head %}
+    {{ super() }}
+{% endblock head %}
+{% block jumbo %}
+     <h1>Skutter Control &ndash; Admin / Panic</h1>
+{% endblock jumbo %}
+{% block controls %}
+
+    <div class="row">
+        <div class="col-sm">
+            <form action="send" method="POST">
+                <input type="hidden" name="skutterName" value="hettie" />
+                <input type="hidden" name="servo1speedA" value="90" />
+                <input type="hidden" name="servo1speedB" value="90" />
+                <input type="hidden" name="servo2positionA" value="90" />
+                <input type="hidden" name="servo2positionB" value="90" />
+                <input type="hidden" name="LEDstartHueA" value="#000000" />
+                <input type="hidden" name="LEDstartHueB" value="#000000" />
+                <input type="hidden" name="LEDendHueA" value="#000000" />
+                <input type="hidden" name="LEDendHueB" value="#000000" />
+                <input type="hidden" name="transitionTime" value="1" />
+                <button type="submit" class="btn-lg btn-danger">Hettie | STOP</button>
+            </form>
+        </div>
+        <div class="col-sm">
+            <!-- <h3>Column 2</h3> -->
+        </div>
+        <div class="col-sm">
+            <!-- <h3>Column 1</h3> -->
+        </div>
+    </div> <!-- row -->
+    
+{% endblock controls %}
+
+{% block foot %}
+    <script>
+        $(function($) {
+
+            $(".knob").knob({
+                change : function (value) {
+                    //console.log("change : " + value);
+                },
+                release : function (value) {
+                    //console.log(this.$.attr('value'));
+                    console.log("release : " + value);
+                },
+                cancel : function () {
+                    console.log("cancel : ", this);
+                },
+                
+            });
+
+        });
+    </script>
+{% endblock foot %}

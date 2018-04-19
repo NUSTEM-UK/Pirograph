@@ -37,6 +37,9 @@ def str_to_class(s):
 def home():
     return render_template("home.html")
 
+@app.route("/admin")
+def renderAdmin():
+    return render_template("admin.html")
 
 # It's ridiculous to handle each skutter separately here. This needs fixing.
 @app.route("/derek")
