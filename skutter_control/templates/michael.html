@@ -1,0 +1,132 @@
+{% extends "layout.html" %}
+{% block title %}
+    Skutter Control : Michael
+{% endblock title %}
+{% block head %}
+    {{ super() }}
+{% endblock head %}
+{% block jumbo %}
+     <h1>Skutter Control &ndash; Michael</h1>
+{% endblock jumbo %}
+{% block controls %}
+    <div class="row">
+        <div class="col-sm">
+            <!-- <h3>Column 1</h3> -->
+        </div>
+        <div class="col-sm">
+            <h3>Rotation Speed</h3>
+        </div>
+        <div class="col-sm">
+            <h3>Arm Angle</h3>
+        </div>
+        <div class="col-sm">
+            <h3>Start Colour</h3>
+        </div>
+        <div class="col-sm">
+            <h3>End Colour</h3>
+        </div>
+    </div> <!-- row -->
+    <form action="send" method="POST">
+        <input type="hidden" name="skutterName" value="michael" />
+        <div class="row">
+            <div class="col-sm">
+                <h3>State A</h3>
+            </div>
+            <div class="col-sm">
+                <input name="stepper1speedA" class="knob" data-min="-1000" 
+                                                        data-max="1000" 
+                                                        data-displayPrevious=true 
+                                                        data-width="150" 
+                                                        data-angleOffset=-90
+                                                        data-angleArc=180
+                                                        value={{stepper1speedA}} />
+            </div>
+            <div class="col-sm">
+                <input name="stepper2angleA" class="knob" data-min="0" 
+                                                           data-max="360" 
+                                                           data-displayPrevious=true 
+                                                           data-width="150" 
+                                                           data-angleOffset=-90
+                                                           data-angleArc=180
+                                                           value={{stepper2angleA}} />
+            </div>
+            <div class="col-sm">
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueA" value={{LEDstartHueA}} /> 
+            </div>
+            <div class="col-sm">
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueA" value={{LEDendHueA}} /> 
+            </div>
+        </div> <!-- row -->
+        <div class="row">
+            <div class="col-sm">
+                <h3>State B</h3>
+            </div>
+            <div class="col-sm">
+                <input name="stepper1speedB" class="knob" data-min="-1000" 
+                                                        data-max="1000" 
+                                                        data-displayPrevious=true 
+                                                        data-width="150" 
+                                                        data-angleOffset=-90
+                                                        data-angleArc=180
+                                                        value={{stepper1speedB}} />
+            </div>
+            <div class="col-sm">
+                <input name="stepper2angleB" class="knob" data-min="0" 
+                                                           data-max="360" 
+                                                           data-displayPrevious=true 
+                                                           data-width="150" 
+                                                           data-angleOffset=-90
+                                                           data-angleArc=180
+                                                           value={{stepper2angleB}} />
+            </div>
+            <div class="col-sm">
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueB" value={{LEDstartHueB}} /> 
+            </div>
+            <div class="col-sm">
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueB" value={{LEDendHueB}} /> 
+            </div>
+        </div> <!-- row -->
+        <div class="row">
+            <div class="col-sm">
+                <h3>Transition time</h3>
+            </div>
+            <div class="col-sm">
+                <input name="transitionTime" class="knob" data-min="1" 
+                                                          data-max="30" 
+                                                          data-displayPrevious=true 
+                                                          data-width=150
+                                                          value={{transitionTime}} />
+            </div>
+            <div class="col-sm">
+                <input type="submit" value="Send" class="large" />
+            </div>
+            <div class="col-sm">
+            </div>
+            <div class="col-sm"></div>
+            </div>
+        </div> <!-- row -->
+    </form>
+    
+{% endblock controls %}
+
+{% block foot %}
+    <script>
+        $(function($) {
+
+            $(".knob").knob({
+                change : function (value) {
+                    //console.log("change : " + value);
+                },
+                release : function (value) {
+                    //console.log(this.$.attr('value'));
+                    console.log("release : " + value);
+                },
+                cancel : function () {
+                    console.log("cancel : ", this);
+                },
+                
+            });
+
+        });
+    </script>
+{% endblock foot %}
