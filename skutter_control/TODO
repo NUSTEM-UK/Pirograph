@@ -9,12 +9,12 @@ Things that need sorting:
     ✔ ...proof-of-concept, but incomplete (and see above) @started(18-04-15 15:35) @done(18-04-19 08:44) @lasted(3 days 17 hours 9 minutes 13 seconds)
 ✔ Colour control for Skutter pages. @done(18-04-19 08:44)
 ✔ Page layout for A/B states, etc. @done(18-04-17 15:27)
-☐ Disable submit button unless controls changed.
-☐ Fonts are loading from Google fonts - need downloading locally @started(18-04-15 15:35)
-    ✔ Include in repo @done(18-04-15 14:56)
-    ☐ Need linking, eg: https://stackoverflow.com/questions/8966740/how-to-host-google-web-fonts-on-my-own-server
+✔ Disable submit button unless controls changed. @done(18-04-19 16:18)
+✘ Fonts are loading from Google fonts - need downloading locally @started(18-04-15 15:35) @cancelled(18-04-19 16:20) @wasted(4 days 45 minutes 45 seconds)
+    ✘ Include in repo @cancelled(18-04-19 16:20)
+    ✘ Need linking, eg: https://stackoverflow.com/questions/8966740/how-to-host-google-web-fonts-on-my-own-server @cancelled(18-04-19 16:20)
 ✔ Bootstrap theme to https://github.com/lacockj/bs4-steam-theme/, to steampunkify everything @done(18-04-15 14:46)
-☐ Bootstrap theme alternatives: https://bootswatch.com (Spacelab, Slate)
+✔ Bootstrap theme alternatives: https://bootswatch.com (Spacelab, Slate) @done(18-04-19 16:20)
 ✘ Random assignment of Skutter control @cancelled(18-04-19 08:44)
     ✘ One user per Skutter @cancelled(18-04-19 08:44)
     ✘ Cookie storage for session data? @cancelled(18-04-19 08:44)
@@ -23,8 +23,8 @@ Things that need sorting:
 ☐ Tidy up HTML master layout
 ☐ Sanity check of skutterzero and accessor/setter functions
 ☐ Layout tidies
-☐ Apache install on working Pi
-☐ Integrate stepper controls
-☐ Admin page: stop & reset skutter without restarting the app (implies defining defaults / zero positions)
+✔ Apache install on working Pi @done(18-04-19 14:23)
+✔ Integrate stepper controls @done(18-04-19 14:23)
+✔ Admin page: stop & reset skutter without restarting the app (implies defining defaults / zero positions) @done(18-04-19 14:24)
 ☐ Do we pass full HSV data?
-☐ Check we're sending all the form data: LEDendHueB seems to be missing from Hettier in production.
+✔ Check we're sending all the form data: LEDendHueB seems to be missing from Hettie in production. @done(18-04-19 14:24)

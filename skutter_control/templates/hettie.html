@@ -39,6 +39,7 @@
                                                         data-width="150" 
                                                         data-angleOffset=-90
                                                         data-angleArc=180
+                                                        data-fgColor="#FF0000"
                                                         value={{servo1speedA}} />
             </div>
             <div class="col-sm">
@@ -48,13 +49,14 @@
                                                            data-width="150" 
                                                            data-angleOffset=-90
                                                            data-angleArc=180
+                                                           data-fgColor="#FF0000"
                                                            value={{servo2positionA}} />
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueA" value={{LEDstartHueA}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDstartHueA" value={{LEDstartHueA}} /> 
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueA" value={{LEDendHueA}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDendHueA" value={{LEDendHueA}} /> 
             </div>
         </div> <!-- row -->
         <div class="row">
@@ -68,6 +70,7 @@
                                                         data-width="150" 
                                                         data-angleOffset=-90
                                                         data-angleArc=180
+                                                        data-fgColor="#FF0000"
                                                         value={{servo1speedB}} />
             </div>
             <div class="col-sm">
@@ -77,13 +80,14 @@
                                                            data-width="150" 
                                                            data-angleOffset=-90
                                                            data-angleArc=180
+                                                           data-fgColor="#FF0000"
                                                            value={{servo2positionB}} />
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueB" value={{LEDstartHueB}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDstartHueB" value={{LEDstartHueB}} /> 
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueB" value={{LEDendHueB}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDendHueB" value={{LEDendHueB}} /> 
             </div>
         </div> <!-- row -->
         <div class="row">
@@ -95,10 +99,11 @@
                                                           data-max="30" 
                                                           data-displayPrevious=true 
                                                           data-width=150
+                                                          data-fgColor="#FF0000"
                                                           value={{transitionTime}} />
             </div>
             <div class="col-sm">
-                <input type="submit" value="Send" class="large" />
+                <button type="submit" class="btn btn-lg btn-danger btn-block disabled" disabled>Send to Hettie</button>
             </div>
             <div class="col-sm">
             </div>
@@ -112,7 +117,6 @@
 {% block foot %}
     <script>
         $(function($) {
-
             $(".knob").knob({
                 change : function (value) {
                     //console.log("change : " + value);
@@ -120,13 +124,23 @@
                 release : function (value) {
                     //console.log(this.$.attr('value'));
                     console.log("release : " + value);
+                    // Something got touched, so enable the button
+                    $("button[type=submit]").prop("disabled", false);
+                    // ...and remove the disabled class so it looks enabled
+                    $("button[type=submit]").removeClass("disabled");
                 },
                 cancel : function () {
                     console.log("cancel : ", this);
                 },
-                
             });
-
         });
+    </script>
+    <script>
+        function update(jscolor) {
+            // One of the colour controls was adjusted; enable the submit button
+            $("button[type=submit]").prop("disabled", false);
+            // ...and remove the disabled class so it looks enabled
+            $("button[type=submit]").removeClass("disabled");
+        }
     </script>
 {% endblock foot %}
