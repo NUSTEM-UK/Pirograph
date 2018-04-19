@@ -73,6 +73,7 @@ def send():
     mySkutter = request.form.get("skutterName")
     flash_message = "Skutter: " + mySkutter
     for key in request.form:
+        # Slip the skutterName, we already handled that
         if key =="skutterName":
             continue
         # output diagnostics back to the template
@@ -83,24 +84,10 @@ def send():
         # This relies on SkutterZero to handle string/hex data passed in. Ouch.
         # Using setattr here to ensure we access the setter method named key
         setattr(str_to_class(mySkutter), key, request.form[key])
-        # Earlier code here didn't work in production: request.form dictionary not ordered
-        # for v in islice(request.form, 1, None): # Skip the first entry, that's the name of the skutter
-        #     flash_message += " | %s : %s " %(v, request.form[v])
-        #     print(v, request.form[v])
-        #     setattr(str_to_class(mySkutter), v, request.form[v])
     print("End of messages")
 
-
-    # TODO: Handle the individual elements of the form submission, rather than hard-coding here.
-    # servo1speed = request.form.get("servo1speed")
-    # knobData1 = request.form.get("knob-data-1")
-    # flash_message = "Skutter: "+ skutterName + " | Servo1Speed: " + servo1speed + " | Knob data: " + knobData1
-    # Work out which Skutter we're talking to from the form data, and command that one.
-    
-    # str_to_class(skutterName).servo1speed(servo1speed)
-    # Give some mildly reassuring feedback to the user, that their data bas been acted upon.
+    # Set the template flash message and return to the corresponding form page
     flash(flash_message)
-    # Return us to the Skutter page from which we came.
     return redirect(mySkutter)
 
 if __name__ == '__main__':
