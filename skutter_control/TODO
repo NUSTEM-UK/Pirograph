@@ -23,8 +23,8 @@ Things that need sorting:
 ☐ Tidy up HTML master layout
 ☐ Sanity check of skutterzero and accessor/setter functions
 ☐ Layout tidies
-☐ Apache install on working Pi
-☐ Integrate stepper controls
-☐ Admin page: stop & reset skutter without restarting the app (implies defining defaults / zero positions)
+✔ Apache install on working Pi @done(18-04-19 14:23)
+✔ Integrate stepper controls @done(18-04-19 14:23)
+✔ Admin page: stop & reset skutter without restarting the app (implies defining defaults / zero positions) @done(18-04-19 14:24)
 ☐ Do we pass full HSV data?
-☐ Check we're sending all the form data: LEDendHueB seems to be missing from Hettier in production.
+✔ Check we're sending all the form data: LEDendHueB seems to be missing from Hettie in production. @done(18-04-19 14:24)

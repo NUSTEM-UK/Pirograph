@@ -4,6 +4,19 @@
 {% endblock title %}
 {% block head %}
     {{ super() }}
+    <script>
+        $(document).ready(function (){
+            validate();
+            $('#servo1speedA').change(validate);
+        });
+        function validate() {
+            if ($('#servo1positionA').val() != {{servo1speedA}} {
+                $("button[type=submit]").prop("disabled", false);
+            } else {
+                $("button[type=submit]").prop("disabled", true);
+            }
+        }
+    </script>
 {% endblock head %}
 {% block jumbo %}
      <h1>Skutter Control &ndash; Hettie</h1>

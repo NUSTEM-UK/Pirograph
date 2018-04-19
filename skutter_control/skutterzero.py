@@ -218,11 +218,11 @@ class Skutter:
     
     def servo1speed(self, targetSpeed):
         """Convenience alias for setServo1position."""
-        self.servo1position(targetSpeed)
+        self.servo1position(targetSpeed - 90)
 
     def servo2speed(self, targetSpeed):
         """Convenience alias for setServo2position."""
-        self.servo2position(targetSpeed)
+        self.servo2position(targetSpeed - 90)
 
     @property
     def servo1positionA(self):
@@ -263,41 +263,41 @@ class Skutter:
 
     @property
     def servo1speedA(self):
-        return self._servo1speedA
+        return str(int(self._servo1speedA) - 90)
 
     @servo1speedA.setter
     def servo1speedA(self, targetSpeed):
-        self._servo1speedA = targetSpeed
-        setattr(self, 'servo1positionA', targetSpeed)
+        self._servo1speedA = str(int(targetSpeed) + 90)
+        setattr(self, 'servo1positionA', str(int(targetSpeed) + 90))
         # self.servo1positionA(targetSpeed)
 
     @property
     def servo1speedB(self):
-        return self._servo1speedB
+        return str(int(self._servo1speedB) - 90)
 
     @servo1speedB.setter    
     def servo1speedB(self, targetSpeed):
-        self._servo1speedB = targetSpeed
-        setattr(self,'servo1positionB',targetSpeed)
+        self._servo1speedB = str(int(targetSpeed) + 90)
+        setattr(self,'servo1positionB', str(int(targetSpeed) + 90))
         # self.servo1positionB(targetSpeed)
 
     @property
     def servo2speedA(self):
-        return self._servo2speedA
+        return str(int(self._servo2speedA) - 90)
 
     @servo2speedA.setter
     def servo2speedA(self, targetSpeed):
-        self._servo2speedA = targetSpeed
-        self.servo2positionA(targetSpeed)
+        self._servo2speedA = targetSpeed + 90
+        self.servo2positionA(targetSpeed + 90)
 
     @property
     def servo2speedB(self):
-        return self._servo2speedB
+        return str(int(self._servo2speedB) - 90)
 
     @servo2speedB.setter
     def servo2speedB(self, targetSpeed):
-        self._servo2speedB = targetSpeed
-        self.servo2positionB(targetSpeed)
+        self._servo2speedB = targetSpeed + 90
+        self.servo2positionB(targetSpeed + 90)
     
     def setBrightness(self, targetBrightness):
         """Set LED pixel brightness."""
