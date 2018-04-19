@@ -51,10 +51,10 @@
                                                            value={{servo2positionA}} />
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueA" value={{LEDstartHueA}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDstartHueA" value={{LEDstartHueA}} /> 
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueA" value={{LEDendHueA}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDendHueA" value={{LEDendHueA}} /> 
             </div>
         </div> <!-- row -->
         <div class="row">
@@ -80,10 +80,10 @@
                                                            value={{servo2positionB}} />
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueB" value={{LEDstartHueB}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDstartHueB" value={{LEDstartHueB}} /> 
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueB" value={{LEDendHueB}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDendHueB" value={{LEDendHueB}} /> 
             </div>
         </div> <!-- row -->
         <div class="row">
@@ -112,7 +112,6 @@
 {% block foot %}
     <script>
         $(function($) {
-
             $(".knob").knob({
                 change : function (value) {
                     //console.log("change : " + value);
@@ -128,9 +127,15 @@
                 cancel : function () {
                     console.log("cancel : ", this);
                 },
-                
             });
-
         });
+    </script>
+    <script>
+        function update(jscolor) {
+            // One of the colour controls was adjusted; enable the submit button
+            $("button[type=submit]").prop("disabled", false);
+            // ...and remove the disabled class so it looks enabled
+            $("button[type=submit]").removeClass("disabled");
+        }
     </script>
 {% endblock foot %}
