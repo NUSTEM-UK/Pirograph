@@ -4,19 +4,6 @@
 {% endblock title %}
 {% block head %}
     {{ super() }}
-    <script>
-        $(document).ready(function (){
-            validate();
-            $('#servo1speedA').change(validate);
-        });
-        function validate() {
-            if ($('#servo1positionA').val() != {{servo1speedA}} {
-                $("button[type=submit]").prop("disabled", false);
-            } else {
-                $("button[type=submit]").prop("disabled", true);
-            }
-        }
-    </script>
 {% endblock head %}
 {% block jumbo %}
      <h1>Skutter Control &ndash; Hettie</h1>
@@ -111,7 +98,7 @@
                                                           value={{transitionTime}} />
             </div>
             <div class="col-sm">
-                <button type="submit" class="btn btn-lg btn-danger btn-block">Send to Hettie</button>
+                <button type="submit" class="btn btn-lg btn-danger btn-block disabled" disabled>Send to Hettie</button>
             </div>
             <div class="col-sm">
             </div>
@@ -133,6 +120,10 @@
                 release : function (value) {
                     //console.log(this.$.attr('value'));
                     console.log("release : " + value);
+                    // Something got touched, so enable the button
+                    $("button[type=submit]").prop("disabled", false);
+                    // ...and remove the disabled class so it looks enabled
+                    $("button[type=submit]").removeClass("disabled");
                 },
                 cancel : function () {
                     console.log("cancel : ", this);
