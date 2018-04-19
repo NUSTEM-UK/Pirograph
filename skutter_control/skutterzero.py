@@ -78,6 +78,14 @@ class Skutter:
         self._LEDendHueA = 0
         self._LEDendHueB = 0
         self._transitionTime = 5.0
+        self._stepper1speedA = 0
+        self._stepper1speedB = 0
+        self._stepper2speedA = 0
+        self._stepper2speedB = 0
+        self._stepper1angleA = 0
+        self._stepper1angleB = 0
+        self._stepper2angleA = 0
+        self._stepper2angleB = 0
 
 
     def _message(self, payload, topic=""):
@@ -159,7 +167,7 @@ class Skutter:
 
     @property
     def LEDstartHueB(self):
-        return self._LEDendHueA
+        return self._LEDstartHueB
 
     @LEDstartHueB.setter
     def LEDstartHueB(self, targetHue):
@@ -220,6 +228,7 @@ class Skutter:
     def servo1positionA(self):
         return self._servo1positionA
 
+    @servo1positionA.setter
     def servo1positionA(self, targetSpeed):
         self._servo1positionA = targetSpeed
         self.setServoPosition("1", "A", targetSpeed)
@@ -325,6 +334,99 @@ class Skutter:
             # sanity check - is command in the permittedTransitionTypes list?
             messageDict = {"command": "setTransitionType", "value": requested_type}
             self._message(messageDict, self._mac)
+
+    # >>> STEPPER FUNCTIONS
+    # Joe's root messaging additions first
+
+    def setStepperSpeed(self, speed, stepperNo, state):
+        """Command Stepper1 speed change"""
+        if stepperNo == "1":
+            messageDict = {"command": "setStepper1speed", "speed": speed, "state": state}
+        else:
+            messageDict = {"command": "setStepper2speed", "speed": speed, "state": state}
+        self._message(messageDict, self._mac)
+
+    def setStepperAngle(self, angle, stepperNo, state):
+        """Command Stepper1 speed change"""
+        if stepperNo == "1":
+            messageDict = {"command": "setStepper1angle", "angle": angle, "state": state}
+        else: 
+            messageDict = {"command": "setStepper2angle", "angle": angle, "state": state}
+        self._message(messageDict, self._mac)
+
+    # ...and now some getter/setter methods
+
+    @property
+    def stepper1speedA(self):
+        return self._stepper1speedA
+
+    @stepper1speedA.setter
+    def stepper1speedA(self, targetSpeed):
+        self._stepper1speedA = targetSpeed
+        self.setStepperSpeed(targetSpeed, "1", "A")
+    
+    @property
+    def stepper1speedB(self):
+        return self._stepper1speedB
+
+    @stepper1speedB.setter
+    def stepper1speedB(self, targetSpeed):
+        self._stepper1speedB = targetSpeed
+        self.setStepperSpeed(targetSpeed, "1", "B")
+
+    @property
+    def stepper2speedA(self):
+        return self._stepper2speedA
+    
+    @stepper2speedA.setter
+    def stepper2speedA(self, targetSpeed):
+        self._stepper2speedA = targetSpeed
+        self.setStepperSpeed(targetSpeed, "2", "A")
+    
+    @property
+    def stepper2speedB(self):
+        return self._stepper2speedB
+
+    @stepper2speedB.setter
+    def stepper2speedB(self, targetSpeed):
+        self._stepper2speedB = targetSpeed
+        self.setStepperSpeed(targetSpeed, "2", "B")
+
+    @property
+    def stepper1angleA(self):
+        return self._stepper1angleA
+    
+    @stepper1angleA.setter
+    def stepper1angleA(self, targetAngle):
+        self._stepper1angleA = targetAngle
+        self.setStepperAngle(targetAngle, "1", "A")
+    
+    @property
+    def stepper1angleB(self):
+        return self._stepper1angleB
+    
+    @stepper1angleB.setter
+    def stepper1angleB(self, targetAngle):
+        self._stepper1angleB = targetAngle
+        self.setStepperAngle(targetAngle, "1", "B")
+
+    @property
+    def stepper2angleA(self):
+        return self._stepper2angleA
+    
+    @stepper2angleA.setter
+    def stepper2angleA(self, targetAngle):
+        self._stepper2angleA = targetAngle
+        self.setStepperAngle(targetAngle, "2", "A")
+    
+    @property
+    def stepper2angleB(self):
+        return self._stepper2angleB
+    
+    @stepper2angleB.setter
+    def stepper2angleB(self, targetAngle):
+        self._stepper2angleB = targetAngle
+        self.setStepperAngle(targetAngle, "2", "B")
 
 
 if __name__ == '__main__':
