@@ -231,6 +231,7 @@ class Skutter:
     @servo1positionA.setter
     def servo1positionA(self, targetSpeed):
         self._servo1positionA = targetSpeed
+        # setattr(self, 'setServoPosition', "1", "A", targetSpeed)
         self.setServoPosition("1", "A", targetSpeed)
     
     @property
@@ -267,7 +268,8 @@ class Skutter:
     @servo1speedA.setter
     def servo1speedA(self, targetSpeed):
         self._servo1speedA = targetSpeed
-        self.servo1positionA(targetSpeed)
+        setattr(self, 'servo1positionA', targetSpeed)
+        # self.servo1positionA(targetSpeed)
 
     @property
     def servo1speedB(self):
