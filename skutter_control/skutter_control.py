@@ -21,6 +21,7 @@ app.secret_key = '2B4C0s8ObsIuL6pxvbfJaTm+MJcfvLKSw9IzTNlr1T5pYJZ1kSzQz'
 derek = Skutter("D07")
 daphne = Skutter("D08")
 hettie = Skutter("D04")
+michael = Skutter("D11")
 
 def str_to_class(s):
     """Used for converting a form-passed string into the name of a Skutter object.
@@ -37,6 +38,9 @@ def str_to_class(s):
 def home():
     return render_template("home.html")
 
+@app.route("/admin")
+def renderAdmin():
+    return render_template("admin.html")
 
 # It's ridiculous to handle each skutter separately here. This needs fixing.
 @app.route("/derek")
@@ -51,42 +55,54 @@ def renderDaphne():
 
 @app.route("/hettie")
 def renderHettie():
-    return render_template("hettie.html")
-    # return render_template("hettie.html", servo1positionA=hettieservo1positionA,
-    #                                       servo1positionB=hettie.servo1positionB,
-    #                                       servo2positionA=hettie.servo2positionA,
-    #                                       servo2positionB=hettie.servo2positionB,
-    #                                       LEDstartHueA=hettie.LEDstartHueA,
-    #                                       LEDstartHueA=hettie.LEDstartHueB,
-    #                                       LEDendHueA=hettie.LEDendHueA,
-    #                                       LEDendHueB=hettie.LEDendHueB,
-    #                                       transitionTime=hettie.transitionTime)
+    # return render_template("hettie.html")
+    return render_template("hettie.html", servo1speedA=hettie.servo1speedA,
+                                          servo1speedB=hettie.servo1speedB,
+                                          servo2positionA=hettie.servo2positionA,
+                                          servo2positionB=hettie.servo2positionB,
+                                          LEDstartHueA=hettie.LEDstartHueA,
+                                          LEDstartHueB=hettie.LEDstartHueB,
+                                          LEDendHueA=hettie.LEDendHueA,
+                                          LEDendHueB=hettie.LEDendHueB,
+                                          transitionTime=hettie.transitionTime)
 
+
+@app.route("/michael")
+def renderMichael():
+    return render_template("michael.html", stepper1speedA=michael.stepper1speedA,
+                                           stepper1speedB=michael.stepper1speedB,
+                                           stepper2angleA=michael.stepper2angleA,
+                                           stepper2angleB=michael.stepper2angleB,
+                                           LEDstartHueA=michael.LEDstartHueA,
+                                           LEDstartHueB=michael.LEDstartHueB,
+                                           LEDendHueA=michael.LEDendHueA,
+                                           LEDendHueB=michael.LEDendHueB,
+                                           transitionTime=michael.transitionTime)
 
 # One MQTT form handler to rule them all.
 @app.route("/send", methods=["POST"])
 def send():
     """Handle form submission and fire off MQTT messages."""
-    skutterName = request.form.get("skutterName")
-    flash_message = "Skutter: " + skutterName
-    for v in islice(request.form, 1, None): # Skip the first entry, that's the name of the skutter
-        flash_message += " | %s : %s " %(v, request.form[v])
+    print("<<< DEPLOY THE FORM HANDLER!")
+    mySkutter = request.form.get("skutterName")
+    flash_message = "Skutter: " + mySkutter
+    for key in request.form:
+        # Slip the skutterName, we already handled that
+        if key =="skutterName":
+            continue
+        # output diagnostics back to the template
+        flash_message += " | %s : %s " %(key, request.form[key])
+        # output diagnostics to the console or error log
+        print(key, request.form[key])
         # Now call method v on object skutterName, passing in the form value request.form[v]
         # This relies on SkutterZero to handle string/hex data passed in. Ouch.
-        getattr(str_to_class(skutterName), v)(request.form[v])
+        # Using setattr here to ensure we access the setter method named key
+        setattr(str_to_class(mySkutter), key, request.form[key])
+    print(">>> End of messages")
 
-
-    # TODO: Handle the individual elements of the form submission, rather than hard-coding here.
-    # servo1speed = request.form.get("servo1speed")
-    # knobData1 = request.form.get("knob-data-1")
-    # flash_message = "Skutter: "+ skutterName + " | Servo1Speed: " + servo1speed + " | Knob data: " + knobData1
-    # Work out which Skutter we're talking to from the form data, and command that one.
-    
-    # str_to_class(skutterName).servo1speed(servo1speed)
-    # Give some mildly reassuring feedback to the user, that their data bas been acted upon.
+    # Set the template flash message and return to the corresponding form page
     flash(flash_message)
-    # Return us to the Skutter page from which we came.
-    return redirect(skutterName)
+    return redirect(mySkutter)
 
 if __name__ == '__main__':
     # This should probably be in the main body of the code, not tucked away down here.

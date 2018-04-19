@@ -20,7 +20,7 @@
     </div>
     <div class="col-md-4">
         <h2>Servo Speed</h2>
-        <form class="form-horizontal" action="/send" method="POST">
+        <form class="form-horizontal" action="send" method="POST">
             <!-- So the form handler can parse which skutter the data is for, we return a hidden value here -->
             <input type="hidden" name="skutterName" value="derek" />
             <div class="form-group">
@@ -32,7 +32,7 @@
             </div>
             <div class="form-group">
                 <div class="col-sm-9">
-                    <input type="submit" value="Send" class="btn btn-primary btn-block" />
+                    <button type="submit" class="btn btn-lg btn-danger btn-block">Send to Derek</button>
                 </div>
             </div>
         </form> <!-- /form -->

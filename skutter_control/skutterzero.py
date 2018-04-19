@@ -61,27 +61,32 @@ class Skutter:
     def __init__(self, skutterNumber="00", requestedLEDcount="1"):
         """Initialise the skutter, with vaguely-sane defaults."""
         self._mac = MACS[skutterNumber] # MAC address of specific Wemos module.
-        self.permittedTransitionTypes = ("ONCE", "LOOP", "RETURN")
-        self.cameraRotationTime = 10.0 # Time in secs (float).
+        self._permittedTransitionTypes = ("ONCE", "LOOP", "RETURN")
+        self._cameraRotationTime = 10.0 # Time in secs (float).
         # Make sure all the variables exist
-        self.LEDcount = requestedLEDcount # How many LEDs in the strip?
-        # Package the data.
-        
+        self._LEDcount = requestedLEDcount # How many LEDs in the strip?
+        self._servo1positionA = 90.0
+        self._servo1positionB = 90.0
+        self._servo2positionA = 90.0
+        self._servo2positionB = 90.0
+        self._servo1speedA = 90.0
+        self._servo1speedB = 90.0
+        self._servo2speedA = 90.0
+        self._servo2speedB = 90.0
+        self._LEDstartHueA = 0
+        self._LEDstartHueB = 0
+        self._LEDendHueA = 0
+        self._LEDendHueB = 0
+        self._transitionTime = 5.0
+        self._stepper1speedA = 0
+        self._stepper1speedB = 0
+        self._stepper2speedA = 0
+        self._stepper2speedB = 0
+        self._stepper1angleA = 0
+        self._stepper1angleB = 0
+        self._stepper2angleA = 0
+        self._stepper2angleB = 0
 
-    def _dictionarify(self):
-        """Package everything up into a neat dictionary, for JSONificaation."""
-        # self.skutterDict["mac"] = self._mac
-        self.skutterDict["transitionTime"] = self.transitionTime
-        self.skutterDict["transitionType"] = self.transitionType
-        self.skutterDict["cameraRotationTime"] = self.cameraRotationTime
-        self.skutterDict["servo1position"] = self.servo1position
-        self.skutterDict["servo2position"] = self.servo2position
-        self.skutterDict["LEDstartHue"] = self.LEDstartHue
-        self.skutterDict["LEDendHue"] = self.LEDendHue
-        self.skutterDict["LEDcount"] = self.LEDcount
-        self.skutterDict["LEDbrightness"] = self.LEDbrightness
-        # Leave a stub here for the next thing I think to add.
-        # self.skutterDict[""] = self.
 
     def _message(self, payload, topic=""):
         """Fire the MQTT message (internal class method)
@@ -93,7 +98,9 @@ class Skutter:
         mqttc.publish(mqtt_channel+topic, json.dumps(payload))
         # mqttc.publish(mqtt_channel+topic, self.jsonTestData)
 
-    def getMac(self):
+
+    @property
+    def mac(self):
         """Output object MAC address, as string. For testing purposes."""
         return self._mac
 
@@ -146,24 +153,49 @@ class Skutter:
         self.setLEDhue("end", "A", targetColour)
         self.setLEDhue("end", "B", targetColour)
     
+    @property
+    def LEDstartHueA(self):
+        return self._LEDstartHueA
+
+    @LEDstartHueA.setter
     def LEDstartHueA(self, targetHue):
         """set LED hue for first pixel, for state A."""
         # TODO: sanity check on inputs
-        self.setLEDhue("start", "A", targetHue)
+        self._LEDstartHueA = targetHue
+        # Cast targetHue to string so setLEDhue handler can process, in case it isn't a string.
+        self.setLEDhue("start", "A", str(targetHue))
 
+    @property
+    def LEDstartHueB(self):
+        return self._LEDstartHueB
+
+    @LEDstartHueB.setter
     def LEDstartHueB(self, targetHue):
         """set LED hue for first pixel, for state B."""
         # TODO: sanity check on inputs
+        self._LEDstartHueB = targetHue
         self.setLEDhue("start", "B", targetHue)
     
+    @property
+    def LEDendHueA(self):
+        return self._LEDendHueA
+
+    @LEDendHueA.setter
     def LEDendHueA(self, targetHue):
         """set LED hue for last pixel, for state A"""
         # TODO: sanity check on inputs
+        self._LEDendHueA = targetHue
         self.setLEDhue("end", "A", targetHue)
     
+    @property
+    def LEDendHueB(self):
+        return self._LEDendHueB
+
+    @LEDendHueB.setter
     def LEDendHueB(self, targetHue):
         """set LED hue for last pixel, for state B."""
         # TODO: sanity check on inputs
+        self._LEDendHueB = targetHue
         self.setLEDhue("end", "B", targetHue)
     
     def setServoPosition(self, servoNum, state, angle):
@@ -186,35 +218,86 @@ class Skutter:
     
     def servo1speed(self, targetSpeed):
         """Convenience alias for setServo1position."""
-        self.servo1position(targetSpeed)
+        self.servo1position(targetSpeed - 90)
 
     def servo2speed(self, targetSpeed):
         """Convenience alias for setServo2position."""
-        self.servo2position(targetSpeed)
+        self.servo2position(targetSpeed - 90)
 
+    @property
+    def servo1positionA(self):
+        return self._servo1positionA
+
+    @servo1positionA.setter
     def servo1positionA(self, targetSpeed):
+        self._servo1positionA = targetSpeed
+        # setattr(self, 'setServoPosition', "1", "A", targetSpeed)
         self.setServoPosition("1", "A", targetSpeed)
     
+    @property
+    def servo1positionB(self):
+        return self._servo1positionB
+
+    @servo1positionB.setter
     def servo1positionB(self, targetSpeed):
+        self._servo1positionB = targetSpeed
         self.setServoPosition("1", "B", targetSpeed)
 
+    @property
+    def servo2positionA(self):
+        return self._servo2positionA
+
+    @servo2positionA.setter
     def servo2positionA(self, targetSpeed):
+        self._servo2positionA = targetSpeed
         self.setServoPosition("2", "A", targetSpeed)
 
+    @property
+    def servo2positionB(self):
+        return self._servo2positionB
+    
+    @servo2positionB.setter
     def servo2positionB(self, targetSpeed):
+        self._servo2positionB = targetSpeed
         self.setServoPosition("2", "B", targetSpeed)
 
+    @property
+    def servo1speedA(self):
+        return str(int(self._servo1speedA) - 90)
+
+    @servo1speedA.setter
     def servo1speedA(self, targetSpeed):
-        self.servo1positionA(targetSpeed)
-    
+        self._servo1speedA = str(int(targetSpeed) + 90)
+        setattr(self, 'servo1positionA', str(int(targetSpeed) + 90))
+        # self.servo1positionA(targetSpeed)
+
+    @property
+    def servo1speedB(self):
+        return str(int(self._servo1speedB) - 90)
+
+    @servo1speedB.setter    
     def servo1speedB(self, targetSpeed):
-        self.servo1positionB(targetSpeed)
+        self._servo1speedB = str(int(targetSpeed) + 90)
+        setattr(self,'servo1positionB', str(int(targetSpeed) + 90))
+        # self.servo1positionB(targetSpeed)
 
+    @property
+    def servo2speedA(self):
+        return str(int(self._servo2speedA) - 90)
+
+    @servo2speedA.setter
     def servo2speedA(self, targetSpeed):
-        self.servo2positionA(targetSpeed)
+        self._servo2speedA = targetSpeed + 90
+        self.servo2positionA(targetSpeed + 90)
 
+    @property
+    def servo2speedB(self):
+        return str(int(self._servo2speedB) - 90)
+
+    @servo2speedB.setter
     def servo2speedB(self, targetSpeed):
-        self.servo2positionB(targetSpeed)
+        self._servo2speedB = targetSpeed + 90
+        self.servo2positionB(targetSpeed + 90)
     
     def setBrightness(self, targetBrightness):
         """Set LED pixel brightness."""
@@ -226,22 +309,127 @@ class Skutter:
         """Convenience method alias for setBrightness."""
         self.setBrightness(int(targetBrightness))
 
+    @property
+    def transitionTime(self):
+        return self._transitionTime
+
+    @transitionTime.setter
     def transitionTime(self, requested_time):
         # TODO: add sanity check
         if int(requested_time) < 0: # TODO: check if transitionTime is integer
             # TODO: raise error
             pass
         else:
+            self._transitionTime = requested_time
             messageDict = {"command": "setTransitionTime", "value": int(requested_time)*1000}
             # my_dict = {'id':self._mac, 'transitionTime':requested_angle}
             self._message(messageDict, self._mac)
 
+    @property
+    def transitionType(self):
+        return self._transitionType
+
+    @transitionType.setter
     def transitionType(self, requested_type):
         """Commands colour animation change."""
         if requested_type in self.permittedTransitionTypes:
+            self._transitionType = requested_type
             # sanity check - is command in the permittedTransitionTypes list?
             messageDict = {"command": "setTransitionType", "value": requested_type}
             self._message(messageDict, self._mac)
+
+    # >>> STEPPER FUNCTIONS
+    # Joe's root messaging additions first
+
+    def setStepperSpeed(self, speed, stepperNo, state):
+        """Command Stepper1 speed change"""
+        if stepperNo == "1":
+            messageDict = {"command": "setStepper1speed", "speed": speed, "state": state}
+        else:
+            messageDict = {"command": "setStepper2speed", "speed": speed, "state": state}
+        self._message(messageDict, self._mac)
+
+    def setStepperAngle(self, angle, stepperNo, state):
+        """Command Stepper1 speed change"""
+        if stepperNo == "1":
+            messageDict = {"command": "setStepper1angle", "angle": angle, "state": state}
+        else: 
+            messageDict = {"command": "setStepper2angle", "angle": angle, "state": state}
+        self._message(messageDict, self._mac)
+
+    # ...and now some getter/setter methods
+
+    @property
+    def stepper1speedA(self):
+        return self._stepper1speedA
+
+    @stepper1speedA.setter
+    def stepper1speedA(self, targetSpeed):
+        self._stepper1speedA = targetSpeed
+        self.setStepperSpeed(targetSpeed, "1", "A")
+    
+    @property
+    def stepper1speedB(self):
+        return self._stepper1speedB
+
+    @stepper1speedB.setter
+    def stepper1speedB(self, targetSpeed):
+        self._stepper1speedB = targetSpeed
+        self.setStepperSpeed(targetSpeed, "1", "B")
+
+    @property
+    def stepper2speedA(self):
+        return self._stepper2speedA
+    
+    @stepper2speedA.setter
+    def stepper2speedA(self, targetSpeed):
+        self._stepper2speedA = targetSpeed
+        self.setStepperSpeed(targetSpeed, "2", "A")
+    
+    @property
+    def stepper2speedB(self):
+        return self._stepper2speedB
+
+    @stepper2speedB.setter
+    def stepper2speedB(self, targetSpeed):
+        self._stepper2speedB = targetSpeed
+        self.setStepperSpeed(targetSpeed, "2", "B")
+
+    @property
+    def stepper1angleA(self):
+        return self._stepper1angleA
+    
+    @stepper1angleA.setter
+    def stepper1angleA(self, targetAngle):
+        self._stepper1angleA = targetAngle
+        self.setStepperAngle(targetAngle, "1", "A")
+    
+    @property
+    def stepper1angleB(self):
+        return self._stepper1angleB
+    
+    @stepper1angleB.setter
+    def stepper1angleB(self, targetAngle):
+        self._stepper1angleB = targetAngle
+        self.setStepperAngle(targetAngle, "1", "B")
+
+    @property
+    def stepper2angleA(self):
+        return self._stepper2angleA
+    
+    @stepper2angleA.setter
+    def stepper2angleA(self, targetAngle):
+        self._stepper2angleA = targetAngle
+        self.setStepperAngle(targetAngle, "2", "A")
+    
+    @property
+    def stepper2angleB(self):
+        return self._stepper2angleB
+    
+    @stepper2angleB.setter
+    def stepper2angleB(self, targetAngle):
+        self._stepper2angleB = targetAngle
+        self.setStepperAngle(targetAngle, "2", "B")
 
 
 if __name__ == '__main__':

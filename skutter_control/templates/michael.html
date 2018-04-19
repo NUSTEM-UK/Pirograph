@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block title %}
-    Skutter Control : Hettie
+    Skutter Control : Michael
 {% endblock title %}
 {% block head %}
     {{ super() }}
 {% endblock head %}
 {% block jumbo %}
-     <h1>Skutter Control &ndash; Hettie</h1>
+     <h1>Skutter Control &ndash; Michael</h1>
 {% endblock jumbo %}
 {% block controls %}
     <div class="row">
@@ -27,36 +27,34 @@
         </div>
     </div> <!-- row -->
     <form action="send" method="POST">
-        <input type="hidden" name="skutterName" value="hettie" />
+        <input type="hidden" name="skutterName" value="michael" />
         <div class="row">
             <div class="col-sm">
                 <h3>State A</h3>
             </div>
             <div class="col-sm">
-                <input name="servo1speedA" class="knob" data-min="-90" 
-                                                        data-max="90" 
+                <input name="stepper1speedA" class="knob" data-min="-1000" 
+                                                        data-max="1000" 
                                                         data-displayPrevious=true 
                                                         data-width="150" 
                                                         data-angleOffset=-90
                                                         data-angleArc=180
-                                                        data-fgColor="#FF0000"
-                                                        value={{servo1speedA}} />
+                                                        value={{stepper1speedA}} />
             </div>
             <div class="col-sm">
-                <input name="servo2positionA" class="knob" data-min="0" 
-                                                           data-max="180" 
+                <input name="stepper2angleA" class="knob" data-min="0" 
+                                                           data-max="360" 
                                                            data-displayPrevious=true 
                                                            data-width="150" 
                                                            data-angleOffset=-90
                                                            data-angleArc=180
-                                                           data-fgColor="#FF0000"
-                                                           value={{servo2positionA}} />
+                                                           value={{stepper2angleA}} />
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDstartHueA" value={{LEDstartHueA}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueA" value={{LEDstartHueA}} /> 
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDendHueA" value={{LEDendHueA}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueA" value={{LEDendHueA}} /> 
             </div>
         </div> <!-- row -->
         <div class="row">
@@ -64,30 +62,28 @@
                 <h3>State B</h3>
             </div>
             <div class="col-sm">
-                <input name="servo1speedB" class="knob" data-min="-90" 
-                                                        data-max="90" 
+                <input name="stepper1speedB" class="knob" data-min="-1000" 
+                                                        data-max="1000" 
                                                         data-displayPrevious=true 
                                                         data-width="150" 
                                                         data-angleOffset=-90
                                                         data-angleArc=180
-                                                        data-fgColor="#FF0000"
-                                                        value={{servo1speedB}} />
+                                                        value={{stepper1speedB}} />
             </div>
             <div class="col-sm">
-                <input name="servo2positionB" class="knob" data-min="0" 
-                                                           data-max="180" 
+                <input name="stepper2angleB" class="knob" data-min="0" 
+                                                           data-max="360" 
                                                            data-displayPrevious=true 
                                                            data-width="150" 
                                                            data-angleOffset=-90
                                                            data-angleArc=180
-                                                           data-fgColor="#FF0000"
-                                                           value={{servo2positionB}} />
+                                                           value={{stepper2angleB}} />
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDstartHueB" value={{LEDstartHueB}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDstartHueB" value={{LEDstartHueB}} /> 
             </div>
             <div class="col-sm">
-                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDendHueB" value={{LEDendHueB}} /> 
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" name="LEDendHueB" value={{LEDendHueB}} /> 
             </div>
         </div> <!-- row -->
         <div class="row">
@@ -99,11 +95,11 @@
                                                           data-max="30" 
                                                           data-displayPrevious=true 
                                                           data-width=150
-                                                          data-fgColor="#FF0000"
                                                           value={{transitionTime}} />
             </div>
             <div class="col-sm">
-                <button type="submit" class="btn btn-lg btn-danger btn-block disabled" disabled>Send to Hettie</button>
+                <button type="submit" class="btn btn-lg btn-danger btn-block">Send to Michael</button>
+                <!-- <input type="submit" value="Send" class="large" /> -->
             </div>
             <div class="col-sm">
             </div>
@@ -117,6 +113,7 @@
 {% block foot %}
     <script>
         $(function($) {
+
             $(".knob").knob({
                 change : function (value) {
                     //console.log("change : " + value);
@@ -124,23 +121,13 @@
                 release : function (value) {
                     //console.log(this.$.attr('value'));
                     console.log("release : " + value);
-                    // Something got touched, so enable the button
-                    $("button[type=submit]").prop("disabled", false);
-                    // ...and remove the disabled class so it looks enabled
-                    $("button[type=submit]").removeClass("disabled");
                 },
                 cancel : function () {
                     console.log("cancel : ", this);
                 },
+                
             });
+
         });
-    </script>
-    <script>
-        function update(jscolor) {
-            // One of the colour controls was adjusted; enable the submit button
-            $("button[type=submit]").prop("disabled", false);
-            // ...and remove the disabled class so it looks enabled
-            $("button[type=submit]").removeClass("disabled");
-        }
     </script>
 {% endblock foot %}

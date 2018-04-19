@@ -54,7 +54,7 @@ void setup() {
   // Select camera. Remember to change cam_width & cam_height (and size constructor) above
   // if changing these!
   //cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
-  cam = new Capture(this, cameras[15]); // C615 webcam, 1080p30
+  cam = new Capture(this, cameras[0]); // C615 webcam, 1080p30
   //cam = new Capture(this, cameras[16]); // C615, 1080p15
   //cam = new Capture(this, cameras[18]); // C615, 960x540 30fps.
 
@@ -167,4 +167,3 @@ void keyReleased() {
     threshold_low = 0;
   }
 }
-
