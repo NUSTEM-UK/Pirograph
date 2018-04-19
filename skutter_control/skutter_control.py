@@ -80,11 +80,11 @@ def send():
         # This relies on SkutterZero to handle string/hex data passed in. Ouch.
         # Using setattr here to ensure we access the setter method named key
         setattr(str_to_class(mySkutter), key, request.form[key])
-    # Earlier code here didn't work in production: request.form dictionary not ordered
-    # for v in islice(request.form, 1, None): # Skip the first entry, that's the name of the skutter
-    #     flash_message += " | %s : %s " %(v, request.form[v])
-    #     print(v, request.form[v])
-    #     setattr(str_to_class(mySkutter), v, request.form[v])
+        # Earlier code here didn't work in production: request.form dictionary not ordered
+        # for v in islice(request.form, 1, None): # Skip the first entry, that's the name of the skutter
+        #     flash_message += " | %s : %s " %(v, request.form[v])
+        #     print(v, request.form[v])
+        #     setattr(str_to_class(mySkutter), v, request.form[v])
     print("End of messages")
 
 
