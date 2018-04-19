@@ -74,3 +74,17 @@ Looks like the python3 plugin is present (`locate uwsgi | grep python3`), but ne
 OK, that nearly works... then craps out. Huh. But it works from a remote browser. Umm.... whut?
 
 
+## Apache
+
+OK, so that didn't really work out - I never managed to get the server stable, then I broke it completely.
+
+This was useful: http://www.ashokraja.me/post/Serving-a-Python-Flask-Web-Application-via-Apache-Webserver-in-Raspberry-Pi.aspx
+
+ALso needed
+
+    sudo apt install apache2
+    sudo apt install libapache2-mod-wsgi-py3
+    sudo a2enmod wsgi
+
+See Pi 00 for config.
+
