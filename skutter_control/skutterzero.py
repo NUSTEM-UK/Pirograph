@@ -65,7 +65,7 @@ class Skutter:
         self._cameraRotationTime = 10.0 # Time in secs (float).
         # Make sure all the variables exist
         self._LEDcount = requestedLEDcount # How many LEDs in the strip?
-        self._servo1postionA = 90.0
+        self._servo1positionA = 90.0
         self._servo1positionB = 90.0
         self._servo2positionA = 90.0
         self._servo2positionB = 90.0
