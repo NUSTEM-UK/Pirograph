@@ -343,13 +343,12 @@ class Skutter:
 
     def setStepperSpeed(self, speed, stepperNo, state):
         """Command Stepper1 speed change"""
-        messageDict = {"command": "setStepperSpeed","stepperNum":stepperNo, "speed": speed, "state": state}
-        
+        messageDict = {"command": "setStepperSpeed", "stepperNum": stepperNo, "speed": speed, "state": state}
         self._message(messageDict, self._mac)
 
     def setStepperAngle(self, angle, stepperNo, state):
         """Command Stepper1 speed change"""
-        messageDict = {"command": "setStepperAngle","stepperNum":stepperNo, "angle": angle, "state": state}
+        messageDict = {"command": "setStepperAngle", "stepperNum": stepperNo, "angle": angle, "state": state}
         self._message(messageDict, self._mac)
 
     # ...and now some getter/setter methods
