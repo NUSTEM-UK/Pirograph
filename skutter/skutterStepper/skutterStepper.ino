@@ -23,7 +23,7 @@ Based on WishingWell_Skutter from the Tech-Wishing-Well project.
 #define motorPin2  D6     // IN2 on the ULN2003 driver 1
 #define motorPin3  D7     // IN3 on the ULN2003 driver 1
 #define motorPin4  D8     // IN4 on the ULN2003 driver 1
-
+                                                                        ]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]\
 AccelStepper speedStepper(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
 
 // Motor pin definitions - Stepper Speed 
