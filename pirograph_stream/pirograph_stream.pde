@@ -25,12 +25,13 @@ int current_time;
 float fps;
 
 void setup() {
-  size(1024, 768, P2D);
+  size(1640, 922, P2D);
+  pixelDensity(displayDensity()); // Retina display
   background(0,0,0);
 
-  cam_width = 1024;
-  cam_height = 768  ;
-    
+  cam_width = 1640;
+  cam_height = 922;
+  
   int start_time = millis();
 
   intermediate = createImage(cam_width, cam_height, RGB);
