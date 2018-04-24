@@ -17,6 +17,7 @@ Based on WishingWell_Skutter from the Tech-Wishing-Well project.
 #include <AccelStepper.h>
 #define HALFSTEP 8
 
+//we're using nearly all 9 easily availbale pins ont he wemos - and the Neos need to not be on D0
 // Motor pin definitions - Stepper Speed 
 #define motorPin1  D5     // IN1 on the ULN2003 driver 1
 #define motorPin2  D6     // IN2 on the ULN2003 driver 1
@@ -26,10 +27,10 @@ Based on WishingWell_Skutter from the Tech-Wishing-Well project.
 AccelStepper speedStepper(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
 
 // Motor pin definitions - Stepper Speed 
-#define motorPin5  D1     // IN1 on the ULN2003 driver 1
+#define motorPin5  D4     // IN1 on the ULN2003 driver 1
 #define motorPin6  D2     // IN2 on the ULN2003 driver 1
-#define motorPin7  D3     // IN3 on the ULN2003 driver 1
-#define motorPin8  D4     // IN4 on the ULN2003 driver 1
+#define motorPin7  D1     // IN3 on the ULN2003 driver 1
+#define motorPin8  D0     // IN4 on the ULN2003 driver 1
 
 AccelStepper angleStepper(HALFSTEP, motorPin5, motorPin7, motorPin6, motorPin8);
 
@@ -56,7 +57,7 @@ char subsTargetArray[60];
 // #define PIN_LED_RED D3
 
 //its the only one I've got left!
-#define PIN_PIXEL D0
+#define PIN_PIXEL D3
 
 #define PIXEL_COUNT 9
 //#define SERVO_COUNT 2
