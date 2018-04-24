@@ -80,7 +80,7 @@ int stepperSpeed[5];    // Need to work out which is a speed stepper
 int stepperAngle[5];    // ...and which is an angle stepper
 int nowSpeed;           // current speed of the speedy stepper
 
-bool transitionDirty FALSE;     // Do we have a pending target update at the end of this transition?
+boolean transitionDirty = false;     // Do we have a pending target update at the end of this transition?
 
 // Array of LEDs - current values
 CRGB leds[PIXEL_COUNT];

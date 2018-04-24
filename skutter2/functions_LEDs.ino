@@ -16,16 +16,8 @@ void updateLEDgradient(int state) {
     // Get the end points
     CHSV startColour = CHSV(ledsHSV[0][state].hue, ledsHSV[0][state].sat, ledsHSV[0][state].val);
     CHSV endColour = CHSV(ledsHSV[PIXEL_COUNT - 1][state].hue, ledsHSV[PIXEL_COUNT - 1][state].sat, ledsHSV[PIXEL_COUNT - 1][state].val);
+    
     // Now looping between the 2nd and n-1th LEDs
-    // for (int i = 1; i < PIXEL_COUNT; i++) {    
-    //     CHSV tempColour;
-    //     tempColour.hue = interpolate(startColour.hue, endColour.hue, 0, PIXEL_COUNT, i);
-    //     tempColour.sat = interpolate(startColour.sat, endColour.sat, 0, PIXEL_COUNT, i);
-    //     tempColour.val = interpolate(startColour.val, endColour.val, 0, PIXEL_COUNT, i);
-
-    //     ledsHSV[i][state] = tempColour;
-    // }
-
     // let's try this with the 'map' function - Syntax map(value, fromLow, fromHigh, toLow, toHigh)
     for (int i = 1; i < PIXEL_COUNT; i++) {    
         CHSV tempColour;
