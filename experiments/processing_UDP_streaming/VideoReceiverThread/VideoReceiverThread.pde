@@ -12,8 +12,8 @@ PImage video;
 ReceiverThread thread;
 
 void setup() {
-  size(400,300);
-  video = createImage(320,240,RGB);
+  size(640,360, P2D);
+  video = createImage(640,360,RGB);
   thread = new ReceiverThread(video.width,video.height);
   thread.start();
 }
@@ -25,6 +25,6 @@ void setup() {
 
   // Draw the image
   background(0);
-  imageMode(CENTER);
-  image(video,width/2,height/2);
+  //imageMode(CENTER);
+  image(video,0,0);
 }

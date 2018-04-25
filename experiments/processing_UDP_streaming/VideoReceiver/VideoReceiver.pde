@@ -13,13 +13,13 @@ byte[] buffer = new byte[65536];
 PImage video;
 
 void setup() {
-  size(400,300);
+  size(640,360, P2D);
   try {
     ds = new DatagramSocket(port);
   } catch (SocketException e) {
     e.printStackTrace();
   } 
-  video = createImage(320,240,RGB);
+  video = createImage(640,360,RGB);
 }
 
  void draw() {

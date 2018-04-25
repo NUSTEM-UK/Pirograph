@@ -13,7 +13,7 @@ DatagramSocket ds;
 Capture cam;
 
 void setup() {
-  size(320,240);
+  size(640,360);
   // Setting up the DatagramSocket, requires try/catch
   try {
     ds = new DatagramSocket();
@@ -67,7 +67,9 @@ void broadcast(PImage img) {
   // Send JPEG data as a datagram
   println("Sending datagram with " + packet.length + " bytes");
   try {
-    ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPort));
+    //ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPort));
+    //ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("10.0.1.16"), clientPort));
+    ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("10.0.1.15"), clientPort));
   } 
   catch (Exception e) {
     e.printStackTrace();
