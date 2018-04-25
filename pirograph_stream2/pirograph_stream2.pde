@@ -137,14 +137,14 @@ void processImage(int f) {
       // Y = int((red(cam.pixels[loc]) + green(cam.pixels[loc]) + blue(cam.pixels[loc])) / 3.0);
 
       if (Y > threshold_high) {
-        // intermediate.pixels[loc] = cam.pixels[loc];
+        // intermediates[f].pixels[loc] = cam.pixels[loc];
         maskImages[f].pixels[loc] = color(0, 0, 255);
       } else if (Y < threshold_low) {
-        // intermediate.pixels[loc] = color(0, 0, 0);
+        // intermediates[f].pixels[loc] = color(0, 0, 0);
         maskImages[f].pixels[loc] = color(0, 0, 0);
       } else {
-        // intermediate.pixels[loc] = cam.pixels[loc];
-        maskImages[f].pixels[loc] = color(0, 0, Y);
+        // intermediates[f].pixels[loc] = cam.pixels[loc];
+        maskImages[f].pixels[loc] = color(0, 0, map(Y, threshold_low, threshold_high, 0, 255));
       }
     }
   }
