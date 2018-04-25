@@ -26,9 +26,6 @@ sColour = 2
 eColour = 3
 tTime = 4
 
-# neo strip array
-LEDS = [7]
-
 # define the two buttons
 stateButton = Button(2)
 sendButton = Button(3)
@@ -116,7 +113,7 @@ while True:
     endColour = int(mapper((MCP3008(channel=eColour, device=0),eColour))
 
     # map the start and end colours to create a gradient across the 8 pixel strip
-    for i in range(len(LEDS)):
+    for i in range(7):
         gradColour = (endColour - startColour)/(7 - 0)*(i - 0) + startColour
         gradRGB = colorsys.hsv_to_rgb(gradColour,255,255)
         strip.setPixelColor(i, gradRGB)
