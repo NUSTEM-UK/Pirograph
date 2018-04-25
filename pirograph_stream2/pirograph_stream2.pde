@@ -91,9 +91,7 @@ void setup() {
 void draw() {
 
   if (DONE == false) {
-    if (cam.isAvailable() == true) {
       processImage(NUMPORTS);
-    }
   } else {
     // WE HAVE A FRAME
     // software rotate of surface
@@ -125,7 +123,7 @@ void draw() {
 }
 
 void processImage(int f) {
-  if (cam.isAvailable() == true) {
+  // if (cam.isAvailable() == true) {
     cam.read();
   
     intermediates[f] = cam.get(); // Copy camera image to intermediate
@@ -156,7 +154,7 @@ void processImage(int f) {
     intermediates[f].mask(maskImages[f]);
     intermediates[f].updatePixels();
     DONE = true;
-  }
+  // }
 }
 
 // Handle threshold changes
