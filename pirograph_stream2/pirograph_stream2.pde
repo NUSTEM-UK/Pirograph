@@ -25,6 +25,7 @@ import java.io.*;
 IPCapture cam;
 
 int NUMPORTS = 4;
+boolean DONE = false;
 // NUMPORTS+1 represents our composite image
 
 // We're going to hold all the chunks in arrays.
@@ -88,10 +89,13 @@ void setup() {
 }
 
 void draw() {
-  
-  if (cam.isAvailable() == true) {
-    processImage();
-    
+
+  if (DONE == false) {
+    if (cam.isAvailable() == true) {
+      processImage(NUMPORTS);
+    }
+  } else {
+    // WE HAVE A FRAME
     // software rotate of surface
     // See: https://www.processing.org/tutorials/transform2d/
     pushMatrix(); // Save the current coordinate system
@@ -110,18 +114,19 @@ void draw() {
 
     current_time = millis();
     fps = framesProcessed / ((current_time-start_time)/1000);
-    println("Frame: ", frameCount, " fps: ", fps);
+    println("Frame: ", framesProcessed, " fps: ", fps);
     framesProcessed++;
 
+    DONE = false;
 
     // Store the current frame - use for saving images
     // composite = get();
   }
 }
 
-void processImage() {
+void processImage(int f) {
   cam.read();
-  intermediates[NUMPORTS] = cam.get(); // Copy camera image to intermediate
+  intermediates[f] = cam.get(); // Copy camera image to intermediate
 
   for (int x = 0; x < cam_width; x++) {
     for (int y = 0; y < cam_height; y++) {
@@ -133,21 +138,22 @@ void processImage() {
 
       if (Y > threshold_high) {
         // intermediate.pixels[loc] = cam.pixels[loc];
-        maskImages[NUMPORTS].pixels[loc] = color(0, 0, 255);
+        maskImages[f].pixels[loc] = color(0, 0, 255);
       } else if (Y < threshold_low) {
         // intermediate.pixels[loc] = color(0, 0, 0);
-        maskImages[NUMPORTS].pixels[loc] = color(0, 0, 0);
+        maskImages[f].pixels[loc] = color(0, 0, 0);
       } else {
         // intermediate.pixels[loc] = cam.pixels[loc];
-        maskImages[NUMPORTS].pixels[loc] = color(0, 0, Y);
+        maskImages[f].pixels[loc] = color(0, 0, Y);
       }
     }
   }
 
   // Mask: https://processing.org/reference/PImage_mask_.html
   // Can use an integer array as mask.
-  intermediates[NUMPORTS].mask(maskImages[NUMPORTS]);
-  intermediates[NUMPORTS].updatePixels();
+  intermediates[f].mask(maskImages[f]);
+  intermediates[f].updatePixels();
+  DONE = true;
 }
 
 // Handle threshold changes
