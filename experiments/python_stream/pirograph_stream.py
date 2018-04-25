@@ -208,7 +208,7 @@ r = requests.get('http://10.0.1.10:8081', stream=True)
 
 if (r.status_code == 200):
     bytes = bytes()
-    for chunk in r.iter_content(chunk_size=1024):
+    for chunk in r.iter_content(chunk_size=2048):
         # TODO: Explore performance with different chunk sizes in above line
         bytes += chunk
         a = bytes.find(b'\xff\xd8')
