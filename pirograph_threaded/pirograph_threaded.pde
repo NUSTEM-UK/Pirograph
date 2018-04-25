@@ -178,7 +178,7 @@ void draw() {
       // composites[i].copy(intermediates[i], 0, 0, intermediates[i].width, intermediates[i].height, 0, 0, intermediates[i].width, intermediates[i].height);
       buffers[i].popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
       buffers[i].endDraw();
-      broadcast(buffers[i], i);
+      // broadcast(buffers[i], i);
       // composites[i].copy(buffers[i], -width/2, -height/2, width, height, 0, 0, width, height);
       // composites[i].updatePixels();
       // image(intermediates[i], -width/2, -height/2); // This is where the display updates!
@@ -345,18 +345,22 @@ void keyReleased() {
   } else if (key == 'O') {
     angle = 0;
     println("ANGLE RESET");
-  } else if (key == '0') {
-    println("SWITCH TO CHANNEL 0");
-    displayPortTarget = 0;
   } else if (key == '1') {
     println("SWITCH TO CHANNEL 1");
-    displayPortTarget = 1;
+    displayPortTarget = 0;
+    DONE[0] = false;
   } else if (key == '2') {
     println("SWITCH TO CHANNEL 2");
-    displayPortTarget = 2;
+    displayPortTarget = 1;
+    DONE[1] = false;
   } else if (key == '3') {
     println("SWITCH TO CHANNEL 3");
+    displayPortTarget = 2;
+    DONE[2] = false;
+  } else if (key == '4') {
+    println("SWITCH TO CHANNEL 4");
     displayPortTarget = 3;
+    DONE[3] = false;
   }
   
   if (threshold_high > 255) {
