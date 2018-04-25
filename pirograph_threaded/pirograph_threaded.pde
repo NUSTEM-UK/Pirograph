@@ -67,6 +67,7 @@ int framesProcessed = 0;
 
 void setup() {
   size(1640, 922, P2D);
+  frameRate(15);
   pixelDensity(displayDensity()); // Retina display
   background(0,0,0);
 
@@ -86,12 +87,16 @@ void setup() {
   cam.start();
   cam.pixelWidth = cam_width;    // Explicit here to avoid weird scaling issues should we change resolution vs. display later.
   cam.pixelHeight = cam_height;
+
+  thread("processFive");
 }
 
 void draw() {
 
+
+
   if (DONE == false) {
-      processImage(NUMPORTS);
+      // processImage(NUMPORTS);
   } else {
     // WE HAVE A FRAME
     // software rotate of surface
@@ -122,39 +127,46 @@ void draw() {
   }
 }
 
+void processFive() {
+  while (true) {
+    if (!DONE) {
+      processImage(NUMPORTS);
+      DONE = true;
+    } else {
+      delay(10);
+    }
+  }
+}
+
 void processImage(int f) {
-  // if (cam.isAvailable() == true) { // Removed for performance: risky but gains half an fps, roughly.
-    cam.read();
-  
-    intermediates[f] = cam.get(); // Copy camera image to intermediate
+  cam.read();
+  intermediates[f] = cam.get(); // Copy camera image to intermediate
 
-    for (int x = 0; x < cam_width; x++) {
-      for (int y = 0; y < cam_height; y++) {
-        int loc = x + y*cam_width;
-        
-        // Find luminosity of current pixel (cast to int)
-        Y = int((0.2126*red(cam.pixels[loc])) + (0.7152*green(cam.pixels[loc])) + (0.0722*blue(cam.pixels[loc])));
-        // Y = int((red(cam.pixels[loc]) + green(cam.pixels[loc]) + blue(cam.pixels[loc])) / 3.0);
+  for (int x = 0; x < cam_width; x++) {
+    for (int y = 0; y < cam_height; y++) {
+      int loc = x + y*cam_width;
+      
+      // Find luminosity of current pixel (cast to int)
+      Y = int((0.2126*red(cam.pixels[loc])) + (0.7152*green(cam.pixels[loc])) + (0.0722*blue(cam.pixels[loc])));
+      // Y = int((red(cam.pixels[loc]) + green(cam.pixels[loc]) + blue(cam.pixels[loc])) / 3.0);
 
-        if (Y > threshold_high) {
-          // intermediates[f].pixels[loc] = cam.pixels[loc];
-          maskImages[f].pixels[loc] = color(0, 0, 255);
-        } else if (Y < threshold_low) {
-          // intermediates[f].pixels[loc] = color(0, 0, 0);
-          maskImages[f].pixels[loc] = color(0, 0, 0);
-        } else {
-          // intermediates[f].pixels[loc] = cam.pixels[loc];
-          maskImages[f].pixels[loc] = color(0, 0, map(Y, threshold_low, threshold_high, 0, 255));
-        }
+      if (Y > threshold_high) {
+        // intermediates[f].pixels[loc] = cam.pixels[loc];
+        maskImages[f].pixels[loc] = color(0, 0, 255);
+      } else if (Y < threshold_low) {
+        // intermediates[f].pixels[loc] = color(0, 0, 0);
+        maskImages[f].pixels[loc] = color(0, 0, 0);
+      } else {
+        // intermediates[f].pixels[loc] = cam.pixels[loc];
+        maskImages[f].pixels[loc] = color(0, 0, map(Y, threshold_low, threshold_high, 0, 255));
       }
     }
+  }
 
-    // Mask: https://processing.org/reference/PImage_mask_.html
-    // Can use an integer array as mask.
-    intermediates[f].mask(maskImages[f]);
-    intermediates[f].updatePixels();
-    DONE = true;
-  // }
+  // Mask: https://processing.org/reference/PImage_mask_.html
+  // Can use an integer array as mask.
+  intermediates[f].mask(maskImages[f]);
+  intermediates[f].updatePixels();
 }
 
 // Handle threshold changes
