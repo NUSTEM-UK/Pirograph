@@ -64,6 +64,16 @@ int current_time;
 float fps;
 int framesProcessed = 0;
 
+// int[][] regions = new int[NUMPORTS+1][4]; // Will hold our image processing regions for the threads
+// Initialise regions
+int[][] regions = {
+  { 0, 0, (cam_width/2)-1, (cam_height/2)-1 },
+  { cam_width/2, 0, cam_width, (cam_height/2)-1 },
+  { cam_width/2, cam_height/2, cam_width, cam_height },
+  { 0, cam_height/2, (cam_width/2)-1, cam_height },
+  { 0, 0, cam_width, cam_height }
+};
+
 void setup() {
   size(1640, 922, P2D);
   frameRate(15);
@@ -88,12 +98,20 @@ void setup() {
   cam.pixelWidth = cam_width;    // Explicit here to avoid weird scaling issues should we change resolution vs. display later.
   cam.pixelHeight = cam_height;
 
+  for (int i = 0; i < NUMPORTS+1; i++) {
+    print(i);
+    print(" : ");
+    for (int j = 0; j < 4; j++) {
+      print(regions[i][j]);
+      print(", ");
+    }
+    println();
+  }
+
   thread("processQuad");
 }
 
 void draw() {
-
-
 
   if (DONE[4] == false) {
       // processImage(NUMPORTS);
@@ -130,9 +148,8 @@ void draw() {
 void processImage(int f) {
   cam.read();
   intermediates[f] = cam.get(); // Copy camera image to intermediate
-
-  for (int x = 0; x < cam_width; x++) {
-    for (int y = 0; y < cam_height; y++) {
+  for (int x = regions[f][0]; x < regions[f][2]; x++) {
+    for (int y = regions[f][1]; y < regions[f][3]; y++) {
       int loc = x + y*cam_width;
       
       // Find luminosity of current pixel (cast to int)
@@ -196,6 +213,7 @@ void processD() {
 }
 
 void processQuad() {
+  println("processQuad started");
   while (true) {
     if (!DONE[NUMPORTS]) {
       processImage(NUMPORTS);
