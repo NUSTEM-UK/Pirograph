@@ -94,7 +94,7 @@ void setup() {
 
   // Initialise PGraphics surfaces
   for (int i = 0; i < NUMPORTS+1; i++) {
-    buffers[i] = createGraphics(cam_width, cam_height, P3D);
+    buffers[i] = createGraphics(cam_width, cam_height, P2D);
   }
 
   // cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
@@ -142,7 +142,7 @@ void draw() {
       // composites[i].copy(buffers[i], -width/2, -height/2, width, height, 0, 0, width, height);
       // composites[i].updatePixels();
       // image(intermediates[i], -width/2, -height/2); // This is where the display updates!
-      image(buffers[i], 0 , 0);
+      // image(buffers[i], 0 , 0);
       DONE[i] = false;  // reset the semaphore so the thread restarts
 
       current_time = millis();
@@ -153,7 +153,10 @@ void draw() {
     angle += angleStep; // Increment rotation angle
   }
 
-  
+  for (int i = 0; i < NUMPORTS; i++) {
+    image(buffers[i], 0, 0);
+  }
+
 
   // for (int i = 0; i < NUMPORTS; i++) {
   //   composites[NUMPORTS].blend(composites[i], 0, 0, width, height, 0, 0, width, height, BLEND);
@@ -274,11 +277,12 @@ void keyReleased() {
     threshold_high += 10;
     println("Threshold HIGH: ", threshold_high);
   } else if (key == 'P') {
+    color black = color(0, 0, 0);
     for (int i = 0; i < NUMPORTS+1; i++) {
-      composites[i] = createImage(cam_width, cam_height, ARGB);
-      // buffers[i] = createImage(cam_width, cam_height, ARGB);
+      println("Reset: ", i);
+      intermediates[i] = createImage(cam_width, cam_height, RGB);
+      buffers[i] = createGraphics(cam_width, cam_height, P2D);    // Nuke the offscreen surfaces from orbit, it's the only way to be sure.
     }
-    // image(intermediates[NUMPORTS], 0, 0);
   } else if (key == 'o') {
     angleStep += 0.005;
     println("Step angle: ", angleStep);
