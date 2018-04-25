@@ -37,6 +37,8 @@ PImage[] composites = new PImage[NUMPORTS+1];
 PImage[] maskImages = new PImage[NUMPORTS+1];
 PImage cameraImage;
 
+PGraphics[] buffers = new PGraphics[NUMPORTS+1];
+
 int cam_width = 1640;
 int cam_height = 922;
 
@@ -90,6 +92,11 @@ void setup() {
     composites[i] = createImage(cam_width, cam_height, ARGB);
   }
 
+  // Initialise PGraphics surfaces
+  for (int i = 0; i < NUMPORTS+1; i++) {
+    buffers[i] = createGraphics(cam_width, cam_height, P3D);
+  }
+
   // cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
   // cam = new IPCapture(this, "http://192.168.0.33:8000/stream.mjpg", "", "");
   // cam = new IPCapture(this, "http://192.168.0.33:8081", "", "");
@@ -122,18 +129,21 @@ void draw() {
     // is the frame segment ready?
     if (DONE[i] == true) {
       composites[i].loadPixels();
-      // yes, it's ready - so composite it.
-      pushMatrix();
-      translate(width/2, height/2); // Shift coordinate origin to centre screen
-      rotate(radians(angle));
+      // yes, it's ready - so composite it in the appropriate offscreen buffer.
+      buffers[i].beginDraw();
+      buffers[i].pushMatrix();
+      buffers[i].translate(width/2, height/2); // Shift coordinate origin to centre screen
+      buffers[i].rotate(radians(angle));
+      buffers[i].image(intermediates[i], -width/2, -height/2, width, height);
       // composites[i].copy(intermediates[i], -intermediates[i].width/2, -intermediates[i].height/2, intermediates[i].width, intermediates[i].height, 0, 0, intermediates[i].width, intermediates[i].height);
-      composites[i].copy(intermediates[i], 0, 0, intermediates[i].width, intermediates[i].height, 0, 0, intermediates[i].width, intermediates[i].height);
-      popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
-      composites[i].updatePixels();
-      // image(composites[i], 0, 0);
+      // composites[i].copy(intermediates[i], 0, 0, intermediates[i].width, intermediates[i].height, 0, 0, intermediates[i].width, intermediates[i].height);
+      buffers[i].popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
+      buffers[i].endDraw();
+      // composites[i].copy(buffers[i], -width/2, -height/2, width, height, 0, 0, width, height);
+      // composites[i].updatePixels();
       // image(intermediates[i], -width/2, -height/2); // This is where the display updates!
+      image(buffers[i], 0 , 0);
       DONE[i] = false;  // reset the semaphore so the thread restarts
-      // image(composites[i], 0 , 0);
 
       current_time = millis();
       fps = framesProcessed / ((current_time-start_time)/1000);
@@ -143,15 +153,16 @@ void draw() {
     angle += angleStep; // Increment rotation angle
   }
 
-  for (int i = 0; i < NUMPORTS; i++) {
-    composites[NUMPORTS].blend(composites[i], 0, 0, cam_width, cam_height, 0, 0, cam_width, cam_height, BLEND);
-  }
-  composites[NUMPORTS].updatePixels();
-  image(composites[NUMPORTS], 0, 0);
+  
 
-  //   // Store the current frame - use for saving images
-  //   // composite = get();
+  // for (int i = 0; i < NUMPORTS; i++) {
+  //   composites[NUMPORTS].blend(composites[i], 0, 0, width, height, 0, 0, width, height, BLEND);
   // }
+  // composites[NUMPORTS].updatePixels();
+  // image(composites[NUMPORTS], 0, 0);
+
+  // Store the current frame - use for saving images
+  // composite = get()
 }
 
 void processImage(int f) {
@@ -264,7 +275,8 @@ void keyReleased() {
     println("Threshold HIGH: ", threshold_high);
   } else if (key == 'P') {
     for (int i = 0; i < NUMPORTS+1; i++) {
-      composites[i] = createImage(cam_width, cam_height, RGB);
+      composites[i] = createImage(cam_width, cam_height, ARGB);
+      // buffers[i] = createImage(cam_width, cam_height, ARGB);
     }
     // image(intermediates[NUMPORTS], 0, 0);
   } else if (key == 'o') {
@@ -277,10 +289,14 @@ void keyReleased() {
     angle = 0;
     println("ANGLE RESET");
   }
+  
   if (threshold_high > 255) {
     threshold_high = 255;
+    println("Threshold HIGH: ", threshold_high);
   }
   if (threshold_low < 0) {
     threshold_low = 0;
+    println("Threshold LOW: ", threshold_low);
   }
+
 }
