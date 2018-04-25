@@ -27,6 +27,7 @@ IPCapture cam;
 int NUMPORTS = 4;
 volatile boolean[] DONE = new boolean [NUMPORTS+1];
 int displayPort;
+int displayPortTarget;
 
 // We're going to hold all the chunks in arrays.
 // indices 0, 1, 2, 3 = quadrants A, B, C, D
@@ -80,7 +81,8 @@ void setup() {
   frameRate(30);
   pixelDensity(displayDensity()); // Retina display
   background(0,0,0);
-  displayPort = 0; 
+  displayPort = 0;
+  displayPortTarget = 0;
 
   int start_time = millis();
 
@@ -145,18 +147,28 @@ void draw() {
       // image(buffers[i], 0 , 0);
       DONE[i] = false;  // reset the semaphore so the thread restarts
 
-      current_time = millis();
-      fps = framesProcessed / ((current_time-start_time)/1000);
-      println("Frame: ", framesProcessed, " fps: ", fps);
-      framesProcessed++;
+      // current_time = millis();
+      // fps = framesProcessed / ((current_time-start_time)/1000);
+      // println("Frame: ", framesProcessed, " fps: ", fps);
+      // framesProcessed++;
     }
     angle += angleStep; // Increment rotation angle
   }
 
-  for (int i = 0; i < NUMPORTS; i++) {
-    image(buffers[i], 0, 0);
+  // Work out which buffer to render to main screen.
+  if (displayPortTarget != displayPort) {
+    // Erase the previous image
+    background(0);
+    // Make the transition
+    displayPort = displayPortTarget;
   }
+  // Now blit the surface
+  image(buffers[displayPort], 0, 0);
 
+  // TODO: Update this every n frames. I guess.
+  // for (int i = 0; i < NUMPORTS; i++) {
+  //   image(buffers[i], 0, 0);
+  // }
 
   // for (int i = 0; i < NUMPORTS; i++) {
   //   composites[NUMPORTS].blend(composites[i], 0, 0, width, height, 0, 0, width, height, BLEND);
@@ -278,11 +290,14 @@ void keyReleased() {
     println("Threshold HIGH: ", threshold_high);
   } else if (key == 'P') {
     color black = color(0, 0, 0);
-    for (int i = 0; i < NUMPORTS+1; i++) {
-      println("Reset: ", i);
-      intermediates[i] = createImage(cam_width, cam_height, RGB);
-      buffers[i] = createGraphics(cam_width, cam_height, P2D);    // Nuke the offscreen surfaces from orbit, it's the only way to be sure.
-    }
+    println("Reset: ", displayPort);
+    intermediates[displayPort] = createImage(cam_width, cam_height, RGB);
+    buffers[displayPort] = createGraphics(cam_width, cam_height, P2D);    // Nuke the offscreen surfaces from orbit, it's the only way to be sure.
+    // for (int i = 0; i < NUMPORTS+1; i++) {
+    //   println("Reset: ", i);
+    //   intermediates[i] = createImage(cam_width, cam_height, RGB);
+    //   buffers[i] = createGraphics(cam_width, cam_height, P2D);    // Nuke the offscreen surfaces from orbit, it's the only way to be sure.
+    // }
   } else if (key == 'o') {
     angleStep += 0.005;
     println("Step angle: ", angleStep);
@@ -292,6 +307,18 @@ void keyReleased() {
   } else if (key == 'O') {
     angle = 0;
     println("ANGLE RESET");
+  } else if (key == '0') {
+    println("SWITCH TO CHANNEL 0");
+    displayPortTarget = 0;
+  } else if (key == '1') {
+    println("SWITCH TO CHANNEL 1");
+    displayPortTarget = 1;
+  } else if (key == '2') {
+    println("SWITCH TO CHANNEL 2");
+    displayPortTarget = 2;
+  } else if (key == '3') {
+    println("SWITCH TO CHANNEL 3");
+    displayPortTarget = 3;
   }
   
   if (threshold_high > 255) {
