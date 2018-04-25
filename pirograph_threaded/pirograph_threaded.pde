@@ -52,7 +52,7 @@ DatagramSocket dsC;
 DatagramSocket dsD;
 
 float angle = 0;
-float angleStep = 0.5;
+float angleStep = 0.1;
 
 int Y;
 
@@ -67,10 +67,10 @@ int framesProcessed = 0;
 // int[][] regions = new int[NUMPORTS+1][4]; // Will hold our image processing regions for the threads
 // Initialise regions
 int[][] regions = {
-  { 0, 0, (cam_width/2)-1, (cam_height/2)-1 },
-  { cam_width/2, 0, cam_width, (cam_height/2)-1 },
+  { 0, 0, (cam_width/2), (cam_height/2) },
+  { cam_width/2, 0, cam_width, (cam_height/2) },
   { cam_width/2, cam_height/2, cam_width, cam_height },
-  { 0, cam_height/2, (cam_width/2)-1, cam_height },
+  { 0, cam_height/2, (cam_width/2), cam_height },
   { 0, 0, cam_width, cam_height }
 };
 
@@ -86,8 +86,8 @@ void setup() {
   for (int i = 0; i < NUMPORTS+1; i++) {
     DONE[i] = false;
     intermediates[i] = createImage(cam_width, cam_height, RGB);
-    composites[i] = createImage(cam_width, cam_height, ARGB);
     maskImages[i] = createImage(cam_width, cam_height, RGB);
+    composites[i] = createImage(cam_width, cam_height, ARGB);
   }
   
   // cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
@@ -108,52 +108,53 @@ void setup() {
     println();
   }
 
-  thread("processQuad");
+  // thread("processQuad");
+  thread("processA");
+  thread("processB");
+  thread("processC");
+  thread("processD");
 }
 
 void draw() {
 
-  if (DONE[4] == false) {
-      // processImage(NUMPORTS);
-  } else {
-    // WE HAVE A FRAME
-    // software rotate of surface
-    // See: https://www.processing.org/tutorials/transform2d/
-    pushMatrix(); // Save the current coordinate system
-    translate(width/2, height/2); // Shift coordinate origin to centre screen
-    rotate(radians(angle));
-    image(intermediates[NUMPORTS], -width/2, -height/2);
-    popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
+  // iterate over the PORT threads
+  for (int i = 0; i < NUMPORTS; i++) {
+    // is the frame segment ready?
+    if (DONE[i] == true) {
+      // yes, it's ready - so composite it.
+      pushMatrix();
+      translate(width/2, height/2); // Shift coordinate origin to centre screen
+      rotate(radians(angle));
+      image(intermediates[i], -width/2, -height/2); // This is where the display updates!
+      popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
+      DONE[i] = false;  // reset the semaphore so the thread restarts
+
+      current_time = millis();
+      fps = framesProcessed / ((current_time-start_time)/1000);
+      println("Frame: ", framesProcessed, " fps: ", fps);
+      framesProcessed++;
+    }
     angle += angleStep; // Increment rotation angle
-
-    if (threshold_high > 255) {
-      threshold_high = 255;
-    }
-    if (threshold_low < 0) {
-      threshold_low = 0;
-    }
-
-    current_time = millis();
-    fps = framesProcessed / ((current_time-start_time)/1000);
-    println("Frame: ", framesProcessed, " fps: ", fps);
-    framesProcessed++;
-
-    DONE[4] = false;
-
-    // Store the current frame - use for saving images
-    // composite = get();
   }
+
+  //   // Store the current frame - use for saving images
+  //   // composite = get();
+  // }
 }
 
 void processImage(int f) {
   cam.read();
   intermediates[f] = cam.get(); // Copy camera image to intermediate
+  intermediates[f].loadPixels();
+  maskImages[f].loadPixels();
   for (int x = regions[f][0]; x < regions[f][2]; x++) {
     for (int y = regions[f][1]; y < regions[f][3]; y++) {
       int loc = x + y*cam_width;
+
+      // intermediates[f].pixels[loc] = color(255, 0, 0);
       
       // Find luminosity of current pixel (cast to int)
-      Y = int((0.2126*red(cam.pixels[loc])) + (0.7152*green(cam.pixels[loc])) + (0.0722*blue(cam.pixels[loc])));
+      Y = int((0.2126*red(intermediates[f].pixels[loc])) + (0.7152*green(intermediates[f].pixels[loc])) + (0.0722*blue(intermediates[f].pixels[loc])));
       // Y = int((red(cam.pixels[loc]) + green(cam.pixels[loc]) + blue(cam.pixels[loc])) / 3.0);
 
       if (Y > threshold_high) {
@@ -170,9 +171,8 @@ void processImage(int f) {
   }
 
   // Mask: https://processing.org/reference/PImage_mask_.html
-  // Can use an integer array as mask.
   intermediates[f].mask(maskImages[f]);
-  intermediates[f].updatePixels();
+  // intermediates[f].updatePixels();
 }
 
 // Thread handlers. The heavy lifting is done in processImage()
@@ -224,7 +224,7 @@ void processQuad() {
 // End thread handlers
 
 
-// Handle threshold changes
+// Key control: handle threshold changes.
 void keyReleased() {
   if (key == 'd') {
     threshold_low--;
@@ -254,10 +254,10 @@ void keyReleased() {
     intermediates[NUMPORTS] = createImage(cam_width, cam_height, RGB);
     image(intermediates[NUMPORTS], 0, 0);
   } else if (key == 'o') {
-    angleStep += 0.25;
+    angleStep += 0.02;
     println("Step angle: ", angleStep);
   } else if (key == 'l') {
-    angleStep -= 0.25;
+    angleStep -= 0.02;
     println("Step angle: ", angleStep);
   } else if (key == 'O') {
     angle = 0;
