@@ -37,7 +37,6 @@ stateToggle = 1
 #sendButton.is_pressed == True (State A), False (State B)
 stateToggle = sendButton.is_pressed
 
-
 # arrays to hold the current values for state A and B
 stateAvals = [0,0,0,0]
 stateBvals = [0,0,0,0]
@@ -50,6 +49,10 @@ box = Skutter("??")
 strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
 # Intialize the library (must be called once before other functions).
 strip.begin()
+
+# # get the current analog of the start and end colours
+# currentStartColour = mapper((MCP3008(channel=sColour, device=0),sColour)
+# currentEndColour = mapper((MCP3008(channel=eColour, device=0),eColour)
 
 def allSend():
     # grab the transition time value and map
