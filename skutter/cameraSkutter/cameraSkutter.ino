@@ -44,9 +44,7 @@ void setup() {
     Serial.begin(115200);
     setup_wifi();
 
-    // Get this Huzzah's MAC address and use it to register with the MQTT server
-    //  huzzahMACAddress = WiFi.macAddress();
-    //  skutterNameString = "skutter_" + huzzahMACAddress;
+    // Get this Wemos' MAC address and use it to register with the MQTT server
     skutterNameString = WiFi.macAddress();
     Serial.println(skutterNameString);
     skutterNameString.toCharArray(skutterNameArray, 60);
