@@ -25,8 +25,7 @@ import java.io.*;
 IPCapture cam;
 
 int NUMPORTS = 4;
-boolean DONE = false;
-// NUMPORTS+1 represents our composite image
+volatile boolean[] DONE = new boolean [NUMPORTS+1];
 
 // We're going to hold all the chunks in arrays.
 // indices 0, 1, 2, 3 = quadrants A, B, C, D
@@ -75,6 +74,7 @@ void setup() {
 
   // Initialise images
   for (int i = 0; i < NUMPORTS+1; i++) {
+    DONE[i] = false;
     intermediates[i] = createImage(cam_width, cam_height, RGB);
     composites[i] = createImage(cam_width, cam_height, ARGB);
     maskImages[i] = createImage(cam_width, cam_height, RGB);
@@ -88,14 +88,14 @@ void setup() {
   cam.pixelWidth = cam_width;    // Explicit here to avoid weird scaling issues should we change resolution vs. display later.
   cam.pixelHeight = cam_height;
 
-  thread("processFive");
+  thread("processQuad");
 }
 
 void draw() {
 
 
 
-  if (DONE == false) {
+  if (DONE[4] == false) {
       // processImage(NUMPORTS);
   } else {
     // WE HAVE A FRAME
@@ -120,21 +120,10 @@ void draw() {
     println("Frame: ", framesProcessed, " fps: ", fps);
     framesProcessed++;
 
-    DONE = false;
+    DONE[4] = false;
 
     // Store the current frame - use for saving images
     // composite = get();
-  }
-}
-
-void processFive() {
-  while (true) {
-    if (!DONE) {
-      processImage(NUMPORTS);
-      DONE = true;
-    } else {
-      delay(10);
-    }
   }
 }
 
@@ -168,6 +157,54 @@ void processImage(int f) {
   intermediates[f].mask(maskImages[f]);
   intermediates[f].updatePixels();
 }
+
+// Thread handlers. The heavy lifting is done in processImage()
+void processA() {
+  while (true) {
+    if (!DONE[0]) {
+      processImage(0);
+      DONE[0] = true;
+    }
+  }
+}
+
+void processB() {
+  while (true) {
+    if (!DONE[1]) {
+      processImage(1);
+      DONE[1] = true;
+    }
+  }
+}
+
+void processC() {
+  while (true) {
+    if (!DONE[2]) {
+      processImage(2);
+      DONE[2] = true;
+    }
+  }
+}
+
+void processD() {
+  while (true) {
+    if (!DONE[3]) {
+      processImage(3);
+      DONE[3] = true;
+    }
+  }
+}
+
+void processQuad() {
+  while (true) {
+    if (!DONE[NUMPORTS]) {
+      processImage(NUMPORTS);
+      DONE[NUMPORTS] = true;
+    }
+  }
+}
+// End thread handlers
+
 
 // Handle threshold changes
 void keyReleased() {
