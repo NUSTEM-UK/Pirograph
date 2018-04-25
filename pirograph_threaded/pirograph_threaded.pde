@@ -26,6 +26,7 @@ IPCapture cam;
 
 int NUMPORTS = 4;
 volatile boolean[] DONE = new boolean [NUMPORTS+1];
+int displayPort;
 
 // We're going to hold all the chunks in arrays.
 // indices 0, 1, 2, 3 = quadrants A, B, C, D
@@ -39,8 +40,6 @@ PImage cameraImage;
 int cam_width = 1640;
 int cam_height = 922;
 
-
-
 // UDP ports and sockets for streaming
 int clientPortA = 9100;
 int clientportB = 9101;
@@ -52,7 +51,7 @@ DatagramSocket dsC;
 DatagramSocket dsD;
 
 float angle = 0;
-float angleStep = 0.1;
+float angleStep = 0.02;
 
 int Y;
 
@@ -76,9 +75,10 @@ int[][] regions = {
 
 void setup() {
   size(1640, 922, P2D);
-  frameRate(15);
+  frameRate(30);
   pixelDensity(displayDensity()); // Retina display
   background(0,0,0);
+  displayPort = 0; 
 
   int start_time = millis();
 
@@ -89,7 +89,7 @@ void setup() {
     maskImages[i] = createImage(cam_width, cam_height, RGB);
     composites[i] = createImage(cam_width, cam_height, ARGB);
   }
-  
+
   // cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
   // cam = new IPCapture(this, "http://192.168.0.33:8000/stream.mjpg", "", "");
   // cam = new IPCapture(this, "http://192.168.0.33:8081", "", "");
@@ -121,13 +121,19 @@ void draw() {
   for (int i = 0; i < NUMPORTS; i++) {
     // is the frame segment ready?
     if (DONE[i] == true) {
+      composites[i].loadPixels();
       // yes, it's ready - so composite it.
       pushMatrix();
       translate(width/2, height/2); // Shift coordinate origin to centre screen
       rotate(radians(angle));
-      image(intermediates[i], -width/2, -height/2); // This is where the display updates!
+      // composites[i].copy(intermediates[i], -intermediates[i].width/2, -intermediates[i].height/2, intermediates[i].width, intermediates[i].height, 0, 0, intermediates[i].width, intermediates[i].height);
+      composites[i].copy(intermediates[i], 0, 0, intermediates[i].width, intermediates[i].height, 0, 0, intermediates[i].width, intermediates[i].height);
       popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
+      composites[i].updatePixels();
+      // image(composites[i], 0, 0);
+      // image(intermediates[i], -width/2, -height/2); // This is where the display updates!
       DONE[i] = false;  // reset the semaphore so the thread restarts
+      // image(composites[i], 0 , 0);
 
       current_time = millis();
       fps = framesProcessed / ((current_time-start_time)/1000);
@@ -136,6 +142,12 @@ void draw() {
     }
     angle += angleStep; // Increment rotation angle
   }
+
+  for (int i = 0; i < NUMPORTS; i++) {
+    composites[NUMPORTS].blend(composites[i], 0, 0, cam_width, cam_height, 0, 0, cam_width, cam_height, BLEND);
+  }
+  composites[NUMPORTS].updatePixels();
+  image(composites[NUMPORTS], 0, 0);
 
   //   // Store the current frame - use for saving images
   //   // composite = get();
@@ -251,13 +263,15 @@ void keyReleased() {
     threshold_high += 10;
     println("Threshold HIGH: ", threshold_high);
   } else if (key == 'P') {
-    intermediates[NUMPORTS] = createImage(cam_width, cam_height, RGB);
-    image(intermediates[NUMPORTS], 0, 0);
+    for (int i = 0; i < NUMPORTS+1; i++) {
+      composites[i] = createImage(cam_width, cam_height, RGB);
+    }
+    // image(intermediates[NUMPORTS], 0, 0);
   } else if (key == 'o') {
-    angleStep += 0.02;
+    angleStep += 0.005;
     println("Step angle: ", angleStep);
   } else if (key == 'l') {
-    angleStep -= 0.02;
+    angleStep -= 0.005;
     println("Step angle: ", angleStep);
   } else if (key == 'O') {
     angle = 0;
