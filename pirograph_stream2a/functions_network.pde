@@ -50,7 +50,7 @@ void broadcast(PImage source, int destination) {
             break;
       }
     // stub for duplicate send to local consumer for 4-up composite sketch
-    //ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPort));
+    ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
     
   } 
   catch (Exception e) {
