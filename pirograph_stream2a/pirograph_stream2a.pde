@@ -26,6 +26,8 @@ import java.awt.image.*;
 import java.net.*;
 import java.io.*;
 
+import mqtt.*;
+
 IPCapture cam;
 
 int NUMPORTS = 4;
@@ -55,6 +57,9 @@ DatagramSocket ds2;
 DatagramSocket ds3;
 // Streaming targets - string representations of IP addresses
 String[] streamTargets = { "10.0.1.15", "10.0.1.15", "10.0.1.15", "10.0.1.15" };
+
+// MQTT client. Which you could probably work out from the class name. Great comment, Jonathan.
+MQTTClient client;
 
 float angle = 0;
 float angleStep = 0.5;
@@ -112,11 +117,16 @@ void setup() {
   cam.start();
   cam.pixelWidth = cam_width;    // Explicit here to avoid weird scaling issues should we change resolution vs. display later.
   cam.pixelHeight = cam_height;
-    
+  
+  // MQTT setup: connect and subscribe to the /reset topic
+  client = new MQTTClient(this);
+  client.connect("mqtt://10.0.1.3", "pirographdisplay");
+  client.subscribe("reset");
+
   // UDP streaming setup
   setupDatagramSockets();
 
-}
+} // setup()
 
 void draw() {
 
