@@ -105,44 +105,7 @@ void setup() {
   cam.pixelWidth = cam_width;    // Explicit here to avoid weird scaling issues should we change resolution vs. display later.
   cam.pixelHeight = cam_height;
 
-  // DatagramSocket stuff for UDP streaming
-  try {
-    println("Datagram: 0");
-    ds0 = new DatagramSocket();
-    println("Datagram: 0 initialised");
-  } catch (SocketException e) {
-    e.printStackTrace();
-  } 
-  // try {
-  //   println("Datagram: 1");
-  //   ds1 = new DatagramSocket();
-  //   println("Datagram: 1 initialised");
-  // } catch (SocketException e) {
-  //   e.printStackTrace();
-  // }
-  // try {
-  //   println("Datagram: 2");
-  //   ds2 = new DatagramSocket();
-  //   println("Datagram: 2 initialised");
-  // } catch (SocketException e) {
-  //   e.printStackTrace();
-  // } 
-  // try {
-  //   println("Datagram: 3");
-  //   ds3 = new DatagramSocket();
-  //   println("Datagram: 3 initialised");
-  // } catch (SocketException e) {
-  //   e.printStackTrace();
-  // } 
-  // for (int i = 0; i < NUMPORTS; i++) {
-  //   try {
-  //     println("Datagram: ", i);
-  //     ds[i] = new DatagramSocket();
-  //     println("Datagram: ", i, " initialised");
-  //   } catch (SocketException e) {
-  //     e.printStackTrace();
-  //   }
-  // }
+  setupDatagramSockets();
 
   for (int i = 0; i < NUMPORTS+1; i++) {
     print(i);
@@ -156,9 +119,9 @@ void setup() {
 
   // thread("processQuad");
   thread("processA");
-  thread("processB");
-  thread("processC");
-  thread("processD");
+  // thread("processB");
+  // thread("processC");
+  // thread("processD");
 }
 
 void draw() {
@@ -179,7 +142,7 @@ void draw() {
       // composites[i].copy(intermediates[i], 0, 0, intermediates[i].width, intermediates[i].height, 0, 0, intermediates[i].width, intermediates[i].height);
       buffers[i].popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
       buffers[i].endDraw();
-      // broadcast(buffers[i], i);
+      broadcast(buffers[i], i);
       // composites[i].copy(buffers[i], -width/2, -height/2, width, height, 0, 0, width, height);
       // composites[i].updatePixels();
       // image(intermediates[i], -width/2, -height/2); // This is where the display updates!
@@ -301,119 +264,3 @@ void processQuad() {
 // End thread handlers
 
 
-// Key control: handle threshold changes.
-void keyReleased() {
-  if (key == 'd') {
-    threshold_low--;
-    println("Threshold LOW: ", threshold_low);
-  } else if (key == 'e') {
-    threshold_low++;
-    println("Threshold LOW: ", threshold_low);
-  } else if (key == 'D') {
-    threshold_low -= 10;
-    println("Threshold LOW: ", threshold_low);
-  } else if (key == 'E') {
-    threshold_low += 10;
-    println("Threshold LOW: ", threshold_low);
-  } else if (key == 'f') {
-    threshold_high--;
-    println("Threshold HIGH: ", threshold_high);
-  } else if (key == 'r') {
-    threshold_high++;
-    println("Threshold HIGH: ", threshold_high);
-  } else if (key == 'F') {
-    threshold_high -= 10;
-    println("Threshold HIGH: ", threshold_high);
-  } else if (key == 'R') {
-    threshold_high += 10;
-    println("Threshold HIGH: ", threshold_high);
-  } else if (key == 'P') {
-    color black = color(0, 0, 0);
-    println("Reset: ", displayPort);
-    intermediates[displayPort] = createImage(cam_width, cam_height, RGB);
-    buffers[displayPort] = createGraphics(cam_width, cam_height, P2D);    // Nuke the offscreen surfaces from orbit, it's the only way to be sure.
-    // for (int i = 0; i < NUMPORTS+1; i++) {
-    //   println("Reset: ", i);
-    //   intermediates[i] = createImage(cam_width, cam_height, RGB);
-    //   buffers[i] = createGraphics(cam_width, cam_height, P2D);    // Nuke the offscreen surfaces from orbit, it's the only way to be sure.
-    // }
-  } else if (key == 'o') {
-    angleStep += 0.005;
-    println("Step angle: ", angleStep);
-  } else if (key == 'l') {
-    angleStep -= 0.005;
-    println("Step angle: ", angleStep);
-  } else if (key == 'O') {
-    angle = 0;
-    println("ANGLE RESET");
-  } else if (key == '1') {
-    println("SWITCH TO CHANNEL 1");
-    displayPortTarget = 0;
-    DONE[0] = false;
-  } else if (key == '2') {
-    println("SWITCH TO CHANNEL 2");
-    displayPortTarget = 1;
-    DONE[1] = false;
-  } else if (key == '3') {
-    println("SWITCH TO CHANNEL 3");
-    displayPortTarget = 2;
-    DONE[2] = false;
-  } else if (key == '4') {
-    println("SWITCH TO CHANNEL 4");
-    displayPortTarget = 3;
-    DONE[3] = false;
-  }
-  
-  if (threshold_high > 255) {
-    threshold_high = 255;
-    println("Threshold HIGH: ", threshold_high);
-  }
-  if (threshold_low < 0) {
-    threshold_low = 0;
-    println("Threshold LOW: ", threshold_low);
-  }
-
-}
-
-
-// Function to broadcast a PImage over UDP
-// Special thanks to: http://ubaa.net/shared/processing/udp/
-// This code from https://github.com/shiffman/Processing-UDP-Video-Streaming
-void broadcast(PImage img, int destination) {
-
-  // Ensmallificate the image
-  img.resize(640, 360);
-  // We need a buffered image to do the JPG encoding
-  BufferedImage bimg = new BufferedImage( img.width,img.height, BufferedImage.TYPE_INT_RGB );
-
-  // Transfer pixels from localFrame to the BufferedImage
-  img.loadPixels();
-  bimg.setRGB( 0, 0, img.width, img.height, img.pixels, 0, img.width);
-
-  // Need these output streams to get image as bytes for UDP communication
-  ByteArrayOutputStream baStream	= new ByteArrayOutputStream();
-  BufferedOutputStream bos		= new BufferedOutputStream(baStream);
-
-  // Turn the BufferedImage into a JPG and put it in the BufferedOutputStream
-  // Requires try/catch
-  try {
-    ImageIO.write(bimg, "jpg", bos);
-  } 
-  catch (IOException e) {
-    e.printStackTrace();
-  }
-
-  // Get the byte array, which we will send out via UDP!
-  byte[] packet = baStream.toByteArray();
-
-  // Send JPEG data as a datagram
-  println("Sending datagram with " + packet.length + " bytes");
-  try {
-    //ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPort));
-    //ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("10.0.1.16"), clientPort));
-    ds0.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("10.0.1.15"), clientPorts[destination]));
-  } 
-  catch (Exception e) {
-    e.printStackTrace();
-  }
-}
