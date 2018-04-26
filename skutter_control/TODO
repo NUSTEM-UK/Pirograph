@@ -28,3 +28,25 @@ Things that need sorting:
 ✔ Admin page: stop & reset skutter without restarting the app (implies defining defaults / zero positions) @done(18-04-19 14:24)
 ☐ Do we pass full HSV data?
 ✔ Check we're sending all the form data: LEDendHueB seems to be missing from Hettie in production. @done(18-04-19 14:24)
+
+
+Things to do 2018-04-24:
+    ☐ Check big screen stand configuration
+    ☐ Postcards, signage **order today**
+    ☐ Also, it should tweet. Tweeting/posting images -- from Processing (or a Python daemon running on a file dropbox)
+        ☐ NFS share directory
+    ☐ Frame count display (Pi running Display-o-tron HAT)
+    ☐ Buy pegs, string: integrate printer.
+    ☐ Quad screen, split image, individual processing?
+    ☐ HSV colour pipeline
+        ☐ Skutter end: animate S and V along with H
+        ☐ Web app colour pickers: currently HSL not HSV (check Bootstrap colour picker)
+    ☐ Animation types
+    ☐ Metaskutters
+        ☐ Subclass Skutter to intercept & refire commands
+    ☐ Build 6 off fancy Skutters
+    ☐ Flash frame rejection
+    ☐ Check iMac boot / login without network access
+    ☐ 
+
+

@@ -4,6 +4,10 @@ Install Python packages listed in [requirements.txt](requirements.txt), via `pip
 
 
 Incidentally, `mosquitto_sub -h [hostIP] -v -t pirograph/+` will output MQTT broker action on the `pirograph/#` topics. We've previously written our own Python for that, which keeps breaking between Python2 & 3. Whoops. (On Pi, needs `sudo apt install mosquitto-clients`)
+
+eg:
+
+    mosquitto_sub -h 10.0.1.3 -v -t pirograph/+
 ## Configuring Windows tablets/Chrome browsers
 
 Open System Prefs -> Keyboard, turn off auto-show touch keyboard (to avoid triggering it with colour pickers).

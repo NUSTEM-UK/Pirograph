@@ -174,7 +174,7 @@ class Skutter:
         """set LED hue for first pixel, for state B."""
         # TODO: sanity check on inputs
         self._LEDstartHueB = targetHue
-        self.setLEDhue("start", "B", targetHue)
+        self.setLEDhue("start", "B", str(targetHue))
     
     @property
     def LEDendHueA(self):
@@ -185,7 +185,7 @@ class Skutter:
         """set LED hue for last pixel, for state A"""
         # TODO: sanity check on inputs
         self._LEDendHueA = targetHue
-        self.setLEDhue("end", "A", targetHue)
+        self.setLEDhue("end", "A", str(targetHue))
     
     @property
     def LEDendHueB(self):
@@ -196,7 +196,7 @@ class Skutter:
         """set LED hue for last pixel, for state B."""
         # TODO: sanity check on inputs
         self._LEDendHueB = targetHue
-        self.setLEDhue("end", "B", targetHue)
+        self.setLEDhue("end", "B", str(targetHue))
     
     def setServoPosition(self, servoNum, state, angle):
         """base message sender for servo interactions."""

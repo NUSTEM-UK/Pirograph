@@ -1,80 +1,109 @@
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import processing.video.*; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class Pirograph extends PApplet {
+
 // Basic thresholding to an RGBA destination
 // This is doing the thresholding on RGB source pixels. Ugh.
 
-// import processing.video.*;
-import ipcapture.*;
 
-IPCapture cam;
+
+Capture cam;
 PImage intermediate;
 PImage composite;
 PImage maskImage;
-PImage cameraImage;
 
 int cam_width;
 int cam_height;
 
+
 float angle = 0;
-float angleStep = 0.5;
+float angleStep = 0.5f;
 
 int Y;
 
-float threshold_low = 70;
+float threshold_low = 150;
 float threshold_high = 255;
 
 int start_time;
 int current_time;
 float fps;
-int framesProcessed = 0;
 
-void setup() {
-  size(1640, 922, P2D);
-  frameRate(10); // We're not getting higher than this anyway.
-  pixelDensity(displayDensity()); // Retina display
+public void setup() {
+  
   background(0,0,0);
 
-  cam_width = 1640;
-  cam_height = 922;
+  cam_width = width;
+  cam_height = height;
+  
+  String[] cameras = Capture.list();
+  
+  if (cameras.length == 0) {
+    println("There are no available cameras.");
+    exit();
+  } else {
+    println("Available cameras:");
+    for (int i = 0; i < cameras.length; i++) {
+      print(i);
+      print(" : ");
+      println(cameras[i]);
+    }
+  }
   
   int start_time = millis();
 
   intermediate = createImage(cam_width, cam_height, RGB);
   composite = createImage(cam_width, cam_height, ARGB);
   maskImage = createImage(cam_width, cam_height, RGB);
-  // cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
-   //cam = new IPCapture(this, "http://192.168.0.33:8000/stream.mjpg", "", "");
-  //cam = new IPCapture(this, "http://192.168.0.33:8081", "", "");
-  cam = new IPCapture(this, "http://10.0.1.10:8081/", "", "");
+  
+  // Select camera. Remember to change cam_width & cam_height (and size constructor) above
+  // if changing these!
+  //cam = new Capture(this, cam_width, cam_height, 30); // (parent, w, h, fps)
+  cam = new Capture(this, cameras[0]); // C615 webcam, 1080p30
+  //cam = new Capture(this, cameras[16]); // C615, 1080p15
+  //cam = new Capture(this, cameras[18]); // C615, 960x540 30fps.
+
   cam.start();
-  cam.pixelWidth = cam_width;    // Explicit here to avoid weird scaling issues should we change resolution vs. display later.
-  cam.pixelHeight = cam_height;
 }
 
-void draw() {
+public void draw() {
   
-  if (cam.isAvailable() == true) {
+  if (cam.available() == true) {
     cam.read();
-    intermediate = cam.get();
-    //cam.loadPixels();
-    //intermediate.loadPixels();
+    cam.loadPixels();
+    intermediate.loadPixels();
     // composite.loadPixels();
-    //maskImage.loadPixels();
+    maskImage.loadPixels();
 
     for (int x = 0; x < cam_width; x++) {
       for (int y = 0; y < cam_height; y++) {
         int loc = x + y*cam_width;
         
         // Find luminosity of current pixel (cast to int)
-        Y = int((0.2126*red(cam.pixels[loc])) + (0.7152*green(cam.pixels[loc])) + (0.0722*blue(cam.pixels[loc])));
+        Y = PApplet.parseInt((0.2126f*red(cam.pixels[loc])) + (0.7152f*green(cam.pixels[loc])) + (0.0722f*blue(cam.pixels[loc])));
         // Y = int((red(cam.pixels[loc]) + green(cam.pixels[loc]) + blue(cam.pixels[loc])) / 3.0);
 
         if (Y > threshold_high) {
-          //intermediate.pixels[loc] = cam.pixels[loc];
+          intermediate.pixels[loc] = cam.pixels[loc];
           maskImage.pixels[loc] = color(0, 0, 255);
         } else if (Y < threshold_low) {
-          //intermediate.pixels[loc] = color(0, 0, 0);
+          intermediate.pixels[loc] = color(0, 0, 0);
           maskImage.pixels[loc] = color(0, 0, 0);
         } else {
-          //intermediate.pixels[loc] = cam.pixels[loc];
+          intermediate.pixels[loc] = cam.pixels[loc];
           maskImage.pixels[loc] = color(0, 0, Y);
         }
       }
@@ -90,7 +119,7 @@ void draw() {
     pushMatrix(); // Save the current coordinate system
     translate(width/2, height/2); // Shift coordinate origin to centre screen
     rotate(radians(angle));
-    image(intermediate, -width/2, -height/2); // This actually updates the screen, in case you were wondering.
+    image(intermediate, -width/2, -height/2);
     popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
     angle += angleStep; // Increment rotation angle
 
@@ -102,10 +131,8 @@ void draw() {
     }
 
     current_time = millis();
-    //fps = frameCount / ((current_time-start_time)/1000);
-    fps = framesProcessed / ((current_time-start_time)/1000);
+    fps = frameCount / ((current_time-start_time)/1000);
     println("Frame: ", frameCount, " fps: ", fps);
-    framesProcessed++;
 
     // Store the current frame - use for saving images
     // composite = get();
@@ -113,7 +140,7 @@ void draw() {
 }
 
 // Handle threshold changes
-void keyReleased() {
+public void keyReleased() {
   if (key == 'd') {
     threshold_low--;
     println("Threshold LOW: ", threshold_low);
@@ -142,10 +169,10 @@ void keyReleased() {
     intermediate = createImage(cam_width, cam_height, RGB);
     image(intermediate, 0, 0);
   } else if (key == 'o') {
-    angleStep += 0.25;
+    angleStep += 0.25f;
     println("Step angle: ", angleStep);
   } else if (key == 'l') {
-    angleStep -= 0.25;
+    angleStep -= 0.25f;
     println("Step angle: ", angleStep);
   } else if (key == 'O') {
     angle = 0;
@@ -156,5 +183,15 @@ void keyReleased() {
   }
   if (threshold_low < 0) {
     threshold_low = 0;
+  }
+}
+  public void settings() {  size(1920, 1080, P3D); }
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "Pirograph" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
   }
 }
