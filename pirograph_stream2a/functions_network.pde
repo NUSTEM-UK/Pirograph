@@ -4,16 +4,16 @@
 void broadcast(PImage source, int destination) {
 
   PImage img = source.get();
-  println(img.width, img.height); // Checks out at full res. Phew
+  // println(img.width, img.height); // Checks out at full res. Phew
   // Ensmallificate the image
   img.loadPixels();
-  img.resize(410, 0); // proportional resize
-  println(img.width, img.height);
+  // 960px wide is a bit optimistic for this, but we'll give it a go.
+  img.resize(960, 0); // proportional resize
+  // println(img.width, img.height);
   // We need a buffered image to do the JPG encoding
   BufferedImage bimg = new BufferedImage( img.width,img.height, BufferedImage.TYPE_INT_RGB );
 
   // Transfer pixels from localFrame to the BufferedImage
-  img.loadPixels();
   bimg.setRGB( 0, 0, img.width, img.height, img.pixels, 0, img.width);
 
   // Need these output streams to get image as bytes for UDP communication
@@ -49,8 +49,8 @@ void broadcast(PImage source, int destination) {
             ds3.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[3]), clientPorts[3]));
             break;
       }
+    // stub for duplicate send to local consumer for 4-up composite sketch
     //ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPort));
-    //ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("10.0.1.16"), clientPort));
     
   } 
   catch (Exception e) {
@@ -60,43 +60,43 @@ void broadcast(PImage source, int destination) {
 
 
 void setupDatagramSockets() {
-    // DatagramSocket stuff for UDP streaming
-  try {
-    println("Datagram: 0");
-    ds0 = new DatagramSocket();
-    println("Datagram: 0 initialised");
-  } catch (SocketException e) {
-    e.printStackTrace();
-  } 
-  try {
-    println("Datagram: 1");
-    ds1 = new DatagramSocket();
-    println("Datagram: 1 initialised");
-  } catch (SocketException e) {
-    e.printStackTrace();
+  // DatagramSocket stuff for UDP streaming
+  switch(THISPORT) {
+    case 0:
+      try {
+        println("Datagram: 0");
+        ds0 = new DatagramSocket();
+        println("Datagram: 0 initialised");
+      } catch (SocketException e) {
+        e.printStackTrace();
+      }
+      break;
+    case 1:
+      try {
+        println("Datagram: 1");
+        ds1 = new DatagramSocket();
+        println("Datagram: 1 initialised");
+      } catch (SocketException e) {
+        e.printStackTrace();
+      }
+      break;
+    case 2:
+      try {
+        println("Datagram: 2");
+        ds2 = new DatagramSocket();
+        println("Datagram: 2 initialised");
+      } catch (SocketException e) {
+        e.printStackTrace();
+      }
+      break;
+    case 3:
+      try {
+        println("Datagram: 3");
+        ds3 = new DatagramSocket();
+        println("Datagram: 3 initialised");
+      } catch (SocketException e) {
+        e.printStackTrace();
+      }
+      break;
   }
-  try {
-    println("Datagram: 2");
-    ds2 = new DatagramSocket();
-    println("Datagram: 2 initialised");
-  } catch (SocketException e) {
-    e.printStackTrace();
-  } 
-  try {
-    println("Datagram: 3");
-    ds3 = new DatagramSocket();
-    println("Datagram: 3 initialised");
-  } catch (SocketException e) {
-    e.printStackTrace();
-  } 
-  // For some reason, I can't get this to work via an array of DatagramSockets. Weird.
-  //   for (int i = 0; i < NUMPORTS; i++) {
-  //     try {
-  //       println("Datagram: ", i);
-  //       ds[i] = new DatagramSocket();
-  //       println("Datagram: ", i, " initialised");
-  //     } catch (SocketException e) {
-  //       e.printStackTrace();
-  //     }
-  // }
 }

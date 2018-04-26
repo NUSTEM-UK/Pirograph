@@ -4,6 +4,10 @@ version: 3.0, 2018-04-25
 Jonathan Sanderson for NUSTEM, Northumbria University
 First exhibited at Maker Faire UK, April 2018.
 
+Invoke with:
+
+  processing-java  --sketch=[path to directory] --run --args [portnumber]
+
 
 Receives MJPEG images streamed from MotionEyeOS camera, processes them, and serves the results
 via UDP streams to individual Skutter control stations.
@@ -44,13 +48,13 @@ int cam_height = 922;
 
 
 // UDP ports and sockets for streaming
-int[] clientPorts = {9100, 9101, 9102, 9103};
+int[] clientPorts = {9100, 9100, 9100, 9100};
 DatagramSocket ds0;
 DatagramSocket ds1;
 DatagramSocket ds2;
 DatagramSocket ds3;
 // Streaming targets - string representations of IP addresses
-String[] streamTargets = { "10.0.1.15", "10.0.1.16", "10.0.1.17", "10.0.1.18" };
+String[] streamTargets = { "10.0.1.15", "10.0.1.15", "10.0.1.15", "10.0.1.15" };
 
 float angle = 0;
 float angleStep = 0.5;
@@ -77,6 +81,16 @@ int[][] regions = {
 
 void setup() {
   size(1920, 1080, P2D);
+  // Have we been passed a port number?
+  if (args != null) {
+    // yes - assign it
+    THISPORT = int(args[1]);
+  } else {
+    // no - default to port A
+    println("args == null");
+    THISPORT = 0;
+  }
+  println(">>> HANDLING PORT: ", THISPORT);
   frameRate(30);
   // frame.setResizable(true);
   // pixelDensity(displayDensity()); // Retina display
@@ -98,6 +112,10 @@ void setup() {
   cam.start();
   cam.pixelWidth = cam_width;    // Explicit here to avoid weird scaling issues should we change resolution vs. display later.
   cam.pixelHeight = cam_height;
+    
+  // UDP streaming setup
+  setupDatagramSockets();
+  
 }
 
 void draw() {
@@ -114,6 +132,11 @@ void draw() {
     image(intermediates[THISPORT], -cam_width/2, -cam_height/2, cam_width, cam_height);
     popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
     angle += angleStep; // Increment rotation angle
+
+    composites[THISPORT] = get();   // capture the current display
+
+    // Send a downscale to frame consumers
+    broadcast(composites[THISPORT], THISPORT);
 
     current_time = millis();
     fps = framesProcessed / ((current_time-start_time)/1000);
