@@ -100,3 +100,63 @@ void setupDatagramSockets() {
       break;
   }
 }
+
+
+// Handler for MQTT messages -- pulled from Heart of Maker Faire code
+// I really should be passing JSON-formatted data here, but 
+// this is a quick and dirty hack the evening before Maker Faire, 
+// so I'm leaning on older code that worked previously.
+
+void messageReceived(String topic, byte[] payload) {
+    println("new message: " + topic + " - " + new String(payload));
+
+    // Tokenise the topic string by splitting it on '/'
+    String[] topicParts = topic.split("/");
+    // Convert the payload to a String. We're not overly-worried about performance,
+    // and this is easy. We may revisit later, however.
+    String payloadString = new String(payload);
+
+    // Parse commands.
+    // First check if the topic is long enough to contain a valid command
+    if (topicParts.length > 2) {
+      // Work out to which heart we're speaking
+      int heartNum = Integer.parseInt(topicParts[1]);
+      // ...and the command we're sending it
+      String command = topicParts[2];
+
+      // Handle channel reset
+      if (command.equals("reset")) {
+        if (payloadString.equals("A") && THISPORT == 0) {
+          background(0);
+        } else if (payloadString.equals("B") && THISPORT == 1) {
+          background(0);
+        } else if (payloadString.equals("C") && THISPORT == 2) {
+          background(0);
+        } else if (payloadString.equals("D") && THISPORT == 3) {
+          background(0);
+        }
+      }
+
+      // Handle save commands
+      if (command.equals("save")) {
+        if (payloadString.equals("A") && THISPORT == 0) {
+          filename = saveFilePath + "Pirograph-A-";
+          filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+          composites[THISPORT].save(filename);
+        } else if (payloadString.equals("B") && THISPORT == 1) {
+          filename = saveFilePath + "Pirograph-B-";
+          filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+          composites[THISPORT].save(filename);
+        } else if (payloadString.equals("C") && THISPORT == 2) {
+          filename = saveFilePath + "Pirograph-C-";
+          filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+          composites[THISPORT].save(filename);
+        } else if (payloadString.equals("D") && THISPORT == 3) {
+          filename = saveFilePath + "Pirograph-D-";
+          filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+          composites[THISPORT].save(filename);
+        }
+      }
+
+    } // if topicParts.length
+} // messageReceived

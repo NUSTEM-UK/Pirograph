@@ -74,6 +74,8 @@ int current_time;
 float fps;
 int framesProcessed = 0;
 
+String saveFilePath = "/Users/jonathan/Desktop/";
+
 // int[][] regions = new int[NUMPORTS+1][4]; // Will hold our image processing regions for the threads
 // Initialise regions
 int[][] regions = {
@@ -86,6 +88,10 @@ int[][] regions = {
 
 void setup() {
   size(1920, 1080, P2D);
+
+  // TODO: https://forum.processing.org/two/discussion/3013/are-undecorated-frames-dead-with-processing-2-x
+  // ...which might give us undecorated windows. Which would be nice. Though I don't know if we can drag them. Hmm.
+
   // Have we been passed a port number?
   if (args != null) {
     // yes - assign it
