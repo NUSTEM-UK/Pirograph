@@ -1,10 +1,10 @@
 // Function to broadcast a PImage over UDP
 // Special thanks to: http://ubaa.net/shared/processing/udp/
 // This code from https://github.com/shiffman/Processing-UDP-Video-Streaming
-void broadcast(PGraphics source, int destination) {
+void broadcast(PImage source, int destination) {
 
   PImage img = source.get();
-  // println(img.width, img.height); // Checks out at full res. Phew
+  println(img.width, img.height); // Checks out at full res. Phew
   // Ensmallificate the image
   img.loadPixels();
   img.resize(640, 0); // proportional resize

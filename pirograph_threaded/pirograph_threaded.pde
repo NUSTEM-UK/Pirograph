@@ -142,7 +142,8 @@ void draw() {
       // composites[i].copy(intermediates[i], 0, 0, intermediates[i].width, intermediates[i].height, 0, 0, intermediates[i].width, intermediates[i].height);
       buffers[i].popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
       buffers[i].endDraw();
-      broadcast(buffers[i], i);
+      composites[i].copy(buffers[i], 0, 0, cam_width, cam_height, 0, 0, cam_width, cam_height);
+      broadcast(composites[i], i);
       // composites[i].copy(buffers[i], -width/2, -height/2, width, height, 0, 0, width, height);
       // composites[i].updatePixels();
       // image(intermediates[i], -width/2, -height/2); // This is where the display updates!
