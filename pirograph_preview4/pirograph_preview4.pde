@@ -1,4 +1,7 @@
 // Receiver / preview for Pirograph streams
+
+// This version gives 4-up display... which it turns out I don't need. Hence not implemented.
+
 // Runs on pi-top Ceeds to show a down-res version of the full image
 // --Based on code by-- almost entirely lifted from Daniel Shiffman
 // <http://www.shiffman.net>
