@@ -77,7 +77,6 @@ int[][] regions = {
 };
 
 void setup() {
-  // fullscreen(P2D, 2) // Display full resolution on second display
   size(1640, 922, P2D);
   frameRate(30);
   pixelDensity(displayDensity()); // Retina display
