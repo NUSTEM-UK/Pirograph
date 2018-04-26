@@ -92,7 +92,7 @@ void setup() {
   }
   println(">>> HANDLING PORT: ", THISPORT);
   frameRate(30);
-  // frame.setResizable(true);
+  frame.setResizable(true);
   // pixelDensity(displayDensity()); // Retina display
   background(0,0,0);
 
@@ -115,7 +115,7 @@ void setup() {
     
   // UDP streaming setup
   setupDatagramSockets();
-  
+
 }
 
 void draw() {
