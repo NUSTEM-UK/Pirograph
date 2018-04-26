@@ -28,6 +28,8 @@ int NUMPORTS = 4;
 volatile boolean[] DONE = new boolean [NUMPORTS+1];
 int displayPort;
 int displayPortTarget;
+// Streaming targets - string representations of IP addresses
+String[] streamTargets = { "10.0.1.15", "10.0.1.16", "10.0.1.17", "10.0.1.18" };
 
 // We're going to hold all the chunks in arrays.
 // indices 0, 1, 2, 3 = quadrants A, B, C, D
@@ -105,6 +107,7 @@ void setup() {
   cam.pixelWidth = cam_width;    // Explicit here to avoid weird scaling issues should we change resolution vs. display later.
   cam.pixelHeight = cam_height;
 
+  // UDP streaming setup
   setupDatagramSockets();
 
   for (int i = 0; i < NUMPORTS+1; i++) {

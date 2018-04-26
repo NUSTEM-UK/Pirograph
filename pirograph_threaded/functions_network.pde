@@ -35,9 +35,23 @@ void broadcast(PImage source, int destination) {
   // Send JPEG data as a datagram
   println("Sending datagram with " + packet.length + " bytes");
   try {
+      switch(destination) {
+          case 0:
+            ds0.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[0]), clientPorts[0]));
+            break;
+          case 1:
+            ds1.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[1]), clientPorts[1]));
+            break;
+          case 2:
+            ds2.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[2]), clientPorts[2]));
+            break;
+          case 3:
+            ds3.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[3]), clientPorts[3]));
+            break;
+      }
     //ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPort));
     //ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("10.0.1.16"), clientPort));
-    ds0.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("10.0.1.15"), clientPorts[destination]));
+    
   } 
   catch (Exception e) {
     e.printStackTrace();
@@ -54,34 +68,35 @@ void setupDatagramSockets() {
   } catch (SocketException e) {
     e.printStackTrace();
   } 
-  // try {
-  //   println("Datagram: 1");
-  //   ds1 = new DatagramSocket();
-  //   println("Datagram: 1 initialised");
-  // } catch (SocketException e) {
-  //   e.printStackTrace();
-  // }
-  // try {
-  //   println("Datagram: 2");
-  //   ds2 = new DatagramSocket();
-  //   println("Datagram: 2 initialised");
-  // } catch (SocketException e) {
-  //   e.printStackTrace();
-  // } 
-  // try {
-  //   println("Datagram: 3");
-  //   ds3 = new DatagramSocket();
-  //   println("Datagram: 3 initialised");
-  // } catch (SocketException e) {
-  //   e.printStackTrace();
-  // } 
-  // for (int i = 0; i < NUMPORTS; i++) {
-  //   try {
-  //     println("Datagram: ", i);
-  //     ds[i] = new DatagramSocket();
-  //     println("Datagram: ", i, " initialised");
-  //   } catch (SocketException e) {
-  //     e.printStackTrace();
-  //   }
-  // }
+  try {
+    println("Datagram: 1");
+    ds1 = new DatagramSocket();
+    println("Datagram: 1 initialised");
+  } catch (SocketException e) {
+    e.printStackTrace();
   }
+  try {
+    println("Datagram: 2");
+    ds2 = new DatagramSocket();
+    println("Datagram: 2 initialised");
+  } catch (SocketException e) {
+    e.printStackTrace();
+  } 
+  try {
+    println("Datagram: 3");
+    ds3 = new DatagramSocket();
+    println("Datagram: 3 initialised");
+  } catch (SocketException e) {
+    e.printStackTrace();
+  } 
+  // For some reason, I can't get this to work via an array of DatagramSockets. Weird.
+  //   for (int i = 0; i < NUMPORTS; i++) {
+  //     try {
+  //       println("Datagram: ", i);
+  //       ds[i] = new DatagramSocket();
+  //       println("Datagram: ", i, " initialised");
+  //     } catch (SocketException e) {
+  //       e.printStackTrace();
+  //     }
+  // }
+}
