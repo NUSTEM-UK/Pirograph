@@ -26,6 +26,7 @@ IPCapture cam;
 
 int NUMPORTS = 4;
 volatile boolean[] DONE = new boolean [NUMPORTS+1];
+int doneCount = 0;
 int displayPort;
 int displayPortTarget;
 // Streaming targets - string representations of IP addresses
@@ -122,59 +123,91 @@ void setup() {
 
   // thread("processQuad");
   thread("processA");
-  // thread("processB");
-  // thread("processC");
-  // thread("processD");
+  thread("processB");
+  thread("processC");
+  thread("processD");
 }
 
 void draw() {
 
-  // iterate over the PORT threads
-  // TODO: run this in the image processing threads. Durr.
+  // iterate over the image processing threads and count how many are done
+  doneCount = 0;
   for (int i = 0; i < NUMPORTS; i++) {
-    // is the frame segment ready?
-    if (DONE[i] == true) {
-      composites[i].loadPixels();
-      // yes, it's ready - so composite it in the appropriate offscreen buffer.
-      buffers[i].beginDraw();
-      buffers[i].pushMatrix();
-      buffers[i].translate(width/2, height/2); // Shift coordinate origin to centre screen
-      buffers[i].rotate(radians(angle));
-      buffers[i].image(intermediates[i], -width/2, -height/2, width, height);
-      // composites[i].copy(intermediates[i], -intermediates[i].width/2, -intermediates[i].height/2, intermediates[i].width, intermediates[i].height, 0, 0, intermediates[i].width, intermediates[i].height);
-      // composites[i].copy(intermediates[i], 0, 0, intermediates[i].width, intermediates[i].height, 0, 0, intermediates[i].width, intermediates[i].height);
-      buffers[i].popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
-      buffers[i].endDraw();
-      composites[i].copy(buffers[i], 0, 0, cam_width, cam_height, 0, 0, cam_width, cam_height);
-      broadcast(composites[i], i);
-      // composites[i].copy(buffers[i], -width/2, -height/2, width, height, 0, 0, width, height);
-      // composites[i].updatePixels();
-      // image(intermediates[i], -width/2, -height/2); // This is where the display updates!
-      // image(buffers[i], 0 , 0);
-      DONE[i] = false;  // reset the semaphore so the thread restarts
+    doneCount += int(DONE[i]);
+  }
 
-      // current_time = millis();
-      // fps = framesProcessed / ((current_time-start_time)/1000);
-      // println("Frame: ", framesProcessed, " fps: ", fps);
-      // framesProcessed++;
+  // Have all threads completed?
+  if (doneCount == NUMPORTS) {
+    // All threads complete
+
+    // RENDER IN TURN & BROADCAST RESULTS
+    // Render needs to happen on the main thread. Doing it all at once here doesn't hurt frame rates too badly,
+    // and makes the joins between the quadrants look neat.
+    for (int f = 0; f < NUMPORTS; f++) {
+      // Access the relevant PGraphcs buffer.
+      buffers[f].beginDraw();
+      // Push the current geometry so we can manipulate it for rotated drawing
+      buffers[f].pushMatrix();
+      // Move origin to centre of surface
+      buffers[f].translate(cam_width/2, cam_width/2);
+      // Dial in the rotation angle
+      buffers[f].rotate(radians(angle));
+      // Now paste over in the new image
+      buffers[f].image(intermediates[f], -cam_width/2, -cam_height/2, cam_width, cam_height);
+      // We're done with the image transform, and with drawing to this buffer
+      // Copy the buffer to the composites array
+      // I'd expect this to be done outside of the geometry transform, but that seems to 
+      // (a.) barf, with the image in the wrong place, and (b.) worse than halve the frame rate.
+      // So we'll do it here. Because reasons.
+      composites[f].copy(buffers[f], 0, 0, cam_width, cam_height, 0, 0, cam_width, cam_height);
+      // *Now* we can back out of the geometry transform. Apparently.
+      buffers[f].popMatrix();
+      // ..and we're done with rendering to this buffer.
+      buffers[f].endDraw();
+
+      // Fire the new frame out to the UDP port
+      // TODO: Do this when we return to the individual thread?
+      // broadcast(composites[f], i);
     }
-    angle += angleStep; // Increment rotation angle
+    
+    // DRAW
+    // Draw each of the offscreen buffers over the display window
+    for (int i = 0; i < NUMPORTS; i++) {
+      image(buffers[i], 0, 0, cam_width, cam_height);
+    }
+
+    // UPDATE FPS DISPLAY
+    current_time = millis();
+    fps = framesProcessed / ((current_time-start_time)/1000);
+    println("Frame: ", framesProcessed, " fps: ", fps);
+    framesProcessed++;
+
+    // GET NEXT FRAME
+    cam.read();
+
+    // Update the rotation angle
+    angle += angleStep;
+
+    // Tell the threads they're no longer done.
+    for (int i = 0; i < NUMPORTS; i++) {
+      DONE[i] = false;
+    }
+
+  } else {
+    // around we go.
   }
 
-  // Work out which buffer to render to main screen.
-  if (displayPortTarget != displayPort) {
-    // Erase the previous image
-    background(0);
-    // Make the transition
-    displayPort = displayPortTarget;
-  }
-  // Now blit the surface
-  image(buffers[displayPort], 0, 0);
-
-  // TODO: Update this every n frames. I guess.
-  // for (int i = 0; i < NUMPORTS; i++) {
-  //   image(buffers[i], 0, 0);
+  // // Work out which buffer to render to main screen.
+  // if (displayPortTarget != displayPort) {
+  //   // Erase the previous image
+  //   background(0);
+  //   // Make the transition
+  //   displayPort = displayPortTarget;
   // }
+  // // Now blit the surface
+  // image(buffers[displayPort], 0, 0);
+
+
 
   // for (int i = 0; i < NUMPORTS; i++) {
   //   composites[NUMPORTS].blend(composites[i], 0, 0, width, height, 0, 0, width, height, BLEND);
@@ -184,46 +217,75 @@ void draw() {
 
   // Store the current frame - use for saving images
   // composite = get()
-}
+
+} // END OF draw()
+
 
 void processImage(int f) {
-  cam.read();
-  intermediates[f] = cam.get(); // Copy camera image to intermediate
+  // MAIN IMAGE PROCESSING LOOP
+  // Invoked by thread handlers when a new frame is ready for processing.
+  // Updates intermediates[] with a masked frame.
+
+  // Set up our drawing surfaces
+  intermediates[f] = cam.get();
   intermediates[f].loadPixels();
   maskImages[f].loadPixels();
+  composites[f].loadPixels();
+  
+  // Now compute the image mask for the region in which we're interested
   for (int x = regions[f][0]; x < regions[f][2]; x++) {
     for (int y = regions[f][1]; y < regions[f][3]; y++) {
       int loc = x + y*cam_width;
 
+      // In some versions, I've copied the image pixels here while computing the mask.
+      // This doesn't seem efficient, hence the cam.get() line above.
+      // ...but I'm leaving the line in in case I had reasons previously. It's been a while.
       // intermediates[f].pixels[loc] = color(255, 0, 0);
       
-      // Find luminosity of current pixel (cast to int)
+      // Find luminosity of current pixel (and cast to int)
+      // Doing a 'correct' YUV transform
       Y = int((0.2126*red(intermediates[f].pixels[loc])) + (0.7152*green(intermediates[f].pixels[loc])) + (0.0722*blue(intermediates[f].pixels[loc])));
+      // Quick version averaging RGB values, left in but commented out. Performance seems OK via the 'correct' approach.
       // Y = int((red(cam.pixels[loc]) + green(cam.pixels[loc]) + blue(cam.pixels[loc])) / 3.0);
 
+      // Now use the computer luminosity to build the mask image, with cutoffs
       if (Y > threshold_high) {
-        // intermediates[f].pixels[loc] = cam.pixels[loc];
-        maskImages[f].pixels[loc] = color(0, 0, 255);
+        maskImages[f].pixels[loc] = color(0, 0, 255); // Fully opaque mask
       } else if (Y < threshold_low) {
-        // intermediates[f].pixels[loc] = color(0, 0, 0);
-        maskImages[f].pixels[loc] = color(0, 0, 0);
+        maskImages[f].pixels[loc] = color(0, 0, 0); // Fully transparent mask
       } else {
-        // intermediates[f].pixels[loc] = cam.pixels[loc];
+        // Apply a mask opacity on an interpolation between low and high Y values (between cutoffs).
+        // This feathers the edges of the mask and looks a bit nicer.
         maskImages[f].pixels[loc] = color(0, 0, map(Y, threshold_low, threshold_high, 0, 255));
       }
     }
   }
-
+  // Apply the mask image to the intermediate image (which came from the camera, remember)
   // Mask: https://processing.org/reference/PImage_mask_.html
   intermediates[f].mask(maskImages[f]);
-  // intermediates[f].updatePixels();
+  intermediates[f].updatePixels();  // Write the pixels back to the PImage. Not necessary?
+
+  // At this point we're done: intermediates[f] stores the new frame with mask, to composite over the old frame.
+  // So let's do the composite.
+  // Unfortunately, rotate() only works when drawing a PImage, so we need to render to an 
+  // offscreen buffer surface as an intermediate step.
+  // ...and the drawing doesn't work on a background thread (Java error & impressively big crash)
+  // so the drawing has to be in draw(). Gnats.
+  
+  // ...so we're done. We'll return to the thread handler which will set the DONE semaphore for this segment.
+
 }
 
 // Thread handlers. The heavy lifting is done in processImage()
 void processA() {
   while (true) {
     if (!DONE[0]) {
+      // broadcast the previous frame
+      // broadcast(composites[0], 0);
+
+      // and now handle the next one
       processImage(0);
+      // mask processing done: signal the main thread that we're finished
       DONE[0] = true;
     }
   }

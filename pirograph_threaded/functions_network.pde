@@ -7,7 +7,7 @@ void broadcast(PImage source, int destination) {
   println(img.width, img.height); // Checks out at full res. Phew
   // Ensmallificate the image
   img.loadPixels();
-  img.resize(640, 0); // proportional resize
+  img.resize(410, 0); // proportional resize
   println(img.width, img.height);
   // We need a buffered image to do the JPG encoding
   BufferedImage bimg = new BufferedImage( img.width,img.height, BufferedImage.TYPE_INT_RGB );

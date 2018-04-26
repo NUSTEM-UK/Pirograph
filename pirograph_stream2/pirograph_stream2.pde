@@ -67,6 +67,7 @@ int framesProcessed = 0;
 
 void setup() {
   size(1640, 922, P2D);
+  // frame.setResizable(true);
   pixelDensity(displayDensity()); // Retina display
   background(0,0,0);
 
