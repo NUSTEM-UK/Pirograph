@@ -149,20 +149,20 @@ void draw() {
     popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
     angle += angleStep; // Increment rotation angle
 
-    composites[THISPORT] = get();   // capture the current display
-
-    // Send a downscale to frame consumers
+    // capture the current display
+    composites[THISPORT] = get();
+    // Send a downscale to frame consumers over UDP
     broadcast(composites[THISPORT], THISPORT);
 
     current_time = millis();
     fps = framesProcessed / ((current_time-start_time)/1000);
-    println("Frame: ", framesProcessed, " fps: ", fps);
+    if (frameCount % 60 == 0) {
+      // Output fps diagnostics every few seconds only.
+      println("Frame: ", framesProcessed, " fps: ", fps);
+    }
     framesProcessed++;
 
     DONE = false;
-
-    // Store the current frame - use for saving images
-    // composite = get();
   }
 }
 

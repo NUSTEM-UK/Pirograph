@@ -126,32 +126,32 @@ void messageReceived(String topic, byte[] payload) {
 
       // Handle channel reset
       if (command.equals("reset")) {
-        if (payloadString.equals("A") && THISPORT == 0) {
+        if (payloadString.equals("0") && THISPORT == 0) {
           background(0);
-        } else if (payloadString.equals("B") && THISPORT == 1) {
+        } else if (payloadString.equals("1") && THISPORT == 1) {
           background(0);
-        } else if (payloadString.equals("C") && THISPORT == 2) {
+        } else if (payloadString.equals("2") && THISPORT == 2) {
           background(0);
-        } else if (payloadString.equals("D") && THISPORT == 3) {
+        } else if (payloadString.equals("3") && THISPORT == 3) {
           background(0);
         }
       }
 
       // Handle save commands
       if (command.equals("save")) {
-        if (payloadString.equals("A") && THISPORT == 0) {
+        if (payloadString.equals("0") && THISPORT == 0) {
           filename = saveFilePath + "Pirograph-A-";
           filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
           composites[THISPORT].save(filename);
-        } else if (payloadString.equals("B") && THISPORT == 1) {
+        } else if (payloadString.equals("1") && THISPORT == 1) {
           filename = saveFilePath + "Pirograph-B-";
           filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
           composites[THISPORT].save(filename);
-        } else if (payloadString.equals("C") && THISPORT == 2) {
+        } else if (payloadString.equals("2") && THISPORT == 2) {
           filename = saveFilePath + "Pirograph-C-";
           filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
           composites[THISPORT].save(filename);
-        } else if (payloadString.equals("D") && THISPORT == 3) {
+        } else if (payloadString.equals("3") && THISPORT == 3) {
           filename = saveFilePath + "Pirograph-D-";
           filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
           composites[THISPORT].save(filename);
