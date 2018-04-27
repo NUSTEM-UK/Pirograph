@@ -101,7 +101,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     
     if (root["command"] == "setRoll") {
         int target = root["value"];
-        rollStepper.move(target);
+        rollStepper.move(   target);
         }
     
 }
