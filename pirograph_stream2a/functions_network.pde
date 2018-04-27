@@ -33,24 +33,28 @@ void broadcast(PImage source, int destination) {
   byte[] packet = baStream.toByteArray();
 
   // Send JPEG data as a datagram
-  println("Sending datagram with " + packet.length + " bytes");
+  // println("Sending datagram with " + packet.length + " bytes");
   try {
       switch(destination) {
           case 0:
             ds0.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[0]), clientPorts[0]));
+            ds0.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
             break;
           case 1:
             ds1.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[1]), clientPorts[1]));
+            ds1.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
             break;
           case 2:
             ds2.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[2]), clientPorts[2]));
+            ds2.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
             break;
           case 3:
             ds3.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[3]), clientPorts[3]));
+            ds3.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
             break;
       }
     // stub for duplicate send to local consumer for 4-up composite sketch
-    //ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPort));
+    // ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
     
   } 
   catch (Exception e) {
@@ -100,3 +104,59 @@ void setupDatagramSockets() {
       break;
   }
 }
+
+
+// Handler for MQTT messages -- pulled from Heart of Maker Faire code
+// I really should be passing JSON-formatted data here, but 
+// this is a quick and dirty hack the evening before Maker Faire, 
+// so I'm leaning on older code that worked previously.
+
+void messageReceived(String topic, byte[] payload) {
+    println("new message: " + topic + " : " + new String(payload));
+
+    // Tokenise the topic string by splitting it on '/'
+    String[] topicParts = topic.split("/");
+    // Convert the payload to a String. We're not overly-worried about performance,
+    // and this is easy. We may revisit later, however.
+    String payloadString = new String(payload);
+    String command = topicParts[1];
+
+    // Parse commands
+    // Handle channel reset
+    if (command.equals("reset")) {
+      if (payloadString.equals("0") && THISPORT == 0) {
+        println("*** RESET ***");
+        background(0);
+      } else if (payloadString.equals("1") && THISPORT == 1) {
+        println("*** RESET ***");
+        background(0);
+      } else if (payloadString.equals("2") && THISPORT == 2) {
+        println("*** RESET ***");
+        background(0);
+      } else if (payloadString.equals("3") && THISPORT == 3) {
+        println("*** RESET ***");
+        background(0);
+      }
+    }
+
+    // Handle save commands
+    if (command.equals("save")) {
+      if (payloadString.equals("0") && THISPORT == 0) {
+        filename = saveFilePath + "Pirograph-A-";
+        filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+        composites[THISPORT].save(filename);
+      } else if (payloadString.equals("1") && THISPORT == 1) {
+        filename = saveFilePath + "Pirograph-B-";
+        filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+        composites[THISPORT].save(filename);
+      } else if (payloadString.equals("2") && THISPORT == 2) {
+        filename = saveFilePath + "Pirograph-C-";
+        filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+        composites[THISPORT].save(filename);
+      } else if (payloadString.equals("3") && THISPORT == 3) {
+        filename = saveFilePath + "Pirograph-D-";
+        filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+        composites[THISPORT].save(filename);
+      }
+    }
+} // messageReceived

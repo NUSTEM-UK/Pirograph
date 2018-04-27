@@ -26,6 +26,8 @@ import java.awt.image.*;
 import java.net.*;
 import java.io.*;
 
+import mqtt.*;
+
 IPCapture cam;
 
 int NUMPORTS = 4;
@@ -48,13 +50,16 @@ int cam_height = 922;
 
 
 // UDP ports and sockets for streaming
-int[] clientPorts = {9100, 9100, 9100, 9100};
+int[] clientPorts = {9100, 9101, 9102, 9103};
 DatagramSocket ds0;
 DatagramSocket ds1;
 DatagramSocket ds2;
 DatagramSocket ds3;
 // Streaming targets - string representations of IP addresses
 String[] streamTargets = { "10.0.1.15", "10.0.1.15", "10.0.1.15", "10.0.1.15" };
+
+// MQTT client. Which you could probably work out from the class name. Great comment, Jonathan.
+MQTTClient client;
 
 float angle = 0;
 float angleStep = 0.5;
@@ -69,6 +74,10 @@ int current_time;
 float fps;
 int framesProcessed = 0;
 
+// String saveFilePath = "/Users/jonathan/Desktop/";
+String saveFilePath = "/Users/rygp8/Desktop/";
+String filename;
+
 // int[][] regions = new int[NUMPORTS+1][4]; // Will hold our image processing regions for the threads
 // Initialise regions
 int[][] regions = {
@@ -81,6 +90,10 @@ int[][] regions = {
 
 void setup() {
   size(1920, 1080, P2D);
+
+  // TODO: https://forum.processing.org/two/discussion/3013/are-undecorated-frames-dead-with-processing-2-x
+  // ...which might give us undecorated windows. Which would be nice. Though I don't know if we can drag them. Hmm.
+
   // Have we been passed a port number?
   if (args != null) {
     // yes - assign it
@@ -112,11 +125,16 @@ void setup() {
   cam.start();
   cam.pixelWidth = cam_width;    // Explicit here to avoid weird scaling issues should we change resolution vs. display later.
   cam.pixelHeight = cam_height;
-    
+  
+  // MQTT setup: connect and subscribe to the /reset topic
+  client = new MQTTClient(this);
+  client.connect("mqtt://10.0.1.3", "pirographdisplay");
+  client.subscribe("pirograph/#");
+
   // UDP streaming setup
   setupDatagramSockets();
 
-}
+} // setup()
 
 void draw() {
 
@@ -133,20 +151,20 @@ void draw() {
     popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
     angle += angleStep; // Increment rotation angle
 
-    composites[THISPORT] = get();   // capture the current display
-
-    // Send a downscale to frame consumers
+    // capture the current display
+    composites[THISPORT] = get();
+    // Send a downscale to frame consumers over UDP
     broadcast(composites[THISPORT], THISPORT);
 
     current_time = millis();
     fps = framesProcessed / ((current_time-start_time)/1000);
-    println("Frame: ", framesProcessed, " fps: ", fps);
+    if (frameCount % 60 == 0) {
+      // Output fps diagnostics every few seconds only.
+      println("Frame: ", framesProcessed, " fps: ", fps);
+    }
     framesProcessed++;
 
     DONE = false;
-
-    // Store the current frame - use for saving images
-    // composite = get();
   }
 }
 

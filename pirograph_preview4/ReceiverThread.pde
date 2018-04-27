@@ -6,7 +6,7 @@
 class ReceiverThread extends Thread {
 
   // Port we are receiving.
-  int port = 9100; 
+  // int port = 9100; 
   DatagramSocket ds; 
   // A byte array to read into (max size of 65536, could be smaller)
   byte[] buffer = new byte[65536]; 
@@ -17,7 +17,7 @@ class ReceiverThread extends Thread {
   // Start with something 
   PImage img;
 
-  ReceiverThread (int w, int h) {
+  ReceiverThread (int w, int h, int port) {
     img = createImage(w,h,RGB);
     running = false;
     available = true; // We start with "loading . . " being available
