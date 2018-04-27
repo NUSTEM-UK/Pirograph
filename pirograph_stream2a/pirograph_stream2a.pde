@@ -32,6 +32,7 @@ IPCapture cam;
 
 int NUMPORTS = 4;
 int THISPORT = 0; // Defines with which channel (quadrant) we're working.
+string [] PORTNAMES = {"A", "B", "C", "D"};
 
 boolean DONE = false;
 // NUMPORTS+1 represents our composite image
@@ -48,6 +49,7 @@ PImage cameraImage;
 int cam_width = 1640;
 int cam_height = 922;
 
+int rotation_offset = 150; // pixel offset for rotation centre.
 
 // UDP ports and sockets for streaming
 int[] clientPorts = {9100, 9101, 9102, 9103};
@@ -89,10 +91,9 @@ int[][] regions = {
 };
 
 void setup() {
-  size(1920, 1080, P2D);
-
-  // TODO: https://forum.processing.org/two/discussion/3013/are-undecorated-frames-dead-with-processing-2-x
-  // ...which might give us undecorated windows. Which would be nice. Though I don't know if we can drag them. Hmm.
+  // size(1920, 1080, P2D);
+  // Go fullscreen on screen 2; should be possible to shift between dekstops.
+  fullScreen(P2D, 2);
 
   // Have we been passed a port number?
   if (args != null) {
@@ -105,7 +106,8 @@ void setup() {
   }
   println(">>> HANDLING PORT: ", THISPORT);
   frameRate(30);
-  frame.setResizable(true);
+  frame.setTitle("Pirograph : " + PORTNAMES[THISPORT]);
+  // frame.setResizable(true);
   // pixelDensity(displayDensity()); // Retina display
   background(0,0,0);
 
@@ -145,7 +147,8 @@ void draw() {
     // software rotate of surface
     // See: https://www.processing.org/tutorials/transform2d/
     pushMatrix(); // Save the current coordinate system
-    translate(width/2, height/2); // Shift coordinate origin to centre screen
+    // Shift coordinate origin for rotation transform
+    translate(width/2, height/2);
     rotate(radians(angle));
     image(intermediates[THISPORT], -cam_width/2, -cam_height/2, cam_width, cam_height);
     popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
