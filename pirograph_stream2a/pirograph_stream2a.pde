@@ -74,6 +74,8 @@ int current_time;
 float fps;
 int framesProcessed = 0;
 
+String saveFilePath = "/Users/jonathan/Desktop/";
+
 // int[][] regions = new int[NUMPORTS+1][4]; // Will hold our image processing regions for the threads
 // Initialise regions
 int[][] regions = {
@@ -86,6 +88,10 @@ int[][] regions = {
 
 void setup() {
   size(1920, 1080, P2D);
+
+  // TODO: https://forum.processing.org/two/discussion/3013/are-undecorated-frames-dead-with-processing-2-x
+  // ...which might give us undecorated windows. Which would be nice. Though I don't know if we can drag them. Hmm.
+
   // Have we been passed a port number?
   if (args != null) {
     // yes - assign it
@@ -143,20 +149,20 @@ void draw() {
     popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
     angle += angleStep; // Increment rotation angle
 
-    composites[THISPORT] = get();   // capture the current display
-
-    // Send a downscale to frame consumers
+    // capture the current display
+    composites[THISPORT] = get();
+    // Send a downscale to frame consumers over UDP
     broadcast(composites[THISPORT], THISPORT);
 
     current_time = millis();
     fps = framesProcessed / ((current_time-start_time)/1000);
-    println("Frame: ", framesProcessed, " fps: ", fps);
+    if (frameCount % 60 == 0) {
+      // Output fps diagnostics every few seconds only.
+      println("Frame: ", framesProcessed, " fps: ", fps);
+    }
     framesProcessed++;
 
     DONE = false;
-
-    // Store the current frame - use for saving images
-    // composite = get();
   }
 }
 
