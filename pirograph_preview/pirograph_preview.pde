@@ -16,8 +16,22 @@ import java.io.*;
 PImage video;
 ReceiverThread thread;
 
+int THISPORT; // to which channel are we subscribing?
+
+int[] clientPorts = {9100, 9101, 9102, 9103};
+
 void setup() {
   size(960,540, P2D);
+
+  // We should have a command-line argument to tell us which channel to receive
+  if (args != NULL){
+    THISPORT = int(args[1]);
+  } else {
+    // default to port A
+    println("args == null");
+    THISPORT = 0'
+  }
+
   video = createImage(960,540,RGB);
   thread = new ReceiverThread(video.width,video.height);
   thread.start();
