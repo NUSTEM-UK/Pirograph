@@ -13,7 +13,7 @@
 #define motorPin3  D7     // IN3 on the ULN2003 driver 1
 #define motorPin4  D8     // IN4 on the ULN2003 driver 1
 
-pitchStepper speedStepper(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
+AccelStepper pitchStepper(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
 
 // Motor pin definitions - Stepper Speed 
 #define motorPin5  D1     // IN1 on the ULN2003 driver 1
@@ -21,7 +21,7 @@ pitchStepper speedStepper(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
 #define motorPin7  D3     // IN3 on the ULN2003 driver 1
 #define motorPin8  D4     // IN4 on the ULN2003 driver 1
 
-rollStepper angleStepper(HALFSTEP, motorPin5, motorPin7, motorPin6, motorPin8);
+AccelStepper rollStepper(HALFSTEP, motorPin5, motorPin7, motorPin6, motorPin8);
 
 int tenSteps = 10;
 
