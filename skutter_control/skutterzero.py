@@ -15,8 +15,8 @@ from colorsys import rgb_to_hsv # Needed for Hex to HSV conversions
 mqttc = mqtt.Client()
 
 # TODO: expose interface for configuring the MQTT broker address & port
-mqtt_server = "10.0.1.3"
-# mqtt_server = "localhost"
+# mqtt_server = "10.0.1.3"
+mqtt_server = "localhost"
 # mqtt_server = "192.168.0.31"
 mqtt_port = 1883
 # TODO: expose interface for configuring the MQTT channel root

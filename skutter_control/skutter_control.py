@@ -101,7 +101,7 @@ def send():
     print(">>> End of messages")
 
     # Set the template flash message and return to the corresponding form page
-    flash(flash_message)
+    # flash(flash_message)
     return redirect(mySkutter)
 
 if __name__ == '__main__':

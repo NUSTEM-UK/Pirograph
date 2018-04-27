@@ -1,30 +1,32 @@
-{% extends "layout.html" %}
-{% block title %}
-    {{ super() }}
-{% endblock title %}
-{% block head %}
-    {{ super() }}
-{% endblock head %}
-{% block jumbo %}
-    <h1>Skutter Control</h1>
-    <p>Control any skutter, anytime, anywhere.</p>
-    <p>This is a large content block / call-out, part of a standard Bootstrap layout.</p>
-{% endblock jumbo %}
-{% block row2 %}
-    <div class="col-md-4">
-        <h2>Column One</h2>
-        <p>Bootstrap uses a conventional 12-column grid, with content columns able to span multiple columns. 
-          That's defined in the div classes in the page template.</p>
-    </div>
-    <div class="col-md-4">
-        <h2>Column Two</h2>
-        <p>Fingers crossed, this gives us enough flexibility to make things work easily.</p>
-    </div>
-    <div class="col-md-4">
-        <h2>Available Skutters</h2>
-        <a class="btn btn-success btn-block" href="derek" role="button">Derek</a> 
-        <a class="btn btn-success btn-block" href="daphne" role="button">Daphne</a> 
-        <a class="btn btn-success btn-block" href="hettie" role="button">Hettie</a>
-        <a class="btn btn-success btn-block" href="michael" role="button">Michael</a> 
-    </div>
-{% endblock row2 %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+  {% extends "layout.html" %} {% block title %} {{ super() }} {% endblock title %} {% block head %} {{ super() }} {% endblock head %} {% block jumbo %}
+  <h1>Skutter Control</h1>
+  <p>Control any skutter, anytime, anywhere.</p>{% endblock jumbo %} {% block row2 %}
+  <div class="col-md-12">
+    <h2>Available Skutters</h2>
+  </div>
+  <div class="col-md-4">
+    <a class="btn btn-warning btn-block" href="derek" role="button">Derek</a>
+    <a class="btn btn-warning btn-block" href="daphne" role="button">Daphne</a>
+    <a class="btn btn-warning btn-block" href="hettie" role="button">Hettie</a>
+    <a class="btn btn-warning btn-block" href="michael" role="button">Michael</a>
+  </div>
+  <div class="col-md-4">
+    <a class="btn btn-warning btn-block" href="derek" role="button">Derek</a>
+    <a class="btn btn-warning btn-block" href="daphne" role="button">Daphne</a>
+    <a class="btn btn-warning btn-block" href="hettie" role="button">Hettie</a>
+    <a class="btn btn-warning btn-block" href="michael" role="button">Michael</a>
+  </div>
+  <div class="col-md-4">
+    <a class="btn btn-warning btn-block" href="derek" role="button">Derek</a>
+    <a class="btn btn-warning btn-block" href="daphne" role="button">Daphne</a>
+    <a class="btn btn-warning btn-block" href="hettie" role="button">Hettie</a>
+    <a class="btn btn-warning btn-block" href="michael" role="button">Michael</a>
+  </div>{% endblock row2 %}
+</body>
+</html>
