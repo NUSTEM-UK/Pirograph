@@ -33,7 +33,7 @@ void broadcast(PImage source, int destination) {
   byte[] packet = baStream.toByteArray();
 
   // Send JPEG data as a datagram
-  println("Sending datagram with " + packet.length + " bytes");
+  // println("Sending datagram with " + packet.length + " bytes");
   try {
       switch(destination) {
           case 0:
@@ -112,55 +112,51 @@ void setupDatagramSockets() {
 // so I'm leaning on older code that worked previously.
 
 void messageReceived(String topic, byte[] payload) {
-    println("new message: " + topic + " - " + new String(payload));
+    println("new message: " + topic + " : " + new String(payload));
 
     // Tokenise the topic string by splitting it on '/'
     String[] topicParts = topic.split("/");
     // Convert the payload to a String. We're not overly-worried about performance,
     // and this is easy. We may revisit later, however.
     String payloadString = new String(payload);
+    String command = topicParts[1];
 
-    // Parse commands.
-    // First check if the topic is long enough to contain a valid command
-    if (topicParts.length > 2) {
-      // Work out to which heart we're speaking
-      int heartNum = Integer.parseInt(topicParts[1]);
-      // ...and the command we're sending it
-      String command = topicParts[2];
-
-      // Handle channel reset
-      if (command.equals("reset")) {
-        if (payloadString.equals("0") && THISPORT == 0) {
-          background(0);
-        } else if (payloadString.equals("1") && THISPORT == 1) {
-          background(0);
-        } else if (payloadString.equals("2") && THISPORT == 2) {
-          background(0);
-        } else if (payloadString.equals("3") && THISPORT == 3) {
-          background(0);
-        }
+    // Parse commands
+    // Handle channel reset
+    if (command.equals("reset")) {
+      if (payloadString.equals("0") && THISPORT == 0) {
+        println("*** RESET ***");
+        background(0);
+      } else if (payloadString.equals("1") && THISPORT == 1) {
+        println("*** RESET ***");
+        background(0);
+      } else if (payloadString.equals("2") && THISPORT == 2) {
+        println("*** RESET ***");
+        background(0);
+      } else if (payloadString.equals("3") && THISPORT == 3) {
+        println("*** RESET ***");
+        background(0);
       }
+    }
 
-      // Handle save commands
-      if (command.equals("save")) {
-        if (payloadString.equals("0") && THISPORT == 0) {
-          filename = saveFilePath + "Pirograph-A-";
-          filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
-          composites[THISPORT].save(filename);
-        } else if (payloadString.equals("1") && THISPORT == 1) {
-          filename = saveFilePath + "Pirograph-B-";
-          filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
-          composites[THISPORT].save(filename);
-        } else if (payloadString.equals("2") && THISPORT == 2) {
-          filename = saveFilePath + "Pirograph-C-";
-          filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
-          composites[THISPORT].save(filename);
-        } else if (payloadString.equals("3") && THISPORT == 3) {
-          filename = saveFilePath + "Pirograph-D-";
-          filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
-          composites[THISPORT].save(filename);
-        }
+    // Handle save commands
+    if (command.equals("save")) {
+      if (payloadString.equals("0") && THISPORT == 0) {
+        filename = saveFilePath + "Pirograph-A-";
+        filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+        composites[THISPORT].save(filename);
+      } else if (payloadString.equals("1") && THISPORT == 1) {
+        filename = saveFilePath + "Pirograph-B-";
+        filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+        composites[THISPORT].save(filename);
+      } else if (payloadString.equals("2") && THISPORT == 2) {
+        filename = saveFilePath + "Pirograph-C-";
+        filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+        composites[THISPORT].save(filename);
+      } else if (payloadString.equals("3") && THISPORT == 3) {
+        filename = saveFilePath + "Pirograph-D-";
+        filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+"second.png";
+        composites[THISPORT].save(filename);
       }
-
-    } // if topicParts.length
+    }
 } // messageReceived

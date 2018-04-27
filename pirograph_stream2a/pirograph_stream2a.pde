@@ -74,7 +74,9 @@ int current_time;
 float fps;
 int framesProcessed = 0;
 
-String saveFilePath = "/Users/jonathan/Desktop/";
+// String saveFilePath = "/Users/jonathan/Desktop/";
+String saveFilePath = "/Users/rygp8/Desktop/";
+String filename;
 
 // int[][] regions = new int[NUMPORTS+1][4]; // Will hold our image processing regions for the threads
 // Initialise regions
@@ -127,7 +129,7 @@ void setup() {
   // MQTT setup: connect and subscribe to the /reset topic
   client = new MQTTClient(this);
   client.connect("mqtt://10.0.1.3", "pirographdisplay");
-  client.subscribe("reset");
+  client.subscribe("pirograph/#");
 
   // UDP streaming setup
   setupDatagramSockets();
