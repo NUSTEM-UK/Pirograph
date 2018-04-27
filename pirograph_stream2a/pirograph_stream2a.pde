@@ -148,7 +148,19 @@ void draw() {
     // See: https://www.processing.org/tutorials/transform2d/
     pushMatrix(); // Save the current coordinate system
     // Shift coordinate origin for rotation transform
-    translate(width/2, height/2);
+    switch(THISPORT):
+      case 0: // top left
+        translate((width/2) - rotation_offset, (height/2) - rotation_offset);
+        break;
+      case 1: // top right
+        translate((width/2) + rotation_offset, (height/2) - rotation_offset);
+        break;
+      case 2: // bottom right
+        translate((width/2) + rotation_offset, (height/2) + rotation_offset);
+        break;
+      case 3: // bottom left
+        translate((width/2) - rotation_offset, (height/2) + rotation_offset);
+        break;
     rotate(radians(angle));
     image(intermediates[THISPORT], -cam_width/2, -cam_height/2, cam_width, cam_height);
     popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
