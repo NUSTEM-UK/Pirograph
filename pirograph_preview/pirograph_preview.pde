@@ -24,12 +24,12 @@ void setup() {
   size(960,540, P2D);
 
   // We should have a command-line argument to tell us which channel to receive
-  if (args != NULL){
+  if (args != null){
     THISPORT = int(args[1]);
   } else {
     // default to port A
     println("args == null");
-    THISPORT = 0'
+    THISPORT = 0;
   }
 
   video = createImage(960,540,RGB);
