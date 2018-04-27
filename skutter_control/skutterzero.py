@@ -108,6 +108,14 @@ class Skutter:
         testDict = {"name": "Bob", "age": 42}
         # self._message(testDict, "test")
         self._message(testDict, self._mac)
+    
+    def pitch(self, movement):
+        messageDict = {"command": "setPitch", "value": movement}
+        self._message(messageDict, self._mac)
+
+    def roll(self, movement):
+        messageDict = {"command": "setRoll", "value": movement}
+        self._message(messageDict, self._mac)
 
     def setLEDhue(self, position, state, value):
         """Command LED colour change."""

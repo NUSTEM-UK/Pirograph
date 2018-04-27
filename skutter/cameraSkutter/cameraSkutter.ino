@@ -23,7 +23,7 @@ AccelStepper pitchStepper(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
 
 AccelStepper rollStepper(HALFSTEP, motorPin5, motorPin7, motorPin6, motorPin8);
 
-int tenSteps = 10;
+int tenSteps = 100;
 
 const char* ssid = "nustem";
 const char* password = "nustem123";
@@ -96,22 +96,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
     if (root["command"] == "setPitch") {
         int target = root["value"];
-        if (target > 0){
-            // Move + ten steps from current position
-            pitchStepper.move(tenSteps);
-        } else {
-            // Move + ten steps from current position
-            pitchStepper.move(0-tenSteps);
+        pitchStepper.move(target);
         }
-    }
+    
     if (root["command"] == "setRoll") {
         int target = root["value"];
-        if (target > 0){
-            // Move + ten steps from current position
-            rollStepper.move(tenSteps);
-        } else {
-            // Move + ten steps from current position
-            rollStepper.move(0-tenSteps);
+        rollStepper.move(target);
         }
-    }
+    
 }
