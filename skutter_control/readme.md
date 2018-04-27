@@ -14,6 +14,12 @@ Open System Prefs -> Keyboard, turn off auto-show touch keyboard (to avoid trigg
 
 Duplicate Chrome shortcut on Windows desktop, append to properties `--app=http://10.0.1.7`. Launch that shortcut, then hit F11 on a connected keyboard to go full screen.
 
+## View Flask application log
+
+    less -F ~/Pirograph/skutter_control/logs/error.log
+
+In theory, `shift+F` will return to the end of the file.
+
 ## Next steps
 
 In no particular order:
