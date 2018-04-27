@@ -30,10 +30,10 @@ void keyReleased() {
     background(0);
     // image(intermediates[THISPORT], 0, 0);
   } else if (key == 'o') {
-    angleStep += 0.01;
+    angleStep += 0.05;
     println("Step angle: ", angleStep);
   } else if (key == 'l') {
-    angleStep -= 0.01;
+    angleStep -= 0.05;
     println("Step angle: ", angleStep);
   } else if (key == 'O') {
     angle = 0;

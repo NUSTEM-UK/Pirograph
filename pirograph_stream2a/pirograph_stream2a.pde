@@ -50,7 +50,7 @@ int cam_height = 922;
 
 
 // UDP ports and sockets for streaming
-int[] clientPorts = {9100, 9100, 9100, 9100};
+int[] clientPorts = {9100, 9101, 9102, 9103};
 DatagramSocket ds0;
 DatagramSocket ds1;
 DatagramSocket ds2;

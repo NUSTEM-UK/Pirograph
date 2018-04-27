@@ -32,29 +32,31 @@ void setup() {
   video1 = createImage(960,540,RGB);
   video2 = createImage(960,540,RGB);
   video3 = createImage(960,540,RGB);
-  thread0 = new ReceiverThread(video0.width,video0.height);
-  thread1 = new ReceiverThread(video1.width,video0.height);
-  thread2 = new ReceiverThread(video2.width,video0.height);
-  thread3 = new ReceiverThread(video3.width,video0.height);
-  thread.start();
-
+  thread0 = new ReceiverThread(video0.width,video0.height, 9100);
+  thread1 = new ReceiverThread(video1.width,video0.height, 9101);
+  thread2 = new ReceiverThread(video2.width,video0.height, 9102);
+  thread3 = new ReceiverThread(video3.width,video0.height, 9103);
+  thread0.start();
+  thread1.start();
+  thread2.start();
+  thread3.start();
 }
 
  void draw() {
   if (thread0.available()) {
     video0 = thread0.getImage();
-    image(video0,0,0);
+    image(video0,0,0,960,540);
   }
   if (thread1.available()) {
     video1 = thread1.getImage();
-    image(video1,960,0);
+    image(video1,960,0,960,540);
   }
   if (thread2.available()) {
     video2 = thread2.getImage();
-    image(video2,0,540);
+    image(video2,0,540,960,540);
   }
   if (thread3.available()) {
     video3 = thread3.getImage();
-    image(video3,960,540);
+    image(video3,960,540,960,540);
   }
 }

@@ -38,19 +38,23 @@ void broadcast(PImage source, int destination) {
       switch(destination) {
           case 0:
             ds0.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[0]), clientPorts[0]));
+            ds0.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
             break;
           case 1:
             ds1.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[1]), clientPorts[1]));
+            ds1.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
             break;
           case 2:
             ds2.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[2]), clientPorts[2]));
+            ds2.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
             break;
           case 3:
             ds3.send(new DatagramPacket(packet,packet.length, InetAddress.getByName(streamTargets[3]), clientPorts[3]));
+            ds3.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
             break;
       }
     // stub for duplicate send to local consumer for 4-up composite sketch
-    ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
+    // ds.send(new DatagramPacket(packet,packet.length, InetAddress.getByName("localhost"),clientPorts[destination]));
     
   } 
   catch (Exception e) {
