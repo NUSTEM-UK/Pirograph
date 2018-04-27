@@ -56,7 +56,7 @@ DatagramSocket ds1;
 DatagramSocket ds2;
 DatagramSocket ds3;
 // Streaming targets - string representations of IP addresses
-String[] streamTargets = { "10.0.1.15", "10.0.1.15", "10.0.1.15", "10.0.1.15" };
+String[] streamTargets = { "10.0.1.15", "10.0.1.16", "10.0.1.17", "10.0.1.18" };
 
 // MQTT client. Which you could probably work out from the class name. Great comment, Jonathan.
 MQTTClient client;
