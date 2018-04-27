@@ -5,8 +5,6 @@
 
 class ReceiverThread extends Thread {
 
-  // Port we are receiving.
-  int port = 9100; 
   DatagramSocket ds; 
   // A byte array to read into (max size of 65536, could be smaller)
   byte[] buffer = new byte[65536]; 
@@ -23,7 +21,7 @@ class ReceiverThread extends Thread {
     available = true; // We start with "loading . . " being available
 
     try {
-      ds = new DatagramSocket(port);
+      ds = new DatagramSocket(clientPorts[THISPORT]);
     } catch (SocketException e) {
       e.printStackTrace();
     }
