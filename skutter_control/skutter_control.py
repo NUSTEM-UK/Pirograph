@@ -22,6 +22,9 @@ derek = Skutter("D07")
 daphne = Skutter("D08")
 hettie = Skutter("D04")
 michael = Skutter("D11")
+darcey = Skutter("D16")
+jane = Skutter("D12")
+margot = Skutter("D13")
 
 def str_to_class(s):
     """Used for converting a form-passed string into the name of a Skutter object.
@@ -78,6 +81,43 @@ def renderMichael():
                                            LEDendHueA=michael.LEDendHueA,
                                            LEDendHueB=michael.LEDendHueB,
                                            transitionTime=michael.transitionTime)
+
+@app.route("/darcey")
+def renderDarcey():
+    return render_template("darcey.html", stepper1speedA=darcey.stepper1speedA,
+                                          stepper1speedB=darcey.stepper1speedB,
+                                          stepper2angleA=darcey.stepper2angleA,
+                                          stepper2angleB=darcey.stepper2angleB,
+                                          LEDstartHueA=darcey.LEDstartHueA,
+                                          LEDstartHueB=darcey.LEDstartHueB,
+                                          LEDendHueA=darcey.LEDendHueA,
+                                          LEDendHueB=darcey.LEDendHueB,
+                                          transitionTime=darcey.transitionTime)
+
+@app.route("/jane")
+def renderJane():
+    return render_template("jane.html", stepper1speedA=jane.stepper1speedA,
+                                        stepper1speedB=jane.stepper1speedB,
+                                        stepper2angleA=jane.stepper2angleA,
+                                        stepper2angleB=jane.stepper2angleB,
+                                        LEDstartHueA=jane.LEDstartHueA,
+                                        LEDstartHueB=jane.LEDstartHueB,
+                                        LEDendHueA=jane.LEDendHueA,
+                                        LEDendHueB=jane.LEDendHueB,
+                                        transitionTime=jane.transitionTime)
+
+@app.route("/margot")
+def renderMargot():
+    return render_template("margot.html", stepper1speedA=margot.stepper1speedA,
+                                          stepper1speedB=margot.stepper1speedB,
+                                          stepper2angleA=margot.stepper2angleA,
+                                          stepper2angleB=margot.stepper2angleB,
+                                          LEDstartHueA=margot.LEDstartHueA,
+                                          LEDstartHueB=margot.LEDstartHueB,
+                                          LEDendHueA=margot.LEDendHueA,
+                                          LEDendHueB=margot.LEDendHueB,
+                                          transitionTime=margot.transitionTime)
+
 
 # One MQTT form handler to rule them all.
 @app.route("/send", methods=["POST"])

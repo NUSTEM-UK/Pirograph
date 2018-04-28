@@ -28,7 +28,7 @@ ReceiverThread thread3;
 void setup() {
   // size(1920, 1080, P2D);
   // Go fullscreen on screen 2; should be possible to shift between dekstops.
-  fullScreen(P2D, 2);
+  fullScreen(P2D, 1);
   background(0);
   video0 = createImage(960,540,RGB);
   video1 = createImage(960,540,RGB);

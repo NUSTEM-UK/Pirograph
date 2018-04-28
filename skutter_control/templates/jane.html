@@ -1,0 +1,155 @@
+{% extends "layout.html" %}
+{% block title %}
+    Skutter Control : Jane
+{% endblock title %}
+{% block head %}
+    {{ super() }}
+{% endblock head %}
+{% block navbar %}
+{% endblock navbar %}
+{% block jumbo %}
+     <h1>Skutter Control &ndash; Jane</h1>
+{% endblock jumbo %}
+{% block controls %}
+    <div class="row skutterHeading">
+        <div class="col-sm">
+            <!-- <h3>Column 1</h3> -->
+        </div>
+        <div class="col-sm">
+            <h3>Rotation Speed</h3>
+        </div>
+        <div class="col-sm">
+            <h3>Arm Angle</h3>
+        </div>
+        <div class="col-sm">
+            <h3>Start Colour</h3>
+        </div>
+        <div class="col-sm">
+            <h3>End Colour</h3>
+        </div>
+    </div> <!-- row -->
+    <form action="send" method="POST">
+        <input type="hidden" name="skutterName" value="jane" />
+        <div class="row">
+            <div class="col-sm">
+                <h3 class="rowHead">State A</h3>
+            </div>
+            <div class="col-sm">
+                <input name="stepper1speedA" class="knob" data-min="-1000" 
+                                                          data-max="1000" 
+                                                          data-displayPrevious=true 
+                                                          data-width="150" 
+                                                          data-angleOffset=-90
+                                                          data-angleArc=180
+                                                          data-height=120
+                                                          data-fgColor="#F8960B"
+                                                          value={{stepper1speedA}} />
+            </div>
+            <div class="col-sm">
+                <input name="stepper2angleA" class="knob" data-min="0" 
+                                                          data-max="360" 
+                                                          data-displayPrevious=true 
+                                                          data-width="150" 
+                                                          data-angleOffset=-90
+                                                          data-angleArc=180
+                                                          data-height=120
+                                                          data-fgColor="#F8960B"
+                                                          value={{stepper2angleA}} />
+            </div>
+            <div class="col-sm">
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDstartHueA" value={{LEDstartHueA}} /> 
+            </div>
+            <div class="col-sm">
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDendHueA" value={{LEDendHueA}} /> 
+            </div>
+        </div> <!-- row -->
+        <div class="row">
+            <div class="col-sm">
+                <h3 class="rowHead">State B</h3>
+            </div>
+            <div class="col-sm">
+                <input name="stepper1speedB" class="knob" data-min="-1000" 
+                                                          data-max="1000" 
+                                                          data-displayPrevious=true 
+                                                          data-width="150" 
+                                                          data-angleOffset=-90
+                                                          data-angleArc=180
+                                                          data-height=120
+                                                          data-fgColor="#F8960B"
+                                                          value={{stepper1speedB}} />
+            </div>
+            <div class="col-sm">
+                <input name="stepper2angleB" class="knob" data-min="0" 
+                                                          data-max="360" 
+                                                          data-displayPrevious=true 
+                                                          data-width="150" 
+                                                          data-angleOffset=-90
+                                                          data-angleArc=180
+                                                          data-height=120
+                                                          data-fgColor="#F8960B"
+                                                          value={{stepper2angleB}} />
+            </div>
+            <div class="col-sm">
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDstartHueB" value={{LEDstartHueB}} /> 
+            </div>
+            <div class="col-sm">
+                <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDendHueB" value={{LEDendHueB}} /> 
+            </div>
+        </div> <!-- row -->
+        <div class="row">
+            <div class="col-sm">
+                <h3 class="rowHead2">Transition time</h3>
+                <p><em>seconds between<br />states A and B</em></p>
+            </div>
+            <div class="col-sm">
+                <input name="transitionTime" class="knob" data-min="1" 
+                                                          data-max="30" 
+                                                          data-displayPrevious=true 
+                                                          data-width=150
+                                                          data-height=150
+                                                          data-fgColor="#F8960B"
+                                                          value={{transitionTime}} />
+            </div>
+            <div class="col-sm">
+                <button type="submit" class="btn btn-lg btn-warning btn-block disabled rowHead2" disabled>Send to Jane</button>
+                <!-- <input type="submit" value="Send" class="large" /> -->
+            </div>
+            <div class="col-sm">
+            </div>
+            <div class="col-sm"></div>
+            </div>
+        </div> <!-- row -->
+    </form>
+    
+{% endblock controls %}
+
+{% block foot %}
+    <script>
+        $(function($) {
+            $(".knob").knob({
+                change : function (value) {
+                    //console.log("change : " + value);
+                },
+                release : function (value) {
+                    //console.log(this.$.attr('value'));
+                    console.log("release : " + value);
+                    // Something got touched, so enable the button
+                    $("button[type=submit]").prop("disabled", false);
+                    // ...and remove the disabled class so it looks enabled
+                    $("button[type=submit]").removeClass("disabled");
+                },
+                cancel : function () {
+                    console.log("cancel : ", this);
+                },
+            });
+        });
+    </script>
+    <script>
+        function update(jscolor) {
+            // One of the colour controls was adjusted; enable the submit button
+            $("button[type=submit]").prop("disabled", false);
+            // ...and remove the disabled class so it looks enabled
+            $("button[type=submit]").removeClass("disabled");
+        }
+    </script>
+{% endblock foot %}

@@ -32,7 +32,7 @@ IPCapture cam;
 
 int NUMPORTS = 4;
 int THISPORT = 0; // Defines with which channel (quadrant) we're working.
-string [] PORTNAMES = {"A", "B", "C", "D"};
+String [] PORTNAMES = {"A", "B", "C", "D"};
 
 boolean DONE = false;
 // NUMPORTS+1 represents our composite image
@@ -77,7 +77,7 @@ float fps;
 int framesProcessed = 0;
 
 // String saveFilePath = "/Users/jonathan/Desktop/";
-String saveFilePath = "/Users/rygp8/Desktop/";
+String saveFilePath = "/Volumes/outputs/";
 String filename;
 
 // int[][] regions = new int[NUMPORTS+1][4]; // Will hold our image processing regions for the threads
@@ -92,8 +92,8 @@ int[][] regions = {
 
 void setup() {
   // size(1920, 1080, P2D);
-  // Go fullscreen on screen 2; should be possible to shift between dekstops.
-  fullScreen(P2D, 2);
+  // Go fullscreen on screen 1 (external,ironically); should be possible to shift between dekstops.
+  fullScreen(P2D, 1);
 
   // Have we been passed a port number?
   if (args != null) {
@@ -148,7 +148,7 @@ void draw() {
     // See: https://www.processing.org/tutorials/transform2d/
     pushMatrix(); // Save the current coordinate system
     // Shift coordinate origin for rotation transform
-    switch(THISPORT):
+    switch(THISPORT) {
       case 0: // top left
         translate((width/2) - rotation_offset, (height/2) - rotation_offset);
         break;
@@ -161,6 +161,7 @@ void draw() {
       case 3: // bottom left
         translate((width/2) - rotation_offset, (height/2) + rotation_offset);
         break;
+    }
     rotate(radians(angle));
     image(intermediates[THISPORT], -cam_width/2, -cam_height/2, cam_width, cam_height);
     popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.

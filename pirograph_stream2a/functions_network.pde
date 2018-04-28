@@ -59,6 +59,7 @@ void broadcast(PImage source, int destination) {
   } 
   catch (Exception e) {
     e.printStackTrace();
+    println("Failed datagram send with " + packet.length + " bytes");
   }
 }
 
