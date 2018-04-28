@@ -31,22 +31,30 @@ Things that need sorting:
 
 
 Things to do 2018-04-24:
-    ☐ Check big screen stand configuration
-    ☐ Postcards, signage **order today**
-    ☐ Also, it should tweet. Tweeting/posting images -- from Processing (or a Python daemon running on a file dropbox)
-        ☐ NFS share directory
-    ☐ Frame count display (Pi running Display-o-tron HAT)
-    ☐ Buy pegs, string: integrate printer.
-    ☐ Quad screen, split image, individual processing?
+    ✔ Check big screen stand configuration @done(18-04-28 19:06)
+    ✘ Postcards, signage **order today** @cancelled(18-04-28 19:06)
+    ✘ Also, it should tweet. Tweeting/posting images -- from Processing (or a Python daemon running on a file dropbox) @cancelled(18-04-28 19:06)
+        ✔ NFS share directory @done(18-04-28 19:06)
+    ✘ Frame count display (Pi running Display-o-tron HAT) @cancelled(18-04-28 19:06)
+    ✘ Buy pegs, string: integrate printer. @cancelled(18-04-28 19:06)
+    ✔ Quad screen, split image, individual processing? @done(18-04-28 19:06)
     ☐ HSV colour pipeline
         ☐ Skutter end: animate S and V along with H
         ☐ Web app colour pickers: currently HSL not HSV (check Bootstrap colour picker)
-    ☐ Animation types
+    ✘ Animation types @cancelled(18-04-28 19:06)
     ☐ Metaskutters
         ☐ Subclass Skutter to intercept & refire commands
-    ☐ Build 6 off fancy Skutters
-    ☐ Flash frame rejection
-    ☐ Check iMac boot / login without network access
-    ☐ 
+    ✔ Build 6 off fancy Skutters @done(18-04-28 19:06)
+    ✘ Flash frame rejection @cancelled(18-04-28 19:06)
+    ✘ Check iMac boot / login without network access @cancelled(18-04-28 19:06)
+
+Things to do 2018-04-28:
+    ✔ MQTT reset / save for Processing @done(18-04-28 19:07)
+    ☐ Button controller Wemos
+    ☐ Skutter HSV handling
+    ☐ HSV sending API / web interface
+    ☐ Servo / Stepper mixed code
+    
+
 
 
