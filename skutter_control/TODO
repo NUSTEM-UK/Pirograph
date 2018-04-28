@@ -50,10 +50,10 @@ Things to do 2018-04-24:
 
 Things to do 2018-04-28:
     ✔ MQTT reset / save for Processing @done(18-04-28 19:07)
-    ☐ Button controller Wemos
-    ☐ Skutter HSV handling
-    ☐ HSV sending API / web interface
-    ☐ Servo / Stepper mixed code
+    ✔ Button controller Wemos @done(18-04-28 22:44)
+    ✔ Skutter HSV handling @done(18-04-28 22:44)
+    ✔ HSV sending API / web interface @done(18-04-28 22:44)
+    ✔ Servo / Stepper mixed code @done(18-04-28 22:44)
     
 
 
