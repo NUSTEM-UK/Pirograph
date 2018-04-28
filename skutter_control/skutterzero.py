@@ -125,11 +125,17 @@ class Skutter:
             r, g, b = hex_to_rgb(value)
             h, s, v = rgb_to_hsv(r, g, b)
             # Now send the hue value, scaled to integer 0-255 (which the Skutter expects)
-            messageDict = {"command": "setLEDhue", "position": position, "state": state, "value": int(h*255)}
+            messageDict = {"command": "setLEDhue", "position": position, "state": state, "H": int(h*255), "S": int(s*255), "V": int(v*255)}
         else:
             # Assume it's hue value and cast to int
             messageDict = {"command": "setLEDhue", "position": position, "state": state, "value": int(value)}
         self._message(messageDict, self._mac)
+
+    def setLEDhsv(self, position, state, valueH, valueS, valueV):
+        """Command LED colour change on all values."""
+        if value.startswith("#"):
+
+
 
     def LEDstartHue(self, targetHue):
         """set LED hue for first pixel, for states A and B."""
