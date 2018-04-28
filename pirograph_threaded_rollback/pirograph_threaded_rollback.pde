@@ -22,6 +22,8 @@ import java.awt.image.*;
 import java.net.*;
 import java.io.*;
 
+import mqtt.*;
+
 IPCapture cam;
 
 int NUMPORTS = 4;
@@ -51,18 +53,25 @@ DatagramSocket dsB;
 DatagramSocket dsC;
 DatagramSocket dsD;
 
+// MQTT client. Which you could probably work out from the class name. Great comment, Jonathan.
+MQTTClient client;
+
 float angle = 0;
 float angleStep = 0.1;
 
 int Y;
 
-float threshold_low = 70;
+float threshold_low = 50;
 float threshold_high = 255;
 
 int start_time;
 int current_time;
 float fps;
 int framesProcessed = 0;
+
+// String saveFilePath = "/Users/jonathan/Desktop/";
+String saveFilePath = "/Volumes/outputs/";
+String filename;
 
 // int[][] regions = new int[NUMPORTS+1][4]; // Will hold our image processing regions for the threads
 // Initialise regions
@@ -75,8 +84,8 @@ int[][] regions = {
 };
 
 void setup() {
-   size(1920, 1080, P2D);
-  //fullScreen(P2D, 2);
+   //size(1920, 1080, P2D);
+  fullScreen(P2D, 1);
   frameRate(30);
   //pixelDensity(displayDensity()); // Retina display
   background(0,0,0);
@@ -98,6 +107,12 @@ void setup() {
   cam.start();
   cam.pixelWidth = cam_width;    // Explicit here to avoid weird scaling issues should we change resolution vs. display later.
   cam.pixelHeight = cam_height;
+
+  // MQTT setup: connect and subscribe to the /reset topic
+  client = new MQTTClient(this);
+  client.connect("mqtt://10.0.1.3", "pirographdisplay");
+  client.subscribe("pirograph/reset");
+  client.subscribe("pirograph/save");
 
   for (int i = 0; i < NUMPORTS+1; i++) {
     print(i);
@@ -173,7 +188,7 @@ void processImage(int f) {
 
   // Mask: https://processing.org/reference/PImage_mask_.html
   intermediates[f].mask(maskImages[f]);
-  // intermediates[f].updatePixels();
+  intermediates[f].updatePixels();
 }
 
 // Thread handlers. The heavy lifting is done in processImage()
@@ -272,3 +287,42 @@ void keyReleased() {
     threshold_low = 0;
   }
 }
+
+
+// Handler for MQTT messages -- pulled from Heart of Maker Faire code
+// I really should be passing JSON-formatted data here, but 
+// this is a quick and dirty hack the evening before Maker Faire, 
+// so I'm leaning on older code that worked previously.
+
+void messageReceived(String topic, byte[] payload) {
+    println("new message: " + topic + " : " + new String(payload));
+
+    // Tokenise the topic string by splitting it on '/'
+    String[] topicParts = topic.split("/");
+    // Convert the payload to a String. We're not overly-worried about performance,
+    // and this is easy. We may revisit later, however.
+    String payloadString = new String(payload);
+    String command = topicParts[1];
+
+    // Parse commands
+    // Handle channel reset
+    if (command.equals("reset")) {
+      if (payloadString.equals("1")) {
+        println("*** RESET ***");
+        background(0);
+        client.connect("mqtt://10.0.1.3", "pirographdisplay");
+        client.subscribe("pirograph/reset");
+        client.subscribe("pirograph/save");
+      }
+    }
+
+    // Handle save commands
+    if (command.equals("save")) {
+      if (payloadString.equals("1")) {
+        println("*** SAVING FRAME ***");
+        filename = saveFilePath + "Pirograph-";
+        filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".png";
+        saveFrame(filename);
+      }
+    }
+} // messageReceived
