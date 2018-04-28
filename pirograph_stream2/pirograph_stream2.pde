@@ -65,10 +65,15 @@ int current_time;
 float fps;
 int framesProcessed = 0;
 
+String saveFilePath = "/Volumes/outputs/";
+String filename;
+
 void setup() {
-  size(1640, 922, P2D);
+  // size(1640, 922, P2D);
+  fullScreen(P2D, 1);
+  frameRate(30);
   // frame.setResizable(true);
-  pixelDensity(displayDensity()); // Retina display
+  // pixelDensity(displayDensity()); // Retina display
   background(0,0,0);
 
   int start_time = millis();
@@ -187,6 +192,7 @@ void keyReleased() {
   } else if (key == 'P') {
     intermediates[NUMPORTS] = createImage(cam_width, cam_height, RGB);
     image(intermediates[NUMPORTS], 0, 0);
+    background(0);
   } else if (key == 'o') {
     angleStep += 0.25;
     println("Step angle: ", angleStep);
@@ -196,6 +202,10 @@ void keyReleased() {
   } else if (key == 'O') {
     angle = 0;
     println("ANGLE RESET");
+  } else if (key == 's') {
+    filename = saveFilePath + "Pirograph-";
+    filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".png";
+    saveFrame(filename);
   }
   if (threshold_high > 255) {
     threshold_high = 255;

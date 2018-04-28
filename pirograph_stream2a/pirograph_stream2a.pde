@@ -181,13 +181,14 @@ void draw() {
     }
     framesProcessed++;
 
-    if (frameCount % 120 == 0) {
-      // Reconnect to MQTT every 4 seconds
-      // ...because it keeps disconnecting of its own accord
-      client.connect("mqtt://10.0.1.3", "pirographdisplay");
-      client.subscribe("pirograph/save");
-      client.subscribe("pirograph/reset");
-    }
+    // if (frameCount % 120 == 0) {
+    //   // Reconnect to MQTT every 4 seconds
+    //   // ...because it keeps disconnecting of its own accord
+    //   client.disconnect();
+    //   client.connect("mqtt://10.0.1.3", "pirographdisplay");
+    //   client.subscribe("pirograph/save");
+    //   client.subscribe("pirograph/reset");
+    // }
 
     DONE = false;
   }
