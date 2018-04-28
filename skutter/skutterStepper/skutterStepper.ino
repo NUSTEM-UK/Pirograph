@@ -124,18 +124,18 @@ void setup() {
         ledsHSV[targetLED][0] = tempColour;
         ledsHSV[targetLED][1] = tempColour; // Also set state A
         ledsHSV[targetLED][2] = tempColour; // ...and state B
+        delay(100);
+        FastLED.show();
     }
-    FastLED.show();
-
-    // Enable the built-in LEDs for network diagnostics
-    // pinMode(PIN_LED_BLUE, OUTPUT);
-    // pinMode(PIN_LED_RED, OUTPUT);
 
     //Start speed and angles servo positions
-    for (int i = 0; i < 3; i++){
-        stepperSpeed[i] = 0;
-        stepperAngle[i] = 0;
+    for (int i = 0; i < 2; i++){
+        stepperSpeed[i] = 400;
     }
+    stepperSpeed[2] = 0;
+    stepperAngle[0] = 0;
+    stepperAngle[1] = 180;
+    stepperAngle[2] = 0;
 
     // Set defaults
     transitionTarget = 2; // to which index are we heading?
