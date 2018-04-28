@@ -49,7 +49,7 @@ PImage cameraImage;
 int cam_width = 1640;
 int cam_height = 922;
 
-int rotation_offset = 150; // pixel offset for rotation centre.
+int rotation_offset = 0; // pixel offset for rotation centre.
 
 // UDP ports and sockets for streaming
 int[] clientPorts = {9100, 9101, 9102, 9103};
@@ -58,7 +58,7 @@ DatagramSocket ds1;
 DatagramSocket ds2;
 DatagramSocket ds3;
 // Streaming targets - string representations of IP addresses
-String[] streamTargets = { "10.0.1.15", "10.0.1.16", "10.0.1.17", "10.0.1.18" };
+String[] streamTargets = { "10.0.1.20", "10.0.1.16", "10.0.1.17", "10.0.1.18" };
 
 // MQTT client. Which you could probably work out from the class name. Great comment, Jonathan.
 MQTTClient client;
@@ -68,7 +68,7 @@ float angleStep = 0.5;
 
 int Y;
 
-float threshold_low = 70;
+float threshold_low = 50;
 float threshold_high = 255;
 
 int start_time;
@@ -131,7 +131,8 @@ void setup() {
   // MQTT setup: connect and subscribe to the /reset topic
   client = new MQTTClient(this);
   client.connect("mqtt://10.0.1.3", "pirographdisplay");
-  client.subscribe("pirograph/#");
+  client.subscribe("pirograph/reset");
+  client.subscribe("pirograph/save");
 
   // UDP streaming setup
   setupDatagramSockets();
@@ -179,6 +180,14 @@ void draw() {
       println("Frame: ", framesProcessed, " fps: ", fps);
     }
     framesProcessed++;
+
+    if (frameCount % 120 == 0) {
+      // Reconnect to MQTT every 4 seconds
+      // ...because it keeps disconnecting of its own accord
+      client.connect("mqtt://10.0.1.3", "pirographdisplay");
+      client.subscribe("pirograph/save");
+      client.subscribe("pirograph/reset");
+    }
 
     DONE = false;
   }

@@ -36,8 +36,8 @@ void setup() {
   video3 = createImage(960,540,RGB);
   thread0 = new ReceiverThread(video0.width,video0.height, 9100);
   thread1 = new ReceiverThread(video1.width,video0.height, 9101);
-  thread2 = new ReceiverThread(video2.width,video0.height, 9102);
-  thread3 = new ReceiverThread(video3.width,video0.height, 9103);
+  thread2 = new ReceiverThread(video3.width,video0.height, 9102);
+  thread3 = new ReceiverThread(video2.width,video0.height, 9103);
   thread0.start();
   thread1.start();
   thread2.start();
