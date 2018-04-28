@@ -37,15 +37,14 @@ void updateLEDs() {
         CHSV tempColour;
         // inserted the mp function here
         tempColour.hue = (int) map(time_current, time_start, time_end, ledsHSV[i][transitionStart].hue,
-                                    ledsHSV[i][transitionTarget].hue
-                                     );
+                                    ledsHSV[i][transitionTarget].hue);
         // tempColour.hue = interpolate(ledsHSV[i][transitionStart].hue,
         //                              ledsHSV[i][transitionTarget].hue,
         //                              time_start, time_end, time_current);
         tempColour.sat = (int) map(time_current, time_start, time_end, ledsHSV[i][transitionStart].sat,
-                                    ledsHSV[i][transitionTarget].sat;
+                                    ledsHSV[i][transitionTarget].sat);
         tempColour.val = (int) map(time_current, time_start, time_end, ledsHSV[i][transitionStart].val,
-                                    ledsHSV[i][transitionTarget].val;
+                                    ledsHSV[i][transitionTarget].val);
         ledsHSV[i][0] = tempColour;
         leds[i] = tempColour;
         // Serial.print(ledsHSV[i][transitionStart].hue);
