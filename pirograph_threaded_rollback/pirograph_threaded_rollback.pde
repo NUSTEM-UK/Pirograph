@@ -279,6 +279,12 @@ void keyReleased() {
   } else if (key == 'O') {
     angle = 0;
     println("ANGLE RESET");
+  } else if (key == 's') {
+    // Ugh, this should be a function call. Hacky.
+    println("*** SAVING FRAME ***");
+    filename = saveFilePath + "Pirograph-";
+    filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".png";
+    saveFrame(filename);
   }
   if (threshold_high > 255) {
     threshold_high = 255;
