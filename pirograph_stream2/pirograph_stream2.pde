@@ -206,6 +206,7 @@ void keyReleased() {
     filename = saveFilePath + "Pirograph-";
     filename += year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".png";
     saveFrame(filename);
+    println(">>> FRAME SAVED!");
   }
   if (threshold_high > 255) {
     threshold_high = 255;
