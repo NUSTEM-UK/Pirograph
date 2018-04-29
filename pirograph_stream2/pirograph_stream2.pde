@@ -57,7 +57,7 @@ float angleStep = 0.5;
 
 int Y;
 
-float threshold_low = 70;
+float threshold_low = 40;
 float threshold_high = 255;
 
 int start_time;
