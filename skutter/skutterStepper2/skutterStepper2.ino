@@ -388,7 +388,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
     if (root["command"] == "setTransitionTime") { //Comparisons here must use " " and not ''
         Serial.print("PING");
-        transitionTime = root["value"];
+        int preTime = root["value"];
+        // add three seconds to the transition time to remove <2 second errors
+        transitionTime = preTime + 3;
         Serial.print("Transition time: ");
         Serial.println(transitionTime);
         // Set the transition timer running again - added this to see what goes on
