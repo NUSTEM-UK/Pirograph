@@ -25,6 +25,7 @@ michael = Skutter("D11")
 darcey = Skutter("D16")
 jane = Skutter("D12")
 margot = Skutter("D13")
+rudolph = Skutter("D03")
 
 def str_to_class(s):
     """Used for converting a form-passed string into the name of a Skutter object.
