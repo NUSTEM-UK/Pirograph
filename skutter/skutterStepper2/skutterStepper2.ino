@@ -274,7 +274,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     // isn't completed before the next message arrives. But the D1 is pretty quick,
     // and queing commands just a little from the controller should prevent that from
     // happening. So we'll leave it up to the controller.
-    StaticJsonBuffer<256> jsonBuffer;
+    StaticJsonBuffer<400> jsonBuffer; // 256 was previous
 
     JsonObject& root = jsonBuffer.parseObject(payload);
     if (!root.success()) {
@@ -436,11 +436,17 @@ void updateLEDs() {
         tempColour.hue = (int) map(time_current, time_start, time_end, ledsHSV[i][transitionStart].hue,
                                      ledsHSV[i][transitionTarget].hue
                                      );
+        tempColour.sat = (int) map(time_current, time_start, time_end, ledsHSV[i][transitionStart].sat,
+                                     ledsHSV[i][transitionTarget].sat
+                                     );
+        tempColour.val = (int) map(time_current, time_start, time_end, ledsHSV[i][transitionStart].val,
+                                     ledsHSV[i][transitionTarget].val
+                                     );
         // tempColour.hue = interpolate(ledsHSV[i][transitionStart].hue,
         //                              ledsHSV[i][transitionTarget].hue,
         //                              time_start, time_end, time_current);
-        tempColour.sat = 255;
-        tempColour.val = targetBrightness;
+        // tempColour.sat = 255;
+        // tempColour.val = targetBrightness;
         // tempColour.sat = interpolate(ledsHSV[i][transitionStart].sat,
         //                              ledsHSV[i][transitionTarget].sat,
         //                              time_start, time_end, time_current);
