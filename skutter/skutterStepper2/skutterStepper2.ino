@@ -274,7 +274,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     // isn't completed before the next message arrives. But the D1 is pretty quick,
     // and queing commands just a little from the controller should prevent that from
     // happening. So we'll leave it up to the controller.
-    StaticJsonBuffer<400> jsonBuffer; // 256 was previous
+    StaticJsonBuffer<400> jsonBuffer;
 
     JsonObject& root = jsonBuffer.parseObject(payload);
     if (!root.success()) {
@@ -375,13 +375,14 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 
     if (root["command"] == "setStepperSpeed") {
-        int speed = (root["speed"])/2;
+        int speed = root["speed"];
         String state = root["state"];
+        int newSp = speed/2;
         // Now act on it.
         if (state == "A") {
-            stepperSpeed[0] = speed;
+            stepperSpeed[0] = newSp;
                 } else {
-            stepperSpeed[1] = speed;
+            stepperSpeed[1] = newSp;
         }
     }
 
