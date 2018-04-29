@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block title %}
-    Skutter Control : Rudolph
+    Skutter Control : Marcel
 {% endblock title %}
 {% block head %}
     {{ super() }}
@@ -8,7 +8,7 @@
 {% block navbar %}
 {% endblock navbar %}
 {% block jumbo %}
-     <h1>Skutter Control &ndash; Rudolph</h1>
+     <h1>Skutter Control &ndash; Marcel</h1>
 {% endblock jumbo %}
 {% block controls %}
     <div class="row skutterHeading">
@@ -26,7 +26,7 @@
         </div>
     </div> <!-- row -->
     <form action="send" method="POST">
-        <input type="hidden" name="skutterName" value="rudolph" />
+        <input type="hidden" name="skutterName" value="marcel" />
         <div class="row">
             <div class="col-sm">
                 <h3 class="rowHead">State A</h3>
@@ -86,7 +86,7 @@
                                                           value={{transitionTime}} />
             </div>
             <div class="col-sm">
-                <button type="submit" class="btn btn-lg btn-warning btn-block disabled rowHead2" disabled>Send to Rudolph</button>
+                <button type="submit" class="btn btn-lg btn-warning btn-block disabled rowHead2" disabled>Send to Marcel</button>
                 <!-- <input type="submit" value="Send" class="large" /> -->
             </div>
             <div class="col-sm">

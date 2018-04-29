@@ -20,12 +20,12 @@ app.secret_key = '2B4C0s8ObsIuL6pxvbfJaTm+MJcfvLKSw9IzTNlr1T5pYJZ1kSzQz'
 # Instantiate Skutters:
 derek = Skutter("D07")
 daphne = Skutter("D08")
-hettie = Skutter("D04")
 michael = Skutter("D11")
 darcey = Skutter("D16")
 jane = Skutter("D12")
 margot = Skutter("D13")
 rudolph = Skutter("D03")
+marvel = Skutter("D04")
 
 def str_to_class(s):
     """Used for converting a form-passed string into the name of a Skutter object.
