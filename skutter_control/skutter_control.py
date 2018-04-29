@@ -20,11 +20,12 @@ app.secret_key = '2B4C0s8ObsIuL6pxvbfJaTm+MJcfvLKSw9IzTNlr1T5pYJZ1kSzQz'
 # Instantiate Skutters:
 derek = Skutter("D07")
 daphne = Skutter("D08")
-hettie = Skutter("D04")
 michael = Skutter("D11")
 darcey = Skutter("D16")
 jane = Skutter("D12")
 margot = Skutter("D13")
+rudolph = Skutter("D03")
+marvel = Skutter("D04")
 
 def str_to_class(s):
     """Used for converting a form-passed string into the name of a Skutter object.
@@ -118,6 +119,25 @@ def renderMargot():
                                           LEDendHueB=margot.LEDendHueB,
                                           transitionTime=margot.transitionTime)
 
+@app.route("/rudolph")
+def renderRudolph():
+    return render_template("rudolph.html", stepper1speedA=rudolph.stepper1speedA,
+                                           stepper1speedB=rudolph.stepper1speedB,
+                                           LEDstartHueA=rudolph.LEDstartHueA,
+                                           LEDstartHueB=rudolph.LEDstartHueB,
+                                           LEDendHueA=rudolph.LEDendHueA,
+                                           LEDendHueB=rudolph.LEDendHueB,
+                                           transitionTime=rudolph.transitionTime)
+
+@app.route("/marcel")
+def renderMarcel():
+    return render_template("marcel.html", stepper1speedA=marcel.stepper1speedA,
+                                          stepper1speedB=marcel.stepper1speedB,
+                                          LEDstartHueA=marcel.LEDstartHueA,
+                                          LEDstartHueB=marcel.LEDstartHueB,
+                                          LEDendHueA=marcel.LEDendHueA,
+                                          LEDendHueB=marcel.LEDendHueB,
+                                          transitionTime=marcel.transitionTime)
 
 # One MQTT form handler to rule them all.
 @app.route("/send", methods=["POST"])

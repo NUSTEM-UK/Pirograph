@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block title %}
-    Skutter Control : Jane
+    Skutter Control : Marcel
 {% endblock title %}
 {% block head %}
     {{ super() }}
@@ -8,7 +8,7 @@
 {% block navbar %}
 {% endblock navbar %}
 {% block jumbo %}
-     <h1>Skutter Control &ndash; Jane</h1>
+     <h1>Skutter Control &ndash; Marcel</h1>
 {% endblock jumbo %}
 {% block controls %}
     <div class="row skutterHeading">
@@ -19,9 +19,6 @@
             <h3>Rotation Speed</h3>
         </div>
         <div class="col-sm">
-            <h3>Arm Angle</h3>
-        </div>
-        <div class="col-sm">
             <h3>First Colour</h3>
         </div>
         <div class="col-sm">
@@ -29,7 +26,7 @@
         </div>
     </div> <!-- row -->
     <form action="send" method="POST">
-        <input type="hidden" name="skutterName" value="jane" />
+        <input type="hidden" name="skutterName" value="marcel" />
         <div class="row">
             <div class="col-sm">
                 <h3 class="rowHead">State A</h3>
@@ -44,17 +41,6 @@
                                                           data-height=120
                                                           data-fgColor="#F8960B"
                                                           value={{stepper1speedA}} />
-            </div>
-            <div class="col-sm">
-                <input name="stepper2angleA" class="knob" data-min="0" 
-                                                          data-max="360" 
-                                                          data-displayPrevious=true 
-                                                          data-width="150" 
-                                                          data-angleOffset=-90
-                                                          data-angleArc=180
-                                                          data-height=120
-                                                          data-fgColor="#F8960B"
-                                                          value={{stepper2angleA}} />
             </div>
             <div class="col-sm">
                 <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDstartHueA" value={{LEDstartHueA}} /> 
@@ -79,17 +65,6 @@
                                                           value={{stepper1speedB}} />
             </div>
             <div class="col-sm">
-                <input name="stepper2angleB" class="knob" data-min="0" 
-                                                          data-max="360" 
-                                                          data-displayPrevious=true 
-                                                          data-width="150" 
-                                                          data-angleOffset=-90
-                                                          data-angleArc=180
-                                                          data-height=120
-                                                          data-fgColor="#F8960B"
-                                                          value={{stepper2angleB}} />
-            </div>
-            <div class="col-sm">
                 <input class="jscolor {hash:true,closable:true,closeText:'Select'}" onchange="update(this.jscolor)" name="LEDstartHueB" value={{LEDstartHueB}} /> 
             </div>
             <div class="col-sm">
@@ -111,7 +86,7 @@
                                                           value={{transitionTime}} />
             </div>
             <div class="col-sm">
-                <button type="submit" class="btn btn-lg btn-warning btn-block disabled rowHead2" disabled>Send to Jane</button>
+                <button type="submit" class="btn btn-lg btn-warning btn-block disabled rowHead2" disabled>Send to Marcel</button>
                 <!-- <input type="submit" value="Send" class="large" /> -->
             </div>
             <div class="col-sm">
