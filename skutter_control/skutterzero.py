@@ -131,12 +131,6 @@ class Skutter:
             messageDict = {"command": "setLEDhue", "position": position, "state": state, "value": int(value)}
         self._message(messageDict, self._mac)
 
-    def setLEDhsv(self, position, state, valueH, valueS, valueV):
-        """Command LED colour change on all values."""
-        if value.startswith("#"):
-
-
-
     def LEDstartHue(self, targetHue):
         """set LED hue for first pixel, for states A and B."""
         # TODO: sanity check on inputs
