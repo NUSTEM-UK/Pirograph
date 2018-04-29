@@ -121,13 +121,13 @@ def renderMargot():
 
 @app.route("/rudolph")
 def renderRudolph():
-    return render_template("rudolph.html", stepper1speedA=margot.stepper1speedA,
-                                           stepper1speedB=margot.stepper1speedB,
-                                           LEDstartHueA=margot.LEDstartHueA,
-                                           LEDstartHueB=margot.LEDstartHueB,
-                                           LEDendHueA=margot.LEDendHueA,
-                                           LEDendHueB=margot.LEDendHueB,
-                                           transitionTime=margot.transitionTime)
+    return render_template("rudolph.html", stepper1speedA=rudolph.stepper1speedA,
+                                           stepper1speedB=rudolph.stepper1speedB,
+                                           LEDstartHueA=rudolph.LEDstartHueA,
+                                           LEDstartHueB=rudolph.LEDstartHueB,
+                                           LEDendHueA=rudolph.LEDendHueA,
+                                           LEDendHueB=rudolph.LEDendHueB,
+                                           transitionTime=rudolph.transitionTime)
 
 # One MQTT form handler to rule them all.
 @app.route("/send", methods=["POST"])
