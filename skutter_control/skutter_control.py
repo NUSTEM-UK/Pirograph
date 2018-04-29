@@ -129,6 +129,16 @@ def renderRudolph():
                                            LEDendHueB=rudolph.LEDendHueB,
                                            transitionTime=rudolph.transitionTime)
 
+@app.route("/marcel")
+def renderMarcel():
+    return render_template("marcel.html", stepper1speedA=marcel.stepper1speedA,
+                                          stepper1speedB=marcel.stepper1speedB,
+                                          LEDstartHueA=marcel.LEDstartHueA,
+                                          LEDstartHueB=marcel.LEDstartHueB,
+                                          LEDendHueA=marcel.LEDendHueA,
+                                          LEDendHueB=marcel.LEDendHueB,
+                                          transitionTime=marcel.transitionTime)
+
 # One MQTT form handler to rule them all.
 @app.route("/send", methods=["POST"])
 def send():
