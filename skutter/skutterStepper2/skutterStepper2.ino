@@ -59,7 +59,7 @@ char subsTargetArray[60];
 //its the only one I've got left!
 #define PIN_PIXEL D3
 
-#define PIXEL_COUNT 9
+#define PIXEL_COUNT 15
 //#define SERVO_COUNT 2
 
 
