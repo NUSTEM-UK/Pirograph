@@ -375,7 +375,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 
     if (root["command"] == "setStepperSpeed") {
-        int speed = root["speed"];
+        int speed = (root["speed"])/2;
         String state = root["state"];
         // Now act on it.
         if (state == "A") {
