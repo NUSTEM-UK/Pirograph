@@ -8,19 +8,16 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no"
         name="viewport"><!-- TODO: amend following 3 lines. -->
-  <meta content=""
-        name="description">
-  <meta content=""
-        name="author"><!-- <link rel="icon" href="../../../../favicon.ico"> -->
+  <meta content="" name="description">
+  <meta content="" name="author"><!-- <link rel="icon" href="../../../../favicon.ico"> -->
   <title>{% block title %}Skutter Control{% endblock %}</title><!-- Bootstrap core CSS -->
-  <link href="static/css/bootstrap-slate.min.css"
-        rel="stylesheet"><!-- Custom styles for this template -->
-  <link href="static/css/jumbotron.css"
-        rel="stylesheet"><!-- Custom styles for this app -->
-  <link href="static/css/pirograph.css"
-        rel="stylesheet">{% endblock %} <!-- head -->
+  <link href="static/css/bootstrap-slate.min.css" rel="stylesheet"><!-- Custom styles for this template -->
+  <link href="static/css/jumbotron.css" rel="stylesheet"><!-- Custom styles for this app -->
+  <link href="static/css/pirograph.css" rel="stylesheet">
+  {% endblock %} <!-- head -->
    <!-- Navbar left in in case we need to wire up logins later. Which we probably do need. 
          None of this is wired up at present. The login form is commented out. -->
+  {% block navbar %}
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <a class="navbar-brand"
          href="/">Skutter Control</a> <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +54,7 @@
       </form> -->
     </div>
   </nav><!-- Main jumbotron for a primary marketing message or call to action -->
+  {% endblock navbar %}
   <div class="container">
     <main role="main">
       <!-- Main jumbotron for a primary marketing message or call to action -->

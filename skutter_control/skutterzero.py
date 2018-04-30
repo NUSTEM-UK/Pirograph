@@ -125,7 +125,7 @@ class Skutter:
             r, g, b = hex_to_rgb(value)
             h, s, v = rgb_to_hsv(r, g, b)
             # Now send the hue value, scaled to integer 0-255 (which the Skutter expects)
-            messageDict = {"command": "setLEDhue", "position": position, "state": state, "value": int(h*255)}
+            messageDict = {"command": "setLEDhue", "position": position, "state": state, "H": int(h*255), "S": int(s*255), "V": int(v/3)}
         else:
             # Assume it's hue value and cast to int
             messageDict = {"command": "setLEDhue", "position": position, "state": state, "value": int(value)}

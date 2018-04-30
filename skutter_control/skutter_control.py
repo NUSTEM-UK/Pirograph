@@ -20,8 +20,12 @@ app.secret_key = '2B4C0s8ObsIuL6pxvbfJaTm+MJcfvLKSw9IzTNlr1T5pYJZ1kSzQz'
 # Instantiate Skutters:
 derek = Skutter("D07")
 daphne = Skutter("D08")
-hettie = Skutter("D04")
 michael = Skutter("D11")
+darcey = Skutter("D16")
+jane = Skutter("D12")
+margot = Skutter("D13")
+rudolph = Skutter("D03")
+marvel = Skutter("D04")
 
 def str_to_class(s):
     """Used for converting a form-passed string into the name of a Skutter object.
@@ -79,6 +83,62 @@ def renderMichael():
                                            LEDendHueB=michael.LEDendHueB,
                                            transitionTime=michael.transitionTime)
 
+@app.route("/darcey")
+def renderDarcey():
+    return render_template("darcey.html", stepper1speedA=darcey.stepper1speedA,
+                                          stepper1speedB=darcey.stepper1speedB,
+                                          stepper2angleA=darcey.stepper2angleA,
+                                          stepper2angleB=darcey.stepper2angleB,
+                                          LEDstartHueA=darcey.LEDstartHueA,
+                                          LEDstartHueB=darcey.LEDstartHueB,
+                                          LEDendHueA=darcey.LEDendHueA,
+                                          LEDendHueB=darcey.LEDendHueB,
+                                          transitionTime=darcey.transitionTime)
+
+@app.route("/jane")
+def renderJane():
+    return render_template("jane.html", stepper1speedA=jane.stepper1speedA,
+                                        stepper1speedB=jane.stepper1speedB,
+                                        stepper2angleA=jane.stepper2angleA,
+                                        stepper2angleB=jane.stepper2angleB,
+                                        LEDstartHueA=jane.LEDstartHueA,
+                                        LEDstartHueB=jane.LEDstartHueB,
+                                        LEDendHueA=jane.LEDendHueA,
+                                        LEDendHueB=jane.LEDendHueB,
+                                        transitionTime=jane.transitionTime)
+
+@app.route("/margot")
+def renderMargot():
+    return render_template("margot.html", stepper1speedA=margot.stepper1speedA,
+                                          stepper1speedB=margot.stepper1speedB,
+                                          stepper2angleA=margot.stepper2angleA,
+                                          stepper2angleB=margot.stepper2angleB,
+                                          LEDstartHueA=margot.LEDstartHueA,
+                                          LEDstartHueB=margot.LEDstartHueB,
+                                          LEDendHueA=margot.LEDendHueA,
+                                          LEDendHueB=margot.LEDendHueB,
+                                          transitionTime=margot.transitionTime)
+
+@app.route("/rudolph")
+def renderRudolph():
+    return render_template("rudolph.html", stepper1speedA=rudolph.stepper1speedA,
+                                           stepper1speedB=rudolph.stepper1speedB,
+                                           LEDstartHueA=rudolph.LEDstartHueA,
+                                           LEDstartHueB=rudolph.LEDstartHueB,
+                                           LEDendHueA=rudolph.LEDendHueA,
+                                           LEDendHueB=rudolph.LEDendHueB,
+                                           transitionTime=rudolph.transitionTime)
+
+@app.route("/marcel")
+def renderMarcel():
+    return render_template("marcel.html", stepper1speedA=marcel.stepper1speedA,
+                                          stepper1speedB=marcel.stepper1speedB,
+                                          LEDstartHueA=marcel.LEDstartHueA,
+                                          LEDstartHueB=marcel.LEDstartHueB,
+                                          LEDendHueA=marcel.LEDendHueA,
+                                          LEDendHueB=marcel.LEDendHueB,
+                                          transitionTime=marcel.transitionTime)
+
 # One MQTT form handler to rule them all.
 @app.route("/send", methods=["POST"])
 def send():
@@ -101,7 +161,7 @@ def send():
     print(">>> End of messages")
 
     # Set the template flash message and return to the corresponding form page
-    flash(flash_message)
+    # flash(flash_message)
     return redirect(mySkutter)
 
 if __name__ == '__main__':

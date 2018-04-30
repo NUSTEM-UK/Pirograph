@@ -89,14 +89,20 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if (root["command"] == "setLEDhue") {
         String position = root["position"];
         String state = root["state"];
-        int targetHue = root["value"];
+        int targetHue = root["H"];
+        int targetSat = root["S"];
+        int targetVal = root["V"];
         // Output diagnostics to serial for debugging.
         Serial.print("Setting ");
         Serial.print(position);
         Serial.print(" LED in state: ");
         Serial.print(state);
-        Serial.print(" to hue: ");
-        Serial.println(targetHue);
+        Serial.print(" to HSV: ");
+        Serial.print(targetHue);
+        Serial.print(", ");
+        Serial.print(targetSat);
+        Serial.print(", ");
+        Serial.println(targetVal);
         // Work out which end of the pixel string we're addressing
         int pixel_number;
         if (position == "start") {
@@ -119,6 +125,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
         // Serial.print(" to hue: ");
         // Serial.println(targetHue);
         ledsHSV[pixel_number][stateIndex].hue = targetHue;
+        ledsHSV[pixel_number][stateIndex].sat = targetSat;
+        ledsHSV[pixel_number][stateIndex].val = targetVal;
         // Serial.println(ledsHSV[pixel_number][stateIndex].hue);
         // Now update the pixel hue interpolation for this state:
         updateLEDgradient(stateIndex);
@@ -126,6 +134,58 @@ void callback(char* topic, byte* payload, unsigned int length) {
         // time_current = millis();
         // time_end = time_current + transitionTime;
     }
+
+    // Commenting out this monster because the few line changes above perform the same task.
+
+    // if (root["command"] == "setLEDhsv") {
+    //     String position = root["position"];
+    //     String state = root["state"];
+    //     int targetH = root["H"];
+    //     int targetS = root["S"];
+    //     int targetV = root["V"];
+    //     // Output diagnostics to serial for debugging.
+    //     Serial.print("Setting ");
+    //     Serial.print(position);
+    //     Serial.print(" LED in state: ");
+    //     Serial.print(state);
+    //     Serial.print(" to HSV colour: ");
+    //     Serial.print(targetH);
+    //     Serial.print(", ");
+    //     Serial.print(targetS);
+    //     Serial.print(", ");
+    //     Serial.println(targetV);
+    //     // Work out which end of the pixel string we're addressing
+    //     int pixel_number;
+    //     if (position == "start") {
+    //         pixel_number = 0;
+    //     } else {
+    //         pixel_number = (PIXEL_COUNT - 1); // I think that's right. Probably.
+    //     }
+    //     // Are we writing to state A or B?
+    //     int stateIndex;
+    //     if (state == "A") {
+    //         stateIndex = 1;
+    //     } else {
+    //         stateIndex = 2;
+    //     }
+    //     // Update the appropriate array entry:
+    //     // Serial.print("Setting ");
+    //     // Serial.print(pixel_number);
+    //     // Serial.print(" LED in state: ");
+    //     // Serial.print(stateIndex);
+    //     // Serial.print(" to hue: ");
+    //     // Serial.println(targetHue);
+    //     ledsHSV[pixel_number][stateIndex].hue = targetH;
+    //     ledsHSV[pixel_number][stateIndex].sat = targetS;
+    //     ledsHSV[pixel_number][stateIndex].val = targetV;
+    //     // ledsHSV[pixel_number][stateIndex].hue = targetHue;
+    //     // Serial.println(ledsHSV[pixel_number][stateIndex].hue);
+    //     // Now update the pixel hue interpolation for this state:
+    //     updateLEDgradient(stateIndex);
+    //     // Set the transition timer running
+    //     // time_current = millis();
+    //     // time_end = time_current + transitionTime;
+    // }
 
     if (root["command"] == "setBrightness") {
         Serial.println(">>> setBrightness command received!");
