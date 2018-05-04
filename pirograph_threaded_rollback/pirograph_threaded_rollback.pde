@@ -141,13 +141,13 @@ void draw() {
       pushMatrix();
       translate(width/2, height/2); // Shift coordinate origin to centre screen
       rotate(radians(angle));
-      image(intermediates[i], -width/2, -height/2); // This is where the display updates!
+      image(intermediates[i], -width/2, -height/2, width, height); // This is where the display updates!
       popMatrix(); // Revert coordinate origin. Would happen at the end of draw() anyway.
       DONE[i] = false;  // reset the semaphore so the thread restarts
 
       current_time = millis();
       fps = framesProcessed / ((current_time-start_time)/1000);
-      println("Frame: ", framesProcessed, " fps: ", fps);
+      //println("Frame: ", framesProcessed, " Rfps: ", fps);
       framesProcessed++;
     }
     angle += angleStep; // Increment rotation angle
