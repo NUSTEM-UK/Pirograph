@@ -34,6 +34,19 @@ void setup() {
     Serial.begin(115200);
     setup_wifi();
 
+    // Get this Huzzah's MAC address and use it to register with the MQTT server
+    //  huzzahMACAddress = WiFi.macAddress();
+    //  skutterNameString = "skutter_" + huzzahMACAddress;
+    skutterNameString = WiFi.macAddress();
+    Serial.println(skutterNameString);
+    skutterNameString.toCharArray(skutterNameArray, 60);
+    subsTargetString = "pirograph/" + skutterNameString;
+    subsTargetString.toCharArray(subsTargetArray, 60);
+    for (int i = 0; i < 60; i++) {
+        Serial.print(subsTargetArray[i]);
+    }
+    Serial.println();
+
     client.setServer(mqtt_server, 1883);
     // client.setCallback(callback); // We don't really care, frankly.
 
@@ -53,11 +66,13 @@ void loop() {
 
     if (!digitalRead(PIN_BUTTON_RESET)) {
         Serial.println("Sending RESET");
-        client.publish("reset", "1");
+        client.publish("pirograph/reset", "1");
+        delay(1000);
     }
     if (!digitalRead(PIN_BUTTON_SAVE)) {
         Serial.println("Sending SAVE");
-        client.publish("save", "1");
+        client.publish("pirograph/save", "1");
+        delay(1000);
     }
 
 }

@@ -59,7 +59,7 @@ char subsTargetArray[60];
 //its the only one I've got left!
 #define PIN_PIXEL D3
 
-#define PIXEL_COUNT 9
+#define PIXEL_COUNT 15
 //#define SERVO_COUNT 2
 
 
@@ -274,7 +274,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     // isn't completed before the next message arrives. But the D1 is pretty quick,
     // and queing commands just a little from the controller should prevent that from
     // happening. So we'll leave it up to the controller.
-    StaticJsonBuffer<256> jsonBuffer;
+    StaticJsonBuffer<400> jsonBuffer;
 
     JsonObject& root = jsonBuffer.parseObject(payload);
     if (!root.success()) {
@@ -377,17 +377,20 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if (root["command"] == "setStepperSpeed") {
         int speed = root["speed"];
         String state = root["state"];
+        int newSp = speed/2;
         // Now act on it.
         if (state == "A") {
-            stepperSpeed[0] = speed;
+            stepperSpeed[0] = newSp;
                 } else {
-            stepperSpeed[1] = speed;
+            stepperSpeed[1] = newSp;
         }
     }
 
     if (root["command"] == "setTransitionTime") { //Comparisons here must use " " and not ''
         Serial.print("PING");
-        transitionTime = root["value"];
+        int preTime = root["value"];
+        // add three seconds to the transition time to remove <2 second errors
+        transitionTime = preTime + 3;
         Serial.print("Transition time: ");
         Serial.println(transitionTime);
         // Set the transition timer running again - added this to see what goes on
@@ -436,11 +439,17 @@ void updateLEDs() {
         tempColour.hue = (int) map(time_current, time_start, time_end, ledsHSV[i][transitionStart].hue,
                                      ledsHSV[i][transitionTarget].hue
                                      );
+        tempColour.sat = (int) map(time_current, time_start, time_end, ledsHSV[i][transitionStart].sat,
+                                     ledsHSV[i][transitionTarget].sat
+                                     );
+        tempColour.val = (int) map(time_current, time_start, time_end, ledsHSV[i][transitionStart].val,
+                                     ledsHSV[i][transitionTarget].val
+                                     );
         // tempColour.hue = interpolate(ledsHSV[i][transitionStart].hue,
         //                              ledsHSV[i][transitionTarget].hue,
         //                              time_start, time_end, time_current);
-        tempColour.sat = 255;
-        tempColour.val = targetBrightness;
+        // tempColour.sat = 255;
+        // tempColour.val = targetBrightness;
         // tempColour.sat = interpolate(ledsHSV[i][transitionStart].sat,
         //                              ledsHSV[i][transitionTarget].sat,
         //                              time_start, time_end, time_current);
