@@ -69,9 +69,9 @@ String saveFilePath = "/Volumes/outputs/";
 String filename;
 
 void setup() {
-  // size(1640, 922, P2D);
-  fullScreen(P2D, 1);
-  frameRate(30);
+   size(1640, 922, P2D);
+  //fullScreen(P2D, 1);
+  frameRate(15);
   // frame.setResizable(true);
   // pixelDensity(displayDensity()); // Retina display
   background(0,0,0);
