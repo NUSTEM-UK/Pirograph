@@ -11,11 +11,12 @@
   <meta content="" name="description">
   <meta content="" name="author"><!-- <link rel="icon" href="../../../../favicon.ico"> -->
   <title>{% block title %}Skutter Control{% endblock %}</title><!-- Bootstrap core CSS -->
-  <link href="static/css/bootstrap-slate.min.css" rel="stylesheet"><!-- Custom styles for this template -->
+  <link href="static/css/bootstrap-slate.min.css" rel="stylesheet"> <!--Custom styles for this template -->
+  <!-- <link href="static/css/bootstrap-spacelab.min.css" rel="stylesheet">Custom styles for this template -->
   <link href="static/css/jumbotron.css" rel="stylesheet"><!-- Custom styles for this app -->
   <link href="static/css/pirograph.css" rel="stylesheet">
   {% endblock %} <!-- head -->
-   <!-- Navbar left in in case we need to wire up logins later. Which we probably do need. 
+   <!-- Navbar left in in case we need to wire up logins later. Which we probably do need.
          None of this is wired up at present. The login form is commented out. -->
   {% block navbar %}
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
@@ -32,7 +33,7 @@
         </li>
         <li>
           <a class="nav-link" href="/admin">Admin</a>
-        </li>    
+        </li>
         <!-- <li class="nav-item">
           <a class="nav-link" href="#">Link</a>
         </li>
@@ -47,7 +48,7 @@
                 <a class="dropdown-item" href="#">Something else here</a>
             </div>
         </li> -->
-      </ul>     
+      </ul>
       <!-- <form class="form-inline my-2 my-lg-0">
           <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
@@ -88,10 +89,10 @@
   </footer><!-- Bootstrap core JavaScript
         ================================================== -->
   <!-- Placed at the end of the document so the pages load faster -->
-  <script src="static/js/vendor/jquery-slim.min.js"></script> 
-  <script src="static/js/vendor/popper.min.js"></script> 
-  <script src="static/js/bootstrap.min.js"></script> 
-  <script src="static/js/vendor/jquery.knob.min.js"></script> 
+  <script src="static/js/vendor/jquery-slim.min.js"></script>
+  <script src="static/js/vendor/popper.min.js"></script>
+  <script src="static/js/bootstrap.min.js"></script>
+  <script src="static/js/vendor/jquery.knob.min.js"></script>
   <script src="static/js/vendor/jscolor.min.js"></script> {% block foot %}{% endblock %}
 </body>
 </html>
