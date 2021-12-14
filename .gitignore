@@ -5,6 +5,9 @@ application.linux64
 application.windows32
 application.windows64
 application.macosx
+.vscode/*
+arduino_secrets.h
+
 
 
 # Byte-compiled / optimized / DLL files
