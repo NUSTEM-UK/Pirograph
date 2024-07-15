@@ -8,6 +8,7 @@ Sorry, Mac and Windows users.
 """
 
 import pygame, pygame.camera
+import picamera
 import os, time
 from tkinter import Tk
 from tkinter.filedialog import asksaveasfilename
@@ -16,7 +17,7 @@ from PIL import Image, ImageStat, ImageOps, ImageDraw
 # os.system("sydo modprobe bcm2835-v4l2") # needed for Pi camera
 Tk().withdraw()
 pygame.init()
-pygame.camera.init()
+# pygame.camera.init()
 os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
 pygame.display.set_caption("Pirograph")
 pygame.event.set_allowed(None)
@@ -25,11 +26,23 @@ pygame.event.set_allowed([pygame.KEYDOWN, pygame.QUIT])
 imagesize = 800 # basic image size.
 screen = pygame.display.set_mode([imagesize, imagesize], 0, 32)
 
+# Camera additions
+camera = picamera.PiCamera()
+camera.resolution = (1920, 1080)
+camera.crop = (0.0, 0.0, 1.0, 1.0)
+
+x = (screen.get_width() - camera.resolution[0]) / 2
+y = (screen.get_height() - camera.resolution[1]) / 2
+
+# Init camera buffer
+rgb = bytearray(camera.resolution[0] * camera.resolution[1] * 3)
+
 # find, open and start camera
-cam_list = pygame.camera.list_cameras()
-print(cam_list)
-webcam = pygame.camera.Camera(cam_list[0], (1920, 1080))
-webcam.start()
+# cam_list = pygame.camera.list_cameras()
+# print(cam_list)
+# webcam = pygame.camera.Camera(cam_list[0], (1920, 1080))
+# webcam = pygame.camera.Camera("/dev/video0", (1920, 1080))
+# webcam.start()
 
 preRot = 0.0
 autoRotate = False
@@ -51,8 +64,19 @@ def main():
         showScreen()
 
 def showScreen():
-    global camFrame, preRot
-    camFrame = webcam.get_image()
+    global preRot, frame_count
+
+    # camFrame = webcam.get_image()
+
+    # Very old StackOverflow code:
+    # https://stackoverflow.com/questions/27805077/display-io-stream-from-raspberry-pi-camera-as-video-in-pygame
+    stream = io.BytesIO()
+    camera.campture(stream, use_video_port=True, format='rgb')
+    stream.seek(0)
+    stream.readinto(rgb)
+    stream.close()
+    camFrame = pygame.image.frombuffer(rgb[0:(camera.resolution[0] * camera.resolution[1] * 3)], camera.resolution, 'RGB')
+
     frame_count += 1
     if autoRotate:
         preRot += 0.5
