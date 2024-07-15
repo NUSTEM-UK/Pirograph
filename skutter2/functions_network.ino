@@ -1,53 +1,58 @@
 // Setup WiFi network, reporting local IP address to serial
-void setup_wifi() {
-  delay(10);
-  // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
+void setup_wifi()
+{
+    delay(10);
+    // We start by connecting to a WiFi network
+    Serial.println();
+    Serial.print("Connecting to ");
+    Serial.println(ssid);
 
-  WiFi.begin(ssid, password);
+    WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        delay(500);
+        Serial.print(".");
+    }
 
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-
+    Serial.println("");
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
 }
-
 
 // Maintain MQTT broker connection, subscribe to topics on (re)connect
-void reconnect() {
-  // Loop until we're reconnected
-  //digitalWrite(02, HIGH);
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    // Attempt to connect
-    //digitalWrite(02, LOW);
-    if (client.connect(skutterNameArray)) {
-      Serial.println("connected");
-      client.publish("pirograph/announce", subsTargetArray);
-      client.subscribe(subsTargetArray); // Subscribe to the specific channel
-      // Subscribe to the global channel - disabled under discrimination in place
-      // client.subscribe("pirograph/#");
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
-      //digitalWrite(00, HIGH);
-      delay(5000);
+void reconnect()
+{
+    // Loop until we're reconnected
+    // digitalWrite(02, HIGH);
+    while (!client.connected())
+    {
+        Serial.print("Attempting MQTT connection...");
+        // Attempt to connect
+        // digitalWrite(02, LOW);
+        if (client.connect(skutterNameArray))
+        {
+            Serial.println("connected");
+            client.publish("pirograph/announce", subsTargetArray);
+            client.subscribe(subsTargetArray); // Subscribe to the specific channel
+                                               // Subscribe to the global channel - disabled under discrimination in place
+                                               // client.subscribe("pirograph/#");
+        }
+        else
+        {
+            Serial.print("failed, rc=");
+            Serial.print(client.state());
+            Serial.println(" try again in 5 seconds");
+            // Wait 5 seconds before retrying
+            // digitalWrite(00, HIGH);
+            delay(5000);
+        }
     }
-  }
 }
 
-
-void callback(char* topic, byte* payload, unsigned int length) {
+void callback(char *topic, byte *payload, unsigned int length)
+{
     Serial.println(">>> MQTT message received");
     // Serial.print("topic: ");
     // Serial.println(topic);
@@ -55,7 +60,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
     // Serial.println(*payload);
 
     String payloadString;
-    for (int i = 0; i < length ; i++) {
+    for (int i = 0; i < length; i++)
+    {
         payloadString += String((char)payload[i]);
     }
     Serial.print("payload (string): ");
@@ -69,8 +75,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
     // happening. So we'll leave it up to the controller.
     StaticJsonBuffer<256> jsonBuffer;
 
-    JsonObject& root = jsonBuffer.parseObject(payload);
-    if (!root.success()) {
+    JsonObject &root = jsonBuffer.parseObject(payload);
+    if (!root.success())
+    {
         Serial.println("Parsing failed!");
         return;
     }
@@ -81,12 +88,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.println(root["command"].as<String>());
     // Serial.println(root["command"].as<char*>());
     // Serial.println(root["value"].as<char*>());
-    
+
     // String handling: see https://arduinojson.org/example/string/
     // Can cast to String on parse:
     // Serial.println(root["name"].as<String>());
 
-    if (root["command"] == "setLEDhue") {
+    if (root["command"] == "setLEDhue")
+    {
         String position = root["position"];
         String state = root["state"];
         int targetHue = root["H"];
@@ -105,16 +113,22 @@ void callback(char* topic, byte* payload, unsigned int length) {
         Serial.println(targetVal);
         // Work out which end of the pixel string we're addressing
         int pixel_number;
-        if (position == "start") {
+        if (position == "start")
+        {
             pixel_number = 0;
-        } else {
+        }
+        else
+        {
             pixel_number = (PIXEL_COUNT - 1); // I think that's right. Probably.
         }
         // Are we writing to state A or B?
         int stateIndex;
-        if (state == "A") {
+        if (state == "A")
+        {
             stateIndex = 1;
-        } else {
+        }
+        else
+        {
             stateIndex = 2;
         }
         // Update the appropriate array entry:
@@ -187,18 +201,22 @@ void callback(char* topic, byte* payload, unsigned int length) {
     //     // time_end = time_current + transitionTime;
     // }
 
-    if (root["command"] == "setBrightness") {
+    if (root["command"] == "setBrightness")
+    {
         Serial.println(">>> setBrightness command received!");
         targetBrightness = root["value"];
         // Loops through all states, update all brightnesses
-        for (int state = 0; state < 3; state++) {
-            for (int i = 0; i < PIXEL_COUNT; i++) {
+        for (int state = 0; state < 3; state++)
+        {
+            for (int i = 0; i < PIXEL_COUNT; i++)
+            {
                 ledsHSV[i][state].val = targetBrightness;
             }
         }
     }
 
-    if (root["command"] == "setServoPosition") {
+    if (root["command"] == "setServoPosition")
+    {
         int servoNum = root["servoNum"];
         String state = root["state"];
         float targetPosition = root["angle"];
@@ -213,9 +231,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
         int stateIndex;
         // TODO: find out why `if (state == "A")` doesn't work here
         // Something weird to do with String handling
-        if (state == "A") {
+        if (state == "A")
+        {
             stateIndex = 1;
-        } else {
+        }
+        else
+        {
             stateIndex = 2;
         }
         Serial.print("Servo: ");
@@ -224,9 +245,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
         Serial.print(stateIndex);
         Serial.print(" to position: ");
         Serial.println(targetPosition);
-        servoPosition[servoNum-1][stateIndex] = targetPosition;
+        servoPosition[servoNum - 1][stateIndex] = targetPosition;
         Serial.print("Target servo set to : ");
-        Serial.println(servoPosition[servoNum-1][stateIndex]);
+        Serial.println(servoPosition[servoNum - 1][stateIndex]);
         diagnostics();
         Serial.println("<<< END PROCESSING setServoPosition");
         // Set the transition timer running again
@@ -234,7 +255,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
         // time_end = time_current + transitionTime;
     }
 
-    if (root["command"] == "setTransitionType") {
+    if (root["command"] == "setTransitionType")
+    {
         String tempType = root["value"];
         // Output parsed structure to serial, for debugging
         Serial.print("Transition Type: ");
@@ -243,7 +265,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
         transitionType = tempType;
     }
 
-    if (root["command"] == "setTransitionTime") { //Comparisons here must use " " and not ''
+    if (root["command"] == "setTransitionTime")
+    { // Comparisons here must use " " and not ''
         Serial.print("PING");
         transitionTime = root["value"];
         Serial.print("Transition time: ");
@@ -253,27 +276,34 @@ void callback(char* topic, byte* payload, unsigned int length) {
         time_end = time_current + transitionTime;
     }
 
-    if (root["command"] == "setStepperAngle") {
+    if (root["command"] == "setStepperAngle")
+    {
         int angle = root["angle"];
         String state = root["state"];
         // Output parsed structure to serial, for debugging
         // Now act on it.
-        if (state == "A") {
+        if (state == "A")
+        {
             stepperAngle[0] = angle;
-        } else {
+        }
+        else
+        {
             stepperAngle[1] = angle;
         }
     }
 
-    if (root["command"] == "setStepperSpeed") {
+    if (root["command"] == "setStepperSpeed")
+    {
         int speed = root["speed"];
         String state = root["state"];
         // Now act on it.
-        if (state == "A") {
+        if (state == "A")
+        {
             stepperSpeed[0] = speed;
-                } else {
+        }
+        else
+        {
             stepperSpeed[1] = speed;
         }
     }
-
 }
